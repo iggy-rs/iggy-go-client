@@ -23,7 +23,7 @@
     <a href="https://github.com/eldpcn/iggy-go"><strong>Explore the docs »</strong></a>
     <br /> -->
     <br />
-    <a href="https://github.com/eldpcn/iggy-go">View Samples</a>
+    <a href="https://github.com/eldpcn/iggy-go/tree/dev/samples">View Samples</a>
     ·
     <a href="https://github.com/eldpcn/iggy-go/issues">Report Bug</a>
     ·
