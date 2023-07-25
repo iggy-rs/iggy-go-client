@@ -18,6 +18,8 @@ var (
 	createTopicCmd = flag.NewFlagSet("createtopic", flag.ExitOnError)
 	getTopicCmd    = flag.NewFlagSet("gettopic", flag.ExitOnError)
 	deleteTopicCmd = flag.NewFlagSet("deletetopic", flag.ExitOnError)
+
+	getStatsCmd = flag.NewFlagSet("getstats", flag.ExitOnError)
 )
 
 // CLI flags
@@ -58,6 +60,7 @@ func getUsage() {
 	fmt.Println("  gettopic -url <url> -port <port> -streamId <streamId> -topicId <topicId>")
 	fmt.Println("  createtopic -url <url> -port <port> -streamId <streamId> -topicId <topicId> -name <name> -partitionsCount <partitionsCount>")
 	fmt.Println("  deletetopic -url <url> -port <port> -streamId <streamId> -topicId <topicId>")
+	fmt.Println("  getstats -url <url> -port <port>")
 }
 
 func init() {
@@ -111,11 +114,14 @@ func init() {
 	deleteTopicCmd.IntVar(&dt_topicId, "topicid", -1, "Topic Id")
 	deleteTopicCmd.IntVar(&dt_topicId, "tid", -1, "Alias for Topic Id")
 	deleteTopicCmd.IntVar(&dt_topicId, "t", -1, "Alias for Topic Id")
+
+	getStatsCmd.StringVar(&url, "url", "127.0.0.1", "Iggy server url")
+	getStatsCmd.StringVar(&port, "port", "8090", "Iggy server port")
 }
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Error: No command provided.")
+		fmt.Println("No command provided.")
 		os.Exit(1)
 	}
 
@@ -134,8 +140,7 @@ func main() {
 			Name:     cs_name,
 		})
 		if err != nil {
-			fmt.Println("Error:", err)
-			os.Exit(1)
+			HandleError(err)
 		}
 
 	case "getstream":
@@ -144,29 +149,17 @@ func main() {
 		if gs_streamId == -1 {
 			streams, err := ms.GetStreams()
 			if err != nil {
-				fmt.Println("Error:", err)
-				os.Exit(1)
+				HandleError(err)
 			}
-			jsonData, err := json.MarshalIndent(&streams, "", "  ")
-			if err != nil {
-				fmt.Println("Error:", err)
-				os.Exit(1)
-			}
-			fmt.Println(string(jsonData))
+			SerializeAndPrint(streams)
 			return
 		}
 
 		stream, err := ms.GetStreamById(gs_streamId)
 		if err != nil {
-			fmt.Println("Error:", err)
-			os.Exit(1)
+			HandleError(err)
 		}
-		jsonData, err := json.MarshalIndent(&stream, "", "  ")
-		if err != nil {
-			fmt.Println("Error:", err)
-			os.Exit(1)
-		}
-		fmt.Println(string(jsonData))
+		SerializeAndPrint(stream)
 
 	case "deletestream":
 		deleteStreamCmd.Parse(os.Args[2:])
@@ -179,8 +172,7 @@ func main() {
 
 		err := ms.DeleteStream(ds_streamId)
 		if err != nil {
-			fmt.Println("Error:", err)
-			os.Exit(1)
+			HandleError(err)
 		}
 
 	case "createtopic":
@@ -198,8 +190,7 @@ func main() {
 			PartitionsCount: ct_partitionsCount,
 		})
 		if err != nil {
-			fmt.Println("Error:", err)
-			os.Exit(1)
+			HandleError(err)
 		}
 	case "gettopic":
 		getTopicCmd.Parse(os.Args[2:])
@@ -208,28 +199,16 @@ func main() {
 		if gt_topicId == -1 {
 			topics, err := ms.GetTopics(gt_streamId)
 			if err != nil {
-				fmt.Println("Error:", err)
-				os.Exit(1)
+				HandleError(err)
 			}
-			jsonData, err := json.MarshalIndent(&topics, "", "  ")
-			if err != nil {
-				fmt.Println("Error:", err)
-				os.Exit(1)
-			}
-			fmt.Println(string(jsonData))
+			SerializeAndPrint(topics)
 			return
 		}
 		topic, err := ms.GetTopicById(gt_streamId, gt_topicId)
 		if err != nil {
-			fmt.Println("Error:", err)
-			os.Exit(1)
+			HandleError(err)
 		}
-		jsonData, err := json.MarshalIndent(&topic, "", "  ")
-		if err != nil {
-			fmt.Println("Error:", err)
-			os.Exit(1)
-		}
-		fmt.Println(string(jsonData))
+		SerializeAndPrint(topic)
 
 	case "deletetopic":
 		deleteTopicCmd.Parse(os.Args[2:])
@@ -248,9 +227,17 @@ func main() {
 
 		err := ms.DeleteTopic(dt_streamId, dt_topicId)
 		if err != nil {
-			fmt.Println("Error:", err)
-			os.Exit(1)
+			HandleError(err)
 		}
+
+	case "getstats":
+		getStatsCmd.Parse(os.Args[2:])
+		ms := CreateMessageStream()
+		stats, err := ms.GetStats()
+		if err != nil {
+			HandleError(err)
+		}
+		SerializeAndPrint(stats)
 
 	case "help":
 		getUsage()
@@ -273,4 +260,17 @@ func CreateMessageStream() iggy.IMessageStream {
 		panic(err)
 	}
 	return ms
+}
+
+func SerializeAndPrint(obj interface{}) {
+	jsonData, err := json.MarshalIndent(&obj, "", "  ")
+	if err != nil {
+		HandleError(err)
+	}
+	fmt.Println(string(jsonData))
+}
+
+func HandleError(err error) {
+	fmt.Println("Error:", err)
+	os.Exit(1)
 }

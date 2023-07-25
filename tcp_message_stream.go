@@ -210,6 +210,116 @@ func (tms *TcpMessageStream) PollMessages(request MessageFetchRequest) ([]Messag
 	return MapMessages(responseBuffer)
 }
 
+func (tms *TcpMessageStream) CreateConsumerGroup(streamId int, topicId int, request CreateConsumerGroupRequest) error {
+	message := CreateGroup(streamId, topicId, request)
+	_, err := tms.SendAndFetchResponse(message, CreateGroupCode)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (tms *TcpMessageStream) DeleteConsumerGroup(streamId int, topicId int, groupId int) error {
+	message := DeleteGroup(streamId, topicId, groupId)
+	_, err := tms.SendAndFetchResponse(message, DeleteGroupCode)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (tms *TcpMessageStream) GetConsumerGroupById(streamId int, topicId int, groupId int) (*ConsumerGroupResponse, error) {
+	message := GetGroup(streamId, topicId, groupId)
+	buffer, err := tms.SendAndFetchResponse(message, GetGroupCode)
+	if err != nil {
+		return nil, err
+	}
+
+	responseLength := GetResponseLength(buffer)
+	if responseLength <= 1 {
+		return nil, nil
+	}
+
+	responseBuffer := make([]byte, responseLength)
+	if _, err := tms.client.Read(responseBuffer); err != nil {
+		return nil, err
+	}
+
+	return MapConsumerGroup(responseBuffer)
+}
+
+func (tms *TcpMessageStream) GetConsumerGroups(streamId int, topicId int) ([]ConsumerGroupResponse, error) {
+	message := GetGroups(streamId, topicId)
+	buffer, err := tms.SendAndFetchResponse(message, GetGroupsCode)
+	if err != nil {
+		return nil, err
+	}
+
+	responseLength := GetResponseLength(buffer)
+	if responseLength <= 1 {
+		return nil, nil
+	}
+
+	responseBuffer := make([]byte, responseLength)
+	if _, err := tms.client.Read(responseBuffer); err != nil {
+		return nil, err
+	}
+
+	return MapConsumerGroups(responseBuffer), err
+}
+
+func (tms *TcpMessageStream) GetOffset(request OffsetRequest) (*OffsetResponse, error) {
+	message := GetOffset(request)
+	buffer, err := tms.SendAndFetchResponse(message, GetOffsetCode)
+	if err != nil {
+		return nil, err
+	}
+
+	responseLength := GetResponseLength(buffer)
+	if responseLength <= 1 {
+		return nil, nil
+	}
+
+	responseBuffer := make([]byte, responseLength)
+	if _, err := tms.client.Read(responseBuffer); err != nil {
+		return nil, err
+	}
+
+	return MapOffsets(responseBuffer), nil
+}
+
+func (tms *TcpMessageStream) JoinConsumerGroup(request JoinConsumerGroupRequest) error {
+	message := JoinGroup(request)
+	_, err := tms.SendAndFetchResponse(message, JoinGroupCode)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (tms *TcpMessageStream) LeaveConsumerGroup(request LeaveConsumerGroupRequest) error {
+	message := LeaveGroup(request)
+	_, err := tms.SendAndFetchResponse(message, LeaveGroupCode)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (tms *TcpMessageStream) StoreOffset(streamId int, topicId int, offset OffsetContract) error {
+	message := UpdateOffset(streamId, topicId, offset)
+	_, err := tms.SendAndFetchResponse(message, StoreOffsetCode)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (tms *TcpMessageStream) SendAndFetchResponse(message []byte, command int) ([]byte, error) {
 	payload := CreatePayload(message, command)
 

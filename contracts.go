@@ -38,7 +38,7 @@ type MessageFetchRequest struct {
 	ConsumerId      int            `json:"consumerId"`
 	PartitionId     int            `json:"partitionId"`
 	PollingStrategy MessagePolling `json:"pollingStrategy"`
-	Value           int            `json:"value"`
+	Value           uint64         `json:"value"`
 	Count           int            `json:"count"`
 	AutoCommit      bool           `json:"autoCommit"`
 }
@@ -122,7 +122,7 @@ type StreamResponse struct {
 	SizeBytes     uint64          `json:"sizeBytes"`
 	MessagesCount uint64          `json:"messagesCount"`
 	TopicsCount   int             `json:"topicsCount"`
-	Topics        []TopicResponse `json:"topics"`
+	Topics        []TopicResponse `json:"topics,omitempty"`
 }
 
 type TopicRequest struct {
