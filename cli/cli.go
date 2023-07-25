@@ -54,13 +54,13 @@ var (
 
 func getUsage() {
 	fmt.Println("Usage:")
-	fmt.Println("  getstream -url <url> -port <port> -streamId <streamId>")
+	fmt.Println("  getstream    -url <url> -port <port> -streamId <streamId>")
 	fmt.Println("  createstream -url <url> -port <port> -streamId <streamId> -name <name>")
 	fmt.Println("  deletestream -url <url> -port <port> -streamId <streamId>")
-	fmt.Println("  gettopic -url <url> -port <port> -streamId <streamId> -topicId <topicId>")
-	fmt.Println("  createtopic -url <url> -port <port> -streamId <streamId> -topicId <topicId> -name <name> -partitionsCount <partitionsCount>")
-	fmt.Println("  deletetopic -url <url> -port <port> -streamId <streamId> -topicId <topicId>")
-	fmt.Println("  getstats -url <url> -port <port>")
+	fmt.Println("  gettopic     -url <url> -port <port> -streamId <streamId> -topicId <topicId>")
+	fmt.Println("  createtopic  -url <url> -port <port> -streamId <streamId> -topicId <topicId> -name <name> -partitionsCount <partitionsCount>")
+	fmt.Println("  deletetopic  -url <url> -port <port> -streamId <streamId> -topicId <topicId>")
+	fmt.Println("  getstats     -url <url> -port <port>")
 }
 
 func init() {
