@@ -166,7 +166,7 @@ If you want to use this sdk as a CLI tool, you can do that by following these st
 - [x] Samples
 - [ ] Rewrite the CLI tool using CLI frameworks (like Cobra/Viper)
 - [ ] Full SDK implementation
-    - [ ] TCP
+    - [x] TCP
     - [ ] HTTP
     - [ ] QUIC
 
