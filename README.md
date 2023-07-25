@@ -123,12 +123,12 @@ If you want to use this sdk as a CLI tool, you can do that by following these st
       $ go run ./cli help
 
     Usage:
-        getstream -url <url> -port <port> -streamId <streamId>
+        getstream    -url <url> -port <port> -streamId <streamId>
         createstream -url <url> -port <port> -streamId <streamId> -name <name>
         deletestream -url <url> -port <port> -streamId <streamId>
-        gettopic -url <url> -port <port> -streamId <streamId> -topicId <topicId>
-        createtopic -url <url> -port <port> -streamId <streamId> -topicId <topicId> -name <name> -partitionsCount <partitionsCount>
-        deletetopic -url <url> -port <port> -streamId <streamId> -topicId <topicId>
+        gettopic     -url <url> -port <port> -streamId <streamId> -topicId <topicId>
+        createtopic  -url <url> -port <port> -streamId <streamId> -topicId <topicId> -name <name> -partitionsCount <partitionsCount>
+        deletetopic  -url <url> -port <port> -streamId <streamId> -topicId <topicId>
 
     ```
 
