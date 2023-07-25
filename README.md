@@ -183,16 +183,11 @@ If you believe that you can improve this SDK feel free to contribute. Here's how
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
 
 <!-- LICENSE -->
 <!-- ## License
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
  -->
 
 <!-- CONTACT -->
@@ -210,8 +205,6 @@ Project Link: [https://github.com/eldpcn/iggy-go](https://github.com/eldpcn/iggy
 * [iggy-rs repository](https://github.com/iggy-rs/iggy)
 * [iggy-rs documentation](https://docs.iggy.rs/)
 * [iggy-dotnet-client](https://github.com/iggy-rs/iggy-dotnet-client)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [contributors-shield]: https://img.shields.io/github/contributors/eldpcn/iggy-go.svg?style=for-the-badge
