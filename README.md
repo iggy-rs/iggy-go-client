@@ -70,7 +70,7 @@
 
 <!-- Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `eldpcn`, `iggy-go`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description` -->
 
-`iggy-go` is a golang SDK for <a href="https://docs.iggy.rs/">iggy</a> - persistent message streaming platform written in Rust.
+`iggy-go` is a golang SDK for <a href="https://github.com/iggy-rs/iggy">iggy</a> - persistent message streaming platform written in Rust.
 
 
 ### Built With
