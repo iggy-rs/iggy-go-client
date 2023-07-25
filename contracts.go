@@ -56,9 +56,13 @@ type Message struct {
 }
 
 type MessageSendRequest struct {
-	KeyKind  Keykind   `json:"keyKind"`
-	KeyValue int       `json:"keyValue"`
+	Key      Key       `json:"key"`
 	Messages []Message `json:"messages"`
+}
+
+type Key struct {
+	KeyKind Keykind `json:"keyKind"`
+	Value   int     `json:"value"`
 }
 
 type OffsetContract struct {

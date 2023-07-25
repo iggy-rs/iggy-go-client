@@ -41,24 +41,25 @@ func GetMessages(request MessageFetchRequest) []byte {
 func CreateMessage(streamId, topicId int, request MessageSendRequest) []byte {
 	messageBytesCount := 0
 	for _, message := range request.Messages {
-		messageBytesCount += 16 + 4 + len(message.Payload)
+		messageBytesCount += 16 + 1 + 4 + len(message.Payload)
 	}
 
 	bytes := make([]byte, 17+messageBytesCount)
 	binary.LittleEndian.PutUint32(bytes[0:4], uint32(streamId))
 	binary.LittleEndian.PutUint32(bytes[4:8], uint32(topicId))
 
-	switch request.KeyKind {
+	switch request.Key.KeyKind {
 	case PartitionId:
 		bytes[8] = 0
 	case EntityId:
 		bytes[8] = 1
 	}
 
-	binary.LittleEndian.PutUint32(bytes[9:13], uint32(request.KeyValue))
-	binary.LittleEndian.PutUint32(bytes[13:17], uint32(len(request.Messages)))
+	bytes[9] = 4 // default message length
+	binary.LittleEndian.PutUint32(bytes[10:14], uint32(request.Key.Value))
+	binary.LittleEndian.PutUint32(bytes[14:18], uint32(len(request.Messages)))
 
-	position := 17
+	position := 18
 	for _, message := range request.Messages {
 		copy(bytes[position:position+16], message.Id[:])
 		binary.LittleEndian.PutUint32(bytes[position+16:position+20], uint32(len(message.Payload)))

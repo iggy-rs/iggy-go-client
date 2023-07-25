@@ -95,8 +95,10 @@ func PublishMessages(messageStream iggy.IMessageStream) error {
 
 		err := messageStream.SendMessages(StreamId, TopicId, iggy.MessageSendRequest{
 			Messages: messages,
-			KeyKind:  iggy.PartitionId,
-			KeyValue: PartitionId,
+			Key: iggy.Key{
+				KeyKind: iggy.PartitionId,
+				Value:   PartitionId,
+			},
 		})
 		if err != nil {
 			return nil
