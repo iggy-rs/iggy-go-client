@@ -1,9 +1,10 @@
-package iggy
+package tcp
 
 import (
 	"encoding/binary"
 	"net"
 
+	. "github.com/eldpcn/iggy-go/contracts"
 	iggerr "github.com/eldpcn/iggy-go/errors"
 )
 

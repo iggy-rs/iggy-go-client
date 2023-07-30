@@ -1,5 +1,7 @@
 package iggy
 
+import . "github.com/eldpcn/iggy-go/contracts"
+
 type IMessageStream interface {
 	CreateStream(request StreamRequest) error
 	GetStreamById(id int) (*StreamResponse, error)
