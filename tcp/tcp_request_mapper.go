@@ -51,7 +51,7 @@ func CreateMessage(streamId, topicId int, request MessageSendRequest) []byte {
 	binary.LittleEndian.PutUint32(bytes[4:8], uint32(topicId))
 
 	switch request.Key.KeyKind {
-	case Partition:
+	case PartitionId:
 		bytes[8] = 0
 	case EntityId:
 		bytes[8] = 1
