@@ -1,4 +1,4 @@
-package iggy
+package tcp
 
 import (
 	"bytes"
@@ -7,6 +7,7 @@ import (
 	"strings"
 	"unsafe"
 
+	. "github.com/eldpcn/iggy-go/contracts"
 	"github.com/google/uuid"
 )
 

@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	iggy "github.com/eldpcn/iggy-go"
+	. "github.com/eldpcn/iggy-go"
+	. "github.com/eldpcn/iggy-go/contracts"
 )
 
 // CLI commands
@@ -135,7 +136,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		err := ms.CreateStream(iggy.StreamRequest{
+		err := ms.CreateStream(StreamRequest{
 			StreamId: cs_streamId,
 			Name:     cs_name,
 		})
@@ -184,7 +185,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		err := ms.CreateTopic(ct_streamId, iggy.TopicRequest{
+		err := ms.CreateTopic(ct_streamId, TopicRequest{
 			TopicId:         ct_topicId,
 			Name:            ct_name,
 			PartitionsCount: ct_partitionsCount,
@@ -248,11 +249,11 @@ func main() {
 	}
 }
 
-func CreateMessageStream() iggy.IMessageStream {
-	factory := &iggy.MessageStreamFactory{}
-	config := iggy.MessageStreamConfiguration{
+func CreateMessageStream() IMessageStream {
+	factory := &MessageStreamFactory{}
+	config := MessageStreamConfiguration{
 		BaseAddress: url + ":" + port,
-		Protocol:    iggy.Tcp,
+		Protocol:    Tcp,
 	}
 
 	ms, err := factory.CreateMessageStream(config)

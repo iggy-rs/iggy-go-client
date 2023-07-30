@@ -1,7 +1,9 @@
-package iggy
+package tcp
 
 import (
 	"encoding/binary"
+
+	. "github.com/eldpcn/iggy-go/contracts"
 )
 
 func GetMessages(request MessageFetchRequest) []byte {

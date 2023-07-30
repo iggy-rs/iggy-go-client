@@ -1,4 +1,4 @@
-package iggy
+package iggcon
 
 import (
 	"github.com/google/uuid"

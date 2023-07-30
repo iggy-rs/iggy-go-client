@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	iggy "github.com/eldpcn/iggy-go"
+	. "github.com/eldpcn/iggy-go"
+	. "github.com/eldpcn/iggy-go/contracts"
 	sharedDemoContracts "github.com/eldpcn/iggy-go/samples/shared"
 )
 
@@ -15,16 +16,16 @@ const (
 	StreamId          = 1
 	TopicId           = 1
 	MessageBatchCount = 1
-	PartitionId       = 1
+	Partition         = 1
 	Interval          = 1000
 	ConsumerId        = 1
 )
 
 func main() {
-	factory := &iggy.MessageStreamFactory{}
-	config := iggy.MessageStreamConfiguration{
+	factory := &MessageStreamFactory{}
+	config := MessageStreamConfiguration{
 		BaseAddress: "127.0.0.1:8090",
-		Protocol:    iggy.Tcp,
+		Protocol:    Tcp,
 	}
 
 	messageStream, err := factory.CreateMessageStream(config)
@@ -41,9 +42,9 @@ func main() {
 	}
 }
 
-func EnsureInsfrastructureIsInitialized(messageStream iggy.IMessageStream) error {
+func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
 	if _, streamErr := messageStream.GetStreamById(StreamId); streamErr != nil {
-		streamErr = messageStream.CreateStream(iggy.StreamRequest{
+		streamErr = messageStream.CreateStream(StreamRequest{
 			StreamId: StreamId,
 			Name:     "Test Producer Stream",
 		})
@@ -58,7 +59,7 @@ func EnsureInsfrastructureIsInitialized(messageStream iggy.IMessageStream) error
 	fmt.Printf("Stream with ID: %d exists.\n", StreamId)
 
 	if _, topicErr := messageStream.GetTopicById(StreamId, TopicId); topicErr != nil {
-		topicErr = messageStream.CreateTopic(StreamId, iggy.TopicRequest{
+		topicErr = messageStream.CreateTopic(StreamId, TopicRequest{
 			TopicId:         TopicId,
 			Name:            "Test Topic From Producer Sample",
 			PartitionsCount: 12,
@@ -76,20 +77,20 @@ func EnsureInsfrastructureIsInitialized(messageStream iggy.IMessageStream) error
 	return nil
 }
 
-func ConsumeMessages(messageStream iggy.IMessageStream) error {
-	fmt.Printf("Messages will be polled from stream '%d', topic '%d', partition '%d' with interval %d ms.\n", StreamId, TopicId, PartitionId, Interval)
+func ConsumeMessages(messageStream IMessageStream) error {
+	fmt.Printf("Messages will be polled from stream '%d', topic '%d', partition '%d' with interval %d ms.\n", StreamId, TopicId, Partition, Interval)
 
 	for {
-		messages, err := messageStream.PollMessages(iggy.MessageFetchRequest{
+		messages, err := messageStream.PollMessages(MessageFetchRequest{
 			Count:           1,
 			StreamId:        StreamId,
 			TopicId:         TopicId,
 			ConsumerId:      ConsumerId,
-			PartitionId:     PartitionId,
-			PollingStrategy: iggy.Next,
+			PartitionId:     Partition,
+			PollingStrategy: Next,
 			Value:           0,
 			AutoCommit:      true,
-			ConsumerType:    iggy.Consumer,
+			ConsumerType:    Consumer,
 		})
 		if err != nil {
 			return err
@@ -109,7 +110,7 @@ func ConsumeMessages(messageStream iggy.IMessageStream) error {
 	}
 }
 
-func HandleMessage(messageResponse iggy.MessageResponse) error {
+func HandleMessage(messageResponse MessageResponse) error {
 	length := (len(messageResponse.Payload) * 3) / 4
 	bytes := make([]byte, length)
 

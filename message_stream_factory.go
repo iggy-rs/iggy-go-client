@@ -1,16 +1,21 @@
 package iggy
 
-import "errors"
+import (
+	"errors"
+
+	iggcon "github.com/eldpcn/iggy-go/contracts"
+	tcp "github.com/eldpcn/iggy-go/tcp"
+)
 
 type IMessageStreamFactory interface {
-	CreateStream(config MessageStreamConfiguration) (IMessageStream, error)
+	CreateStream(config iggcon.MessageStreamConfiguration) (IMessageStream, error)
 }
 
 type MessageStreamFactory struct{}
 
-func (msf *MessageStreamFactory) CreateMessageStream(config MessageStreamConfiguration) (IMessageStream, error) {
-	if config.Protocol == Tcp {
-		tcpMessageStream, err := NewTcpMessageStream(config.BaseAddress)
+func (msf *MessageStreamFactory) CreateMessageStream(config iggcon.MessageStreamConfiguration) (IMessageStream, error) {
+	if config.Protocol == iggcon.Tcp {
+		tcpMessageStream, err := tcp.NewTcpMessageStream(config.BaseAddress)
 		if err != nil {
 			return nil, err
 		}
