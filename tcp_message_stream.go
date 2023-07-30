@@ -2,8 +2,9 @@ package iggy
 
 import (
 	"encoding/binary"
-	"fmt"
 	"net"
+
+	iggerr "github.com/eldpcn/iggy-go/errors"
 )
 
 type TcpMessageStream struct {
@@ -333,7 +334,7 @@ func (tms *TcpMessageStream) SendAndFetchResponse(message []byte, command int) (
 	}
 
 	if responseCode := GetResponseCode(buffer); responseCode != 0 {
-		return nil, fmt.Errorf("Invalid response status code: %d", responseCode)
+		return nil, iggerr.MapFromCode(responseCode)
 	}
 
 	return buffer, nil

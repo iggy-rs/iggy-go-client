@@ -169,6 +169,8 @@ If you want to use this sdk as a CLI tool, you can do that by following these st
     - [x] TCP
     - [ ] HTTP
     - [ ] QUIC
+- [X] Human friendly error handling
+- [ ] Implementing benchmarks
 
 See the [open issues](https://github.com/eldpcn/iggy-go/issues) for a full list of proposed features (and known issues).
 
