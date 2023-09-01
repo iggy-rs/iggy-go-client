@@ -3,8 +3,8 @@ package iggy
 import (
 	"errors"
 
-	iggcon "github.com/eldpcn/iggy-go/contracts"
-	tcp "github.com/eldpcn/iggy-go/tcp"
+	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
+	tcp "github.com/iggy-rs/iggy-go-client/tcp"
 )
 
 type IMessageStreamFactory interface {

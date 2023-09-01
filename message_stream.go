@@ -1,6 +1,6 @@
 package iggy
 
-import . "github.com/eldpcn/iggy-go/contracts"
+import . "github.com/iggy-rs/iggy-go-client/contracts"
 
 type IMessageStream interface {
 	CreateStream(request StreamRequest) error

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"unsafe"
 
-	. "github.com/eldpcn/iggy-go/contracts"
+	. "github.com/iggy-rs/iggy-go-client/contracts"
 	"github.com/google/uuid"
 )
 

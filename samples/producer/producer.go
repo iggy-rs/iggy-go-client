@@ -6,9 +6,9 @@ import (
 
 	"github.com/google/uuid"
 
-	. "github.com/eldpcn/iggy-go"
-	. "github.com/eldpcn/iggy-go/contracts"
-	sharedDemoContracts "github.com/eldpcn/iggy-go/samples/shared"
+	. "github.com/iggy-rs/iggy-go-client"
+	. "github.com/iggy-rs/iggy-go-client/contracts"
+	sharedDemoContracts "github.com/iggy-rs/iggy-go-client/samples/shared"
 )
 
 const (
