@@ -4,8 +4,8 @@ import (
 	"encoding/binary"
 	"net"
 
-	. "github.com/eldpcn/iggy-go/contracts"
-	iggerr "github.com/eldpcn/iggy-go/errors"
+	. "github.com/iggy-rs/iggy-go-client/contracts"
+	iggerr "github.com/iggy-rs/iggy-go-client/errors"
 )
 
 type TcpMessageStream struct {

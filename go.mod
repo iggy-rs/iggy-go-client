@@ -1,4 +1,4 @@
-module github.com/eldpcn/iggy-go
+module github.com/iggy-rs/iggy-go-client
 
 go 1.20
 

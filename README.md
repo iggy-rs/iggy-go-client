@@ -11,7 +11,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <!-- <a href="https://github.com/eldpcn/iggy-go">
+  <!-- <a href="https://github.com/iggy-rs/iggy-go-client">
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a> -->
 
@@ -20,14 +20,14 @@
   <p align="center">
     SDK for iggy written using go language
     <!-- <br />
-    <a href="https://github.com/eldpcn/iggy-go"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/iggy-rs/iggy-go-client"><strong>Explore the docs »</strong></a>
     <br /> -->
     <br />
-    <a href="https://github.com/eldpcn/iggy-go/tree/dev/samples">View Samples</a>
+    <a href="https://github.com/iggy-rs/iggy-go-client/tree/dev/samples">View Samples</a>
     ·
-    <a href="https://github.com/eldpcn/iggy-go/issues">Report Bug</a>
+    <a href="https://github.com/iggy-rs/iggy-go-client/issues">Report Bug</a>
     ·
-    <a href="https://github.com/eldpcn/iggy-go/issues">Request Feature</a>
+    <a href="https://github.com/iggy-rs/iggy-go-client/issues">Request Feature</a>
     ·
     <a href="https://docs.iggy.rs/">iggy documentation</a>
   </p>
@@ -91,7 +91,7 @@ In order to use this SDK you need to install golang on your enviroment. Here's a
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/eldpcn/iggy-go.git
+   git clone https://github.com/iggy-rs/iggy-go-client.git
    ```
 2. Verify that the solution builds correctly
     ```sh
@@ -172,7 +172,7 @@ If you want to use this sdk as a CLI tool, you can do that by following these st
 - [X] Human friendly error handling
 - [ ] Implementing benchmarks
 
-See the [open issues](https://github.com/eldpcn/iggy-go/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/iggy-rs/iggy-go-client/issues) for a full list of proposed features (and known issues).
 
 <!-- CONTRIBUTING -->
 ## Contributing
@@ -197,7 +197,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <!-- Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com -->
 <!-- 
-Project Link: [https://github.com/eldpcn/iggy-go](https://github.com/eldpcn/iggy-go)
+Project Link: [https://github.com/iggy-rs/iggy-go-client](https://github.com/iggy-rs/iggy-go-client)
 
  -->
 
@@ -209,16 +209,16 @@ Project Link: [https://github.com/eldpcn/iggy-go](https://github.com/eldpcn/iggy
 * [iggy-dotnet-client](https://github.com/iggy-rs/iggy-dotnet-client)
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[contributors-shield]: https://img.shields.io/github/contributors/eldpcn/iggy-go.svg?style=for-the-badge
-[contributors-url]: https://github.com/eldpcn/iggy-go/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/eldpcn/iggy-go.svg?style=for-the-badge
-[forks-url]: https://github.com/eldpcn/iggy-go/network/members
-[stars-shield]: https://img.shields.io/github/stars/eldpcn/iggy-go.svg?style=for-the-badge
-[stars-url]: https://github.com/eldpcn/iggy-go/stargazers
-[issues-shield]: https://img.shields.io/github/issues/eldpcn/iggy-go.svg?style=for-the-badge
-[issues-url]: https://github.com/eldpcn/iggy-go/issues
-[license-shield]: https://img.shields.io/github/license/eldpcn/iggy-go.svg?style=for-the-badge
-[license-url]: https://github.com/eldpcn/iggy-go/blob/master/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/iggy-rs/iggy-go-client.svg?style=for-the-badge
+[contributors-url]: https://github.com/iggy-rs/iggy-go-client/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/iggy-rs/iggy-go-client.svg?style=for-the-badge
+[forks-url]: https://github.com/iggy-rs/iggy-go-client/network/members
+[stars-shield]: https://img.shields.io/github/stars/iggy-rs/iggy-go-client.svg?style=for-the-badge
+[stars-url]: https://github.com/iggy-rs/iggy-go-client/stargazers
+[issues-shield]: https://img.shields.io/github/issues/iggy-rs/iggy-go-client.svg?style=for-the-badge
+[issues-url]: https://github.com/iggy-rs/iggy-go-client/issues
+[license-shield]: https://img.shields.io/github/license/iggy-rs/iggy-go-client.svg?style=for-the-badge
+[license-url]: https://github.com/iggy-rs/iggy-go-client/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/linkedin_username
 [Golang-url]: https://go.dev/

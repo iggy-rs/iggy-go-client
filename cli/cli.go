@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	. "github.com/eldpcn/iggy-go"
-	. "github.com/eldpcn/iggy-go/contracts"
+	. "github.com/iggy-rs/iggy-go-client"
+	. "github.com/iggy-rs/iggy-go-client/contracts"
 )
 
 // CLI commands
