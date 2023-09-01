@@ -1,4 +1,4 @@
-package iggerr
+package ierror
 
 import (
 	"testing"

@@ -5,7 +5,7 @@ import (
 	"net"
 
 	. "github.com/iggy-rs/iggy-go-client/contracts"
-	iggerr "github.com/iggy-rs/iggy-go-client/errors"
+	ierror "github.com/iggy-rs/iggy-go-client/errors"
 )
 
 type TcpMessageStream struct {
@@ -335,7 +335,7 @@ func (tms *TcpMessageStream) SendAndFetchResponse(message []byte, command int) (
 	}
 
 	if responseCode := GetResponseCode(buffer); responseCode != 0 {
-		return nil, iggerr.MapFromCode(responseCode)
+		return nil, ierror.MapFromCode(responseCode)
 	}
 
 	return buffer, nil
