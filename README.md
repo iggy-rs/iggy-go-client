@@ -106,7 +106,7 @@ If you want to use this sdk as a CLI tool, you can do that by following these st
     ```sh
     git clone https://github.com/iggy-rs/iggy.git
     cd iggy
-    cargo r --bin server -r
+    cargo r --bin iggy-server -r
     ```
 1. Open new terminal instance and enter `iggy-go` root folder
     ```sh
