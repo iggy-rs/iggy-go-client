@@ -5,7 +5,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"strings"
 	"unsafe"
 
 	"github.com/google/uuid"
@@ -27,7 +26,7 @@ func MapStreams(payload []byte) []StreamResponse {
 	position := 0
 
 	for position < len(payload) {
-		stream, readBytes := MapToStreams(payload, position)
+		stream, readBytes := MapToStream(payload, position)
 		streams = append(streams, stream)
 		position += readBytes
 	}
@@ -80,31 +79,6 @@ func MapToStream(payload []byte, position int) (StreamResponse, int) {
 		MessagesCount: messagesCount,
 		CreatedAt:     createdAt,
 	}, readBytes
-}
-
-func MapToStreams(payload []byte, position int) (StreamResponse, int) {
-	var stream StreamResponse
-
-	stream.Id = int(binary.LittleEndian.Uint32(payload[position : position+4]))
-	position += 4
-
-	stream.TopicsCount = int(binary.LittleEndian.Uint32(payload[position : position+4]))
-	position += 4
-
-	stream.SizeBytes = binary.LittleEndian.Uint64(payload[position : position+8])
-	position += 8
-
-	stream.MessagesCount = binary.LittleEndian.Uint64(payload[position : position+8])
-	position += 8
-
-	nameLength := int(binary.LittleEndian.Uint32(payload[position : position+4]))
-	position += 4
-
-	name := string(payload[position : position+nameLength])
-	stream.Name = strings.TrimRight(name, "\x00")
-	position += nameLength
-
-	return stream, 4 + 4 + 8 + 8 + 4 + nameLength
 }
 
 func MapMessages(payload []byte) ([]MessageResponse, error) {
