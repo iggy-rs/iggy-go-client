@@ -29,7 +29,7 @@ var (
 	port string
 
 	//get stream
-	gs_streamId int
+	gs_streamName string
 
 	//create stream
 	cs_streamId int
@@ -67,9 +67,9 @@ func getUsage() {
 func init() {
 	getStreamCmd.StringVar(&url, "url", "127.0.0.1", "Iggy server url")
 	getStreamCmd.StringVar(&port, "port", "8090", "Iggy server port")
-	getStreamCmd.IntVar(&gs_streamId, "streamid", -1, "Stream Id. Returns all streams for default value.")
-	getStreamCmd.IntVar(&gs_streamId, "sid", -1, "Alias for Stream Id")
-	getStreamCmd.IntVar(&gs_streamId, "s", -1, "Alias for Stream Id")
+	getStreamCmd.StringVar(&gs_streamName, "streamname", "", "Stream Name. Returns all streams for default value.")
+	getStreamCmd.StringVar(&gs_streamName, "sname", "", "Alias for Stream Name")
+	getStreamCmd.StringVar(&gs_streamName, "s", "", "Alias for Stream Name")
 
 	createStreamCmd.StringVar(&url, "url", "127.0.0.1", "Iggy server url")
 	createStreamCmd.StringVar(&port, "port", "8090", "Iggy server port")
@@ -147,7 +147,7 @@ func main() {
 	case "getstream":
 		getStreamCmd.Parse(os.Args[2:])
 		ms := CreateMessageStream()
-		if gs_streamId == -1 {
+		if gs_streamName == "" {
 			streams, err := ms.GetStreams()
 			if err != nil {
 				HandleError(err)
@@ -156,7 +156,14 @@ func main() {
 			return
 		}
 
-		stream, err := ms.GetStreamById(gs_streamId)
+		stream, err := ms.GetStreamById(
+			GetStreamRequest{
+				StreamID: Identifier{
+					Kind:   StringId,
+					Length: len(gs_streamName),
+					Value:  gs_streamName,
+				},
+			})
 		if err != nil {
 			HandleError(err)
 		}

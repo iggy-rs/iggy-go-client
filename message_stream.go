@@ -4,7 +4,7 @@ import . "github.com/iggy-rs/iggy-go-client/contracts"
 
 type IMessageStream interface {
 	CreateStream(request StreamRequest) error
-	GetStreamById(id int) (*StreamResponse, error)
+	GetStreamById(request GetStreamRequest) (*StreamResponse, error)
 	GetStreams() ([]StreamResponse, error)
 	DeleteStream(id int) error
 

@@ -75,9 +75,8 @@ func (tms *TcpMessageStream) GetStreams() ([]StreamResponse, error) {
 	return MapStreams(responseBuffer), nil
 }
 
-func (tms *TcpMessageStream) GetStreamById(id int) (*StreamResponse, error) {
-	message := make([]byte, 4)
-	binary.LittleEndian.PutUint32(message, uint32(id))
+func (tms *TcpMessageStream) GetStreamById(request GetStreamRequest) (*StreamResponse, error) {
+	var message = GetBytesFromIdentifier(request.StreamID)
 	buffer, err := tms.SendAndFetchResponse(message, GetStreamCode)
 	if err != nil {
 		return nil, err

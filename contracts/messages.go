@@ -5,7 +5,7 @@ import (
 )
 
 type MessageFetchRequest struct {
-	ConsumerType    ConsumerType   `json:"consumerType"`
+	ConsumerKind    ConsumerKind   `json:"consumerKind"`
 	StreamId        int            `json:"streamId"`
 	TopicId         int            `json:"topicId"`
 	ConsumerId      int            `json:"consumerId"`

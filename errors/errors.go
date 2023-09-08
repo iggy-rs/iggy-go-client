@@ -32,10 +32,38 @@ func TranslateErrorCode(code int) string {
 		return "feature_unavailable"
 	case 10:
 		return "cannot_create_base_directory"
+	case 20:
+		return "resource_not_found"
+	case 21:
+		return "cannot_load_resource"
+	case 22:
+		return "cannot_save_resource"
+	case 23:
+		return "cannot_delete_resource"
+	case 24:
+		return "cannot_serialize_resource"
+	case 25:
+		return "cannot_deserialize_resource"
+	case 40:
+		return "unauthenticated"
+	case 41:
+		return "unauthorized"
+	case 42:
+		return "invalid_credentials"
+	case 43:
+		return "invalid_username"
+	case 44:
+		return "invalid_password"
 	case 51:
 		return "not_connected"
 	case 52:
 		return "request_error"
+	case 60:
+		return "invalid_encryption_key"
+	case 61:
+		return "cannot_encrypt_data"
+	case 62:
+		return "cannot_decrypt_data"
 	case 100:
 		return "client_not_found"
 	case 101:
@@ -89,14 +117,18 @@ func TranslateErrorCode(code int) string {
 	case 1008:
 		return "cannot_delete_stream_directory"
 	case 1009:
-		return "stream_not_found"
+		return "stream_id_not_found"
 	case 1010:
-		return "stream_already_exists"
+		return "stream_name_not_found"
 	case 1011:
-		return "invalid_stream_name"
+		return "stream_id_already_exists"
 	case 1012:
-		return "invalid_stream_id"
+		return "stream_name_already_exists"
 	case 1013:
+		return "invalid_stream_name"
+	case 1014:
+		return "invalid_stream_id"
+	case 1015:
 		return "cannot_read_streams"
 	case 2000:
 		return "cannot_create_topics_directory"
@@ -119,16 +151,20 @@ func TranslateErrorCode(code int) string {
 	case 2009:
 		return "cannot_poll_topic"
 	case 2010:
-		return "topic_not_found"
+		return "topic_id_not_found"
 	case 2011:
-		return "topic_already_exists"
+		return "topic_name_not_found"
 	case 2012:
-		return "invalid_topic_name"
+		return "topic_id_already_exists"
 	case 2013:
-		return "invalid_topic_partitions"
+		return "topic_name_already_exists"
 	case 2014:
-		return "invalid_topic_id"
+		return "invalid_topic_name"
 	case 2015:
+		return "too_many_partitions"
+	case 2016:
+		return "invalid_topic_id"
+	case 2017:
 		return "cannot_read_topics"
 	case 3000:
 		return "cannot_create_partition"
@@ -146,6 +182,8 @@ func TranslateErrorCode(code int) string {
 		return "cannot_delete_partition_directory"
 	case 3007:
 		return "partition_not_found"
+	case 3008:
+		return "no_partitions"
 	case 4000:
 		return "segment_not_found"
 	case 4001:
@@ -171,26 +209,38 @@ func TranslateErrorCode(code int) string {
 	case 4011:
 		return "cannot_read_message"
 	case 4012:
-		return "cannot_read_message_timestamp"
-	case 4013:
 		return "cannot_read_message_id"
+	case 4013:
+		return "cannot_read_message_state"
 	case 4014:
-		return "cannot_read_message_length"
+		return "cannot_read_message_timestamp"
 	case 4015:
-		return "cannot_read_message_payload"
+		return "cannot_read_headers_length"
 	case 4016:
-		return "too_big_message_payload"
+		return "cannot_read_headers_payload"
 	case 4017:
-		return "too_many_messages"
+		return "too_big_headers_payload"
 	case 4018:
-		return "empty_message_payload"
+		return "invalid_header_key"
 	case 4019:
-		return "invalid_message_payload_length"
+		return "invalid_header_value"
 	case 4020:
-		return "cannot_read_message_checksum"
+		return "cannot_read_message_length"
 	case 4021:
-		return "invalid_message_checksum"
+		return "cannot_read_message_payload"
 	case 4022:
+		return "too_big_message_payload"
+	case 4023:
+		return "too_many_messages"
+	case 4024:
+		return "empty_message_payload"
+	case 4025:
+		return "invalid_message_payload_length"
+	case 4026:
+		return "cannot_read_message_checksum"
+	case 4027:
+		return "invalid_message_checksum"
+	case 4028:
 		return "invalid_key_value_length"
 	case 4100:
 		return "invalid_offset"

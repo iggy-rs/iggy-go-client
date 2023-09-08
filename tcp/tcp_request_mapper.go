@@ -169,3 +169,15 @@ func GetOffset(request OffsetRequest) []byte {
 	binary.LittleEndian.PutUint32(bytes[13:17], uint32(request.PartitionId))
 	return bytes
 }
+
+func GetBytesFromIdentifier(identifier Identifier) []byte {
+	bytes := make([]byte, int(identifier.Length)+2)
+	bytes[0] = byte(identifier.Kind)
+	bytes[1] = byte(identifier.Length)
+
+	for i := 0; i < int(identifier.Length); i++ {
+		bytes[i+2] = identifier.Value[i]
+	}
+
+	return bytes
+}

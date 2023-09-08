@@ -21,10 +21,3 @@ type LeaveConsumerGroupRequest struct {
 	TopicId         int `json:"topicId"`
 	ConsumerGroupId int `json:"consumerGroupId"`
 }
-
-type ConsumerType int
-
-const (
-	Consumer ConsumerType = iota
-	ConsumerGroup
-)

@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"unsafe"
 
-	. "github.com/iggy-rs/iggy-go-client/contracts"
 	"github.com/google/uuid"
+	. "github.com/iggy-rs/iggy-go-client/contracts"
 )
 
 func MapOffsets(payload []byte) *OffsetResponse {
@@ -36,6 +37,8 @@ func MapStreams(payload []byte) []StreamResponse {
 
 func MapStream(payload []byte) *StreamResponse {
 	stream, position := MapToStream(payload, 0)
+
+	fmt.Println(stream.CreatedAt)
 	topics := make([]TopicResponse, 0)
 	length := len(payload)
 
@@ -52,18 +55,22 @@ func MapStream(payload []byte) *StreamResponse {
 		Topics:        topics,
 		MessagesCount: stream.MessagesCount,
 		SizeBytes:     stream.SizeBytes,
+		CreatedAt:     stream.CreatedAt,
 	}
 }
 
 func MapToStream(payload []byte, position int) (StreamResponse, int) {
 	id := int(binary.LittleEndian.Uint32(payload[position : position+4]))
-	topicsCount := int(binary.LittleEndian.Uint32(payload[position+4 : position+8]))
-	sizeBytes := binary.LittleEndian.Uint64(payload[position+8 : position+16])
-	messagesCount := binary.LittleEndian.Uint64(payload[position+16 : position+24])
-	nameLength := int(binary.LittleEndian.Uint32(payload[position+24 : position+28]))
+	createdAt := binary.LittleEndian.Uint64(payload[position+4 : position+12])
+	topicsCount := int(binary.LittleEndian.Uint32(payload[position+12 : position+16]))
+	sizeBytes := binary.LittleEndian.Uint64(payload[position+16 : position+24])
+	messagesCount := binary.LittleEndian.Uint64(payload[position+24 : position+32])
+	nameLength := int(payload[position+32])
 
-	name := string(payload[position+28 : position+28+nameLength])
-	readBytes := 4 + 4 + 8 + 8 + 4 + nameLength
+	nameBytes := payload[position+33 : position+33+nameLength]
+	name := string(nameBytes)
+
+	readBytes := 4 + 8 + 4 + 8 + 8 + 1 + nameLength
 
 	return StreamResponse{
 		Id:            id,
@@ -71,6 +78,7 @@ func MapToStream(payload []byte, position int) (StreamResponse, int) {
 		Name:          name,
 		SizeBytes:     sizeBytes,
 		MessagesCount: messagesCount,
+		CreatedAt:     createdAt,
 	}, readBytes
 }
 
