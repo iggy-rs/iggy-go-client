@@ -73,9 +73,11 @@ func CreateMessage(streamId, topicId int, request MessageSendRequest) []byte {
 }
 
 func CreateStream(request StreamRequest) []byte {
-	bytes := make([]byte, 4+len(request.Name))
+	nameLength := len(request.Name)
+	bytes := make([]byte, nameLength+5)
 	binary.LittleEndian.PutUint32(bytes[0:4], uint32(request.StreamId))
-	copy(bytes[4:], []byte(request.Name))
+	bytes[4] = byte(nameLength)
+	copy(bytes[5:], []byte(request.Name))
 	return bytes
 }
 
