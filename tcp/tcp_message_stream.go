@@ -97,9 +97,8 @@ func (tms *TcpMessageStream) GetStreamById(request GetStreamRequest) (*StreamRes
 	return MapStream(responseBuffer), nil
 }
 
-func (tms *TcpMessageStream) DeleteStream(id int) error {
-	message := make([]byte, 4)
-	binary.LittleEndian.PutUint32(message, uint32(id))
+func (tms *TcpMessageStream) DeleteStream(id Identifier) error {
+	message := GetBytesFromIdentifier(id)
 	_, err := tms.SendAndFetchResponse(message, DeleteStreamCode)
 	if err != nil {
 		return err

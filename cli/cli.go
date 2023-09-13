@@ -174,7 +174,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		err := ms.DeleteStream(ds_streamId)
+		err := ms.DeleteStream(NewIdentifier(ds_streamId))
 		if err != nil {
 			HandleError(err)
 		}
