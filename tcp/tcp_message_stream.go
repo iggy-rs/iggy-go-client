@@ -127,9 +127,8 @@ func (tms *TcpMessageStream) GetTopicById(streamId Identifier, topicId Identifie
 	return MapTopic(responseBuffer)
 }
 
-func (tms *TcpMessageStream) GetTopics(streamId int) ([]TopicResponse, error) {
-	message := make([]byte, 4)
-	binary.LittleEndian.PutUint32(message, uint32(streamId))
+func (tms *TcpMessageStream) GetTopics(streamId Identifier) ([]TopicResponse, error) {
+	message := GetBytesFromIdentifier(streamId)
 	buffer, err := tms.SendAndFetchResponse(message, GetTopicsCode)
 	if err != nil {
 		return nil, err
@@ -160,7 +159,7 @@ func (tms *TcpMessageStream) CreateTopic(request CreateTopicRequest) error {
 	return nil
 }
 
-func (tms *TcpMessageStream) DeleteTopic(streamId int, topicId int) error {
+func (tms *TcpMessageStream) DeleteTopic(streamId, topicId Identifier) error {
 	message := DeleteTopic(streamId, topicId)
 	_, err := tms.SendAndFetchResponse(message, DeleteTopicCode)
 	if err != nil {

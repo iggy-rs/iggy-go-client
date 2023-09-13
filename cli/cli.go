@@ -202,7 +202,7 @@ func main() {
 		ms := CreateMessageStream()
 
 		if gt_topicId == -1 {
-			topics, err := ms.GetTopics(gt_streamId)
+			topics, err := ms.GetTopics(NewIdentifier(gt_streamId))
 			if err != nil {
 				HandleError(err)
 			}
@@ -230,7 +230,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		err := ms.DeleteTopic(dt_streamId, dt_topicId)
+		err := ms.DeleteTopic(NewIdentifier(dt_streamId), NewIdentifier(dt_topicId))
 		if err != nil {
 			HandleError(err)
 		}
