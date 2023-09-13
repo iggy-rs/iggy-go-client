@@ -151,8 +151,8 @@ func (tms *TcpMessageStream) GetTopics(streamId int) ([]TopicResponse, error) {
 	return MapTopics(responseBuffer)
 }
 
-func (tms *TcpMessageStream) CreateTopic(streamId int, request TopicRequest) error {
-	message := CreateTopic(streamId, request)
+func (tms *TcpMessageStream) CreateTopic(request CreateTopicRequest) error {
+	message := CreateTopic(request)
 	_, err := tms.SendAndFetchResponse(message, CreateTopicCode)
 	if err != nil {
 		return err

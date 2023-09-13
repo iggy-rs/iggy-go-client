@@ -29,7 +29,7 @@ var (
 	port string
 
 	//get stream
-	gs_streamName string
+	gs_streamId int
 
 	//create stream
 	cs_streamId int
@@ -67,9 +67,9 @@ func getUsage() {
 func init() {
 	getStreamCmd.StringVar(&url, "url", "127.0.0.1", "Iggy server url")
 	getStreamCmd.StringVar(&port, "port", "8090", "Iggy server port")
-	getStreamCmd.StringVar(&gs_streamName, "streamname", "", "Stream Name. Returns all streams for default value.")
-	getStreamCmd.StringVar(&gs_streamName, "sname", "", "Alias for Stream Name")
-	getStreamCmd.StringVar(&gs_streamName, "s", "", "Alias for Stream Name")
+	getStreamCmd.IntVar(&gs_streamId, "streamname", -1, "Stream Id. Returns all streams for default value.")
+	getStreamCmd.IntVar(&gs_streamId, "sname", -1, "Alias for Stream Id")
+	getStreamCmd.IntVar(&gs_streamId, "s", -1, "Alias for Stream Id")
 
 	createStreamCmd.StringVar(&url, "url", "127.0.0.1", "Iggy server url")
 	createStreamCmd.StringVar(&port, "port", "8090", "Iggy server port")
@@ -147,7 +147,7 @@ func main() {
 	case "getstream":
 		getStreamCmd.Parse(os.Args[2:])
 		ms := CreateMessageStream()
-		if gs_streamName == "" {
+		if gs_streamId == -1 {
 			streams, err := ms.GetStreams()
 			if err != nil {
 				HandleError(err)
@@ -158,11 +158,7 @@ func main() {
 
 		stream, err := ms.GetStreamById(
 			GetStreamRequest{
-				StreamID: Identifier{
-					Kind:   StringId,
-					Length: len(gs_streamName),
-					Value:  gs_streamName,
-				},
+				StreamID: NewIdentifier(gs_streamId),
 			})
 		if err != nil {
 			HandleError(err)
@@ -192,10 +188,11 @@ func main() {
 			os.Exit(1)
 		}
 
-		err := ms.CreateTopic(ct_streamId, TopicRequest{
+		err := ms.CreateTopic(CreateTopicRequest{
 			TopicId:         ct_topicId,
 			Name:            ct_name,
 			PartitionsCount: ct_partitionsCount,
+			StreamId:        NewIdentifier(ct_streamId),
 		})
 		if err != nil {
 			HandleError(err)

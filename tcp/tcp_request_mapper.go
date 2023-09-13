@@ -128,12 +128,29 @@ func GetGroup(streamId, topicId, groupId int) []byte {
 	return bytes
 }
 
-func CreateTopic(streamId int, request TopicRequest) []byte {
-	bytes := make([]byte, 12+len(request.Name))
-	binary.LittleEndian.PutUint32(bytes[0:4], uint32(streamId))
-	binary.LittleEndian.PutUint32(bytes[4:8], uint32(request.TopicId))
-	binary.LittleEndian.PutUint32(bytes[8:12], uint32(request.PartitionsCount))
-	copy(bytes[12:], []byte(request.Name))
+func CreateTopic(request CreateTopicRequest) []byte {
+	totalIdSize := 2 + request.StreamId.Length
+	totalNameSize := len(request.Name)
+
+	bytes := make([]byte, 15+totalIdSize+totalNameSize)
+
+	copy(bytes[0:totalIdSize], GetBytesFromIdentifier(request.StreamId))
+
+	position := totalIdSize
+	binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(request.TopicId))
+
+	position += 4
+	binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(request.PartitionsCount))
+
+	position += 4
+	binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(request.MessageExpiry))
+
+	position += 4
+	bytes[position] = byte(totalNameSize)
+
+	position++
+	copy(bytes[position:], []byte(request.Name))
+
 	return bytes
 }
 
@@ -177,9 +194,14 @@ func GetBytesFromIdentifier(identifier Identifier) []byte {
 	bytes[0] = byte(identifier.Kind)
 	bytes[1] = byte(identifier.Length)
 
-	for i := 0; i < int(identifier.Length); i++ {
-		bytes[i+2] = identifier.Value[i]
+	if identifier.Kind == StringId {
+		valAsString := identifier.Value.(string)
+		for i := 0; i < int(identifier.Length); i++ {
+			bytes[i+2] = valAsString[i]
+		}
+	} else if identifier.Kind == NumericId {
+		valAsInt := identifier.Value.(int)
+		binary.LittleEndian.PutUint32(bytes[2:6], uint32(valAsInt))
 	}
-
 	return bytes
 }

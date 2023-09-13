@@ -8,7 +8,7 @@ type IMessageStream interface {
 	GetStreams() ([]StreamResponse, error)
 	DeleteStream(id int) error
 
-	CreateTopic(streamId int, request TopicRequest) error
+	CreateTopic(request CreateTopicRequest) error
 	GetTopicById(streamId, topicId int) (*TopicResponse, error)
 	GetTopics(streamId int) ([]TopicResponse, error)
 	DeleteTopic(streamId int, topicId int) error

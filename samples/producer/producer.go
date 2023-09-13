@@ -42,12 +42,7 @@ func main() {
 
 func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
 	if _, streamErr := messageStream.GetStreamById(GetStreamRequest{
-		StreamID: Identifier{
-			Kind:   NumericId,
-			Length: 1,
-			Value:  fmt.Sprint(StringId),
-		},
-	}); streamErr != nil {
+		StreamID: NewIdentifier(StringId)}); streamErr != nil {
 		streamErr = messageStream.CreateStream(StreamRequest{
 			StreamId: StreamId,
 			Name:     "Test Producer Stream",
@@ -63,10 +58,11 @@ func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
 	fmt.Printf("Stream with ID: %d exists.\n", StreamId)
 
 	if _, topicErr := messageStream.GetTopicById(StreamId, TopicId); topicErr != nil {
-		topicErr = messageStream.CreateTopic(StreamId, TopicRequest{
+		topicErr = messageStream.CreateTopic(CreateTopicRequest{
 			TopicId:         TopicId,
 			Name:            "Test Topic From Producer Sample",
 			PartitionsCount: 12,
+			StreamId:        NewIdentifier(StreamId),
 		})
 
 		if topicErr != nil {

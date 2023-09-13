@@ -13,7 +13,7 @@ import (
 
 // config
 const (
-	StreamId          = 1
+	DefaultStreamId   = 1
 	TopicId           = 1
 	MessageBatchCount = 1
 	Partition         = 1
@@ -44,13 +44,10 @@ func main() {
 
 func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
 	if _, streamErr := messageStream.GetStreamById(GetStreamRequest{
-		StreamID: Identifier{
-			Kind:   NumericId,
-			Length: 1,
-			Value:  fmt.Sprint(StringId),
-		}}); streamErr != nil {
+		StreamID: NewIdentifier(StringId),
+	}); streamErr != nil {
 		streamErr = messageStream.CreateStream(StreamRequest{
-			StreamId: StreamId,
+			StreamId: DefaultStreamId,
 			Name:     "Test Producer Stream",
 		})
 
@@ -58,16 +55,17 @@ func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
 			panic(streamErr)
 		}
 
-		fmt.Printf("Created stream with ID: %d.\n", StreamId)
+		fmt.Printf("Created stream with ID: %d.\n", DefaultStreamId)
 	}
 
-	fmt.Printf("Stream with ID: %d exists.\n", StreamId)
+	fmt.Printf("Stream with ID: %d exists.\n", DefaultStreamId)
 
-	if _, topicErr := messageStream.GetTopicById(StreamId, TopicId); topicErr != nil {
-		topicErr = messageStream.CreateTopic(StreamId, TopicRequest{
+	if _, topicErr := messageStream.GetTopicById(DefaultStreamId, TopicId); topicErr != nil {
+		topicErr = messageStream.CreateTopic(CreateTopicRequest{
 			TopicId:         TopicId,
 			Name:            "Test Topic From Producer Sample",
 			PartitionsCount: 12,
+			StreamId:        NewIdentifier(DefaultStreamId),
 		})
 
 		if topicErr != nil {
@@ -83,12 +81,12 @@ func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
 }
 
 func ConsumeMessages(messageStream IMessageStream) error {
-	fmt.Printf("Messages will be polled from stream '%d', topic '%d', partition '%d' with interval %d ms.\n", StreamId, TopicId, Partition, Interval)
+	fmt.Printf("Messages will be polled from stream '%d', topic '%d', partition '%d' with interval %d ms.\n", DefaultStreamId, TopicId, Partition, Interval)
 
 	for {
 		messages, err := messageStream.PollMessages(MessageFetchRequest{
 			Count:           1,
-			StreamId:        StreamId,
+			StreamId:        DefaultStreamId,
 			TopicId:         TopicId,
 			ConsumerId:      ConsumerId,
 			PartitionId:     Partition,
