@@ -108,7 +108,7 @@ func (tms *TcpMessageStream) DeleteStream(id int) error {
 	return nil
 }
 
-func (tms *TcpMessageStream) GetTopicById(streamId int, topicId int) (*TopicResponse, error) {
+func (tms *TcpMessageStream) GetTopicById(streamId Identifier, topicId Identifier) (*TopicResponse, error) {
 	message := GetTopicByIdMessage(streamId, topicId)
 	buffer, err := tms.SendAndFetchResponse(message, GetTopicCode)
 	if err != nil {

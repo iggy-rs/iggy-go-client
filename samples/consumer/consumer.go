@@ -60,7 +60,7 @@ func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
 
 	fmt.Printf("Stream with ID: %d exists.\n", DefaultStreamId)
 
-	if _, topicErr := messageStream.GetTopicById(DefaultStreamId, TopicId); topicErr != nil {
+	if _, topicErr := messageStream.GetTopicById(NewIdentifier(DefaultStreamId), NewIdentifier(TopicId)); topicErr != nil {
 		topicErr = messageStream.CreateTopic(CreateTopicRequest{
 			TopicId:         TopicId,
 			Name:            "Test Topic From Producer Sample",

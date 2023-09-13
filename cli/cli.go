@@ -209,7 +209,7 @@ func main() {
 			SerializeAndPrint(topics)
 			return
 		}
-		topic, err := ms.GetTopicById(gt_streamId, gt_topicId)
+		topic, err := ms.GetTopicById(NewIdentifier(gt_streamId), NewIdentifier(gt_topicId))
 		if err != nil {
 			HandleError(err)
 		}

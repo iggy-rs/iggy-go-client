@@ -154,10 +154,10 @@ func CreateTopic(request CreateTopicRequest) []byte {
 	return bytes
 }
 
-func GetTopicByIdMessage(streamId, topicId int) []byte {
-	bytes := make([]byte, 8)
-	binary.LittleEndian.PutUint32(bytes[0:4], uint32(streamId))
-	binary.LittleEndian.PutUint32(bytes[4:8], uint32(topicId))
+func GetTopicByIdMessage(streamId, topicId Identifier) []byte {
+	bytes := make([]byte, 4+streamId.Length+topicId.Length)
+	copy(bytes[0:2+streamId.Length], GetBytesFromIdentifier(streamId))
+	copy(bytes[2+streamId.Length:], GetBytesFromIdentifier(topicId))
 	return bytes
 }
 

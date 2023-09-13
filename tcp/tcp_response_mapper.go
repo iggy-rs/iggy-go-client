@@ -154,14 +154,9 @@ func MapTopic(payload []byte) (*TopicResponse, error) {
 		position += readBytes
 	}
 
-	return &TopicResponse{
-		Id:              topic.Id,
-		Name:            topic.Name,
-		PartitionsCount: topic.PartitionsCount,
-		Partitions:      partitions,
-		MessagesCount:   topic.MessagesCount,
-		SizeBytes:       topic.SizeBytes,
-	}, nil
+	topic.Partitions = partitions
+
+	return &topic, nil
 }
 
 func MapToTopic(payload []byte, position int) (TopicResponse, int, error) {
@@ -188,14 +183,16 @@ func MapToTopic(payload []byte, position int) (TopicResponse, int, error) {
 
 func MapToPartition(payload []byte, position int) (PartitionContract, int) {
 	id := int(binary.LittleEndian.Uint32(payload[position : position+4]))
-	segmentsCount := int(binary.LittleEndian.Uint32(payload[position+4 : position+8]))
-	currentOffset := binary.LittleEndian.Uint64(payload[position+8 : position+16])
-	sizeBytes := binary.LittleEndian.Uint64(payload[position+16 : position+24])
-	messagesCount := binary.LittleEndian.Uint64(payload[position+24 : position+32])
-	readBytes := 4 + 4 + 8 + 8 + 8
+	createdAt := binary.LittleEndian.Uint64(payload[position+4 : position+12])
+	segmentsCount := int(binary.LittleEndian.Uint32(payload[position+12 : position+16]))
+	currentOffset := binary.LittleEndian.Uint64(payload[position+16 : position+24])
+	sizeBytes := binary.LittleEndian.Uint64(payload[position+24 : position+32])
+	messagesCount := binary.LittleEndian.Uint64(payload[position+32 : position+40])
+	readBytes := 4 + 4 + 8 + 8 + 8 + 8
 
 	partition := PartitionContract{
 		Id:            id,
+		CreatedAt:     createdAt,
 		SegmentsCount: segmentsCount,
 		CurrentOffset: currentOffset,
 		SizeBytes:     sizeBytes,
