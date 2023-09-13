@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/json"
-	"fmt"
 	"unsafe"
 
 	"github.com/google/uuid"
@@ -36,8 +35,6 @@ func MapStreams(payload []byte) []StreamResponse {
 
 func MapStream(payload []byte) *StreamResponse {
 	stream, position := MapToStream(payload, 0)
-
-	fmt.Println(stream.CreatedAt)
 	topics := make([]TopicResponse, 0)
 	length := len(payload)
 
@@ -170,20 +167,22 @@ func MapTopic(payload []byte) (*TopicResponse, error) {
 func MapToTopic(payload []byte, position int) (TopicResponse, int, error) {
 	topic := TopicResponse{}
 	topic.Id = int(binary.LittleEndian.Uint32(payload[position : position+4]))
-	topic.PartitionsCount = int(binary.LittleEndian.Uint32(payload[position+4 : position+8]))
-	topic.SizeBytes = binary.LittleEndian.Uint64(payload[position+8 : position+16])
-	topic.MessagesCount = binary.LittleEndian.Uint64(payload[position+16 : position+24])
+	topic.CreatedAt = int(binary.LittleEndian.Uint64(payload[position+4 : position+12]))
+	topic.PartitionsCount = int(binary.LittleEndian.Uint32(payload[position+12 : position+16]))
+	topic.MessageExpiry = int(binary.LittleEndian.Uint32(payload[position+16 : position+20]))
+	topic.SizeBytes = binary.LittleEndian.Uint64(payload[position+20 : position+28])
+	topic.MessagesCount = binary.LittleEndian.Uint64(payload[position+28 : position+36])
 
-	nameLength := int(binary.LittleEndian.Uint32(payload[position+24 : position+28]))
-	nameEnd := position + 28 + nameLength
+	nameLength := int(payload[position+36])
+	nameEnd := position + 37 + nameLength
 
 	if nameEnd > len(payload) {
 		return TopicResponse{}, 0, json.Unmarshal([]byte(`{}`), &topic)
 	}
 
-	topic.Name = string(bytes.Trim(payload[position+28:nameEnd], "\x00"))
+	topic.Name = string(bytes.Trim(payload[position+37:nameEnd], "\x00"))
 
-	readBytes := 4 + 4 + 8 + 8 + 4 + nameLength
+	readBytes := 4 + 4 + 4 + 8 + 8 + 1 + 8 + nameLength
 	return topic, readBytes, nil
 }
 
