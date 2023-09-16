@@ -44,7 +44,7 @@ func main() {
 
 func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
 	if _, streamErr := messageStream.GetStreamById(GetStreamRequest{
-		StreamID: NewIdentifier(StringId),
+		StreamID: NewIdentifier(DefaultStreamId),
 	}); streamErr != nil {
 		streamErr = messageStream.CreateStream(StreamRequest{
 			StreamId: DefaultStreamId,
@@ -84,21 +84,22 @@ func ConsumeMessages(messageStream IMessageStream) error {
 	fmt.Printf("Messages will be polled from stream '%d', topic '%d', partition '%d' with interval %d ms.\n", DefaultStreamId, TopicId, Partition, Interval)
 
 	for {
-		messages, err := messageStream.PollMessages(MessageFetchRequest{
+		messagesWrapper, err := messageStream.PollMessages(FetchMessagesRequest{
 			Count:           1,
-			StreamId:        DefaultStreamId,
-			TopicId:         TopicId,
-			ConsumerId:      ConsumerId,
+			StreamId:        NewIdentifier(DefaultStreamId),
+			TopicId:         NewIdentifier(TopicId),
+			Consumer:        Consumer{Kind: ConsumerSingle, Id: ConsumerId},
 			PartitionId:     Partition,
-			PollingStrategy: Next,
-			Value:           0,
+			PollingStrategy: NextPollingStrategy(),
 			AutoCommit:      true,
-			ConsumerKind:    ConsumerSingle,
 		})
 		if err != nil {
 			return err
 		}
-
+		if messagesWrapper == nil {
+			panic("Something went wrong - this edge case handling will be refactored")
+		}
+		messages := messagesWrapper.Messages
 		if len(messages) != 0 {
 			for _, message := range messages {
 				if err := HandleMessage(message); err != nil {

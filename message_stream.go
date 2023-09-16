@@ -13,8 +13,8 @@ type IMessageStream interface {
 	GetTopics(streamId Identifier) ([]TopicResponse, error)
 	DeleteTopic(streamId, topicId Identifier) error
 
-	SendMessages(request MessageSendRequest) error
-	PollMessages(request MessageFetchRequest) ([]MessageResponse, error)
+	SendMessages(request SendMessagesRequest) error
+	PollMessages(request FetchMessagesRequest) (*FetchMessagesResponse, error)
 
 	StoreOffset(request StoreOffsetRequest) error
 	GetOffset(request GetOffsetRequest) (*OffsetResponse, error)

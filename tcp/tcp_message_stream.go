@@ -2,7 +2,6 @@ package tcp
 
 import (
 	"encoding/binary"
-	"fmt"
 	"net"
 
 	. "github.com/iggy-rs/iggy-go-client/contracts"
@@ -172,8 +171,6 @@ func (tms *TcpMessageStream) DeleteTopic(streamId, topicId Identifier) error {
 
 func (tms *TcpMessageStream) CreateStream(request StreamRequest) error {
 	message := CreateStream(request)
-
-	fmt.Println(message)
 	_, err := tms.SendAndFetchResponse(message, CreateStreamCode)
 	if err != nil {
 		return err
@@ -182,7 +179,7 @@ func (tms *TcpMessageStream) CreateStream(request StreamRequest) error {
 	return nil
 }
 
-func (tms *TcpMessageStream) SendMessages(request MessageSendRequest) error {
+func (tms *TcpMessageStream) SendMessages(request SendMessagesRequest) error {
 	message := CreateMessage(request)
 	_, err := tms.SendAndFetchResponse(message, SendMessagesCode)
 	if err != nil {
@@ -192,7 +189,7 @@ func (tms *TcpMessageStream) SendMessages(request MessageSendRequest) error {
 	return nil
 }
 
-func (tms *TcpMessageStream) PollMessages(request MessageFetchRequest) ([]MessageResponse, error) {
+func (tms *TcpMessageStream) PollMessages(request FetchMessagesRequest) (*FetchMessagesResponse, error) {
 	message := GetMessages(request)
 	buffer, err := tms.SendAndFetchResponse(message, PollMessagesCode)
 	if err != nil {
@@ -201,7 +198,7 @@ func (tms *TcpMessageStream) PollMessages(request MessageFetchRequest) ([]Messag
 
 	responseLength := GetResponseLength(buffer)
 	if responseLength <= 1 {
-		return []MessageResponse{}, nil
+		return nil, nil
 	}
 
 	responseBuffer := make([]byte, responseLength)

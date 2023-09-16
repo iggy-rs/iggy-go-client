@@ -9,5 +9,5 @@ const (
 
 type Consumer struct {
 	Kind ConsumerKind
-	ID   uint32
+	Id   uint32
 }

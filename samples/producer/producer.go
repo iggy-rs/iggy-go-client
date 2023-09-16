@@ -98,7 +98,7 @@ func PublishMessages(messageStream IMessageStream) error {
 			})
 		}
 
-		err := messageStream.SendMessages(MessageSendRequest{
+		err := messageStream.SendMessages(SendMessagesRequest{
 			StreamId:     NewIdentifier(StreamId),
 			TopicId:      NewIdentifier(TopicId),
 			Messages:     messages,

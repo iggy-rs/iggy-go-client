@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"unsafe"
 
 	"github.com/google/uuid"
@@ -80,20 +81,38 @@ func MapToStream(payload []byte, position int) (StreamResponse, int) {
 	}, readBytes
 }
 
-func MapMessages(payload []byte) ([]MessageResponse, error) {
-	const propertiesSize = 36
+func MapMessages(payload []byte) (*FetchMessagesResponse, error) {
+	const propertiesSize = 45
 	length := len(payload)
-	position := 4
+	partitionId := int(binary.LittleEndian.Uint32(payload[0:4]))
+	currentOffset := binary.LittleEndian.Uint64(payload[4:12])
+	//messagesCount := int(binary.LittleEndian.Uint32(payload[12:16]))
+	position := 16
+
+	response := FetchMessagesResponse{
+		PartitionId:   partitionId,
+		CurrentOffset: currentOffset,
+	}
+
+	if length <= position {
+		return &response, nil
+	}
+
 	var messages []MessageResponse
 
 	for position < length {
 		offset := binary.LittleEndian.Uint64(payload[position : position+8])
-		timestamp := binary.LittleEndian.Uint64(payload[position+8 : position+16])
-		id, err := uuid.FromBytes(payload[position+16 : position+32])
+		state, err := mapMessageState(payload[position+8])
+		timestamp := binary.LittleEndian.Uint64(payload[position+9 : position+17])
+		id, err := uuid.FromBytes(payload[position+17 : position+33])
+		checksum := binary.LittleEndian.Uint32(payload[position+33 : position+37])
+		headersLength := int(binary.LittleEndian.Uint32(payload[position+37 : position+41]))
+		headers, err := mapHeaders(payload[(position + 41):(position + 41 + headersLength)])
 		if err != nil {
 			return nil, err
 		}
-		messageLength := binary.LittleEndian.Uint32(payload[position+32 : position+36])
+		position += headersLength
+		messageLength := binary.LittleEndian.Uint32(payload[position+41 : position+45])
 
 		payloadRangeStart := position + propertiesSize
 		payloadRangeEnd := position + propertiesSize + int(messageLength)
@@ -107,10 +126,13 @@ func MapMessages(payload []byte) ([]MessageResponse, error) {
 		position += totalSize
 
 		messages = append(messages, MessageResponse{
-			Offset:    offset,
-			Timestamp: timestamp,
 			Id:        id,
 			Payload:   payloadSlice,
+			Offset:    offset,
+			Timestamp: timestamp,
+			Checksum:  checksum,
+			State:     state,
+			Headers:   headers,
 		})
 
 		if position+propertiesSize >= length {
@@ -118,7 +140,87 @@ func MapMessages(payload []byte) ([]MessageResponse, error) {
 		}
 	}
 
-	return messages, nil
+	response.Messages = messages
+	return &response, nil
+}
+
+func mapMessageState(state byte) (MessageState, error) {
+	switch state {
+	case 1:
+		return MessageStateAvailable, nil
+	case 10:
+		return MessageStateUnavailable, nil
+	case 20:
+		return MessageStatePoisoned, nil
+	case 30:
+		return MessageStateMarkedForDeletion, nil
+	default:
+		return 0, errors.New("Invalid message state")
+	}
+}
+
+func mapHeaders(payload []byte) (map[HeaderKey]HeaderValue, error) {
+	headers := make(map[HeaderKey]HeaderValue)
+	position := 0
+
+	for position < len(payload) {
+		if len(payload) <= position+4 {
+			return nil, errors.New("Invalid header key length")
+		}
+
+		keyLength := binary.LittleEndian.Uint32(payload[position : position+4])
+		position += 4
+
+		if keyLength == 0 || 255 < keyLength {
+			return nil, errors.New("Key has incorrect size, must be between 1 and 255")
+		}
+
+		if len(payload) < position+int(keyLength) {
+			return nil, errors.New("Invalid header key")
+		}
+
+		key := string(payload[position : position+int(keyLength)])
+		position += int(keyLength)
+
+		headerKind, err := mapHeaderKind(payload, position)
+		if err != nil {
+			return nil, err
+		}
+		position++
+
+		if len(payload) <= position+4 {
+			return nil, errors.New("Invalid header value length")
+		}
+
+		valueLength := binary.LittleEndian.Uint32(payload[position : position+4])
+		position += 4
+
+		if valueLength == 0 || 255 < valueLength {
+			return nil, errors.New("Value has incorrect size, must be between 1 and 255")
+		}
+
+		if len(payload) < position+int(valueLength) {
+			return nil, errors.New("Invalid header value")
+		}
+
+		value := payload[position : position+int(valueLength)]
+		position += int(valueLength)
+
+		headers[HeaderKey{Value: key}] = HeaderValue{
+			Kind:  headerKind,
+			Value: value,
+		}
+	}
+
+	return headers, nil
+}
+
+func mapHeaderKind(payload []byte, position int) (HeaderKind, error) {
+	if position >= len(payload) {
+		return 0, errors.New("Invalid header kind position")
+	}
+
+	return HeaderKind(payload[position]), nil
 }
 
 func MapTopics(payload []byte) ([]TopicResponse, error) {

@@ -6,41 +6,35 @@ import (
 	. "github.com/iggy-rs/iggy-go-client/contracts"
 )
 
-func GetMessages(request MessageFetchRequest) []byte {
-	bytes := make([]byte, 31)
-	bytes[0] = 0
+func GetMessages(request FetchMessagesRequest) []byte {
+	streamTopicIdLength := 2 + request.StreamId.Length + 2 + request.TopicId.Length
+	messageSize := 18 + 5 + streamTopicIdLength
+	bytes := make([]byte, messageSize)
+	bytes[0] = byte(request.Consumer.Kind)
+	binary.LittleEndian.PutUint32(bytes[1:5], uint32(request.Consumer.Id))
 
-	binary.LittleEndian.PutUint32(bytes[1:5], uint32(request.ConsumerId))
-	binary.LittleEndian.PutUint32(bytes[5:9], uint32(request.StreamId))
-	binary.LittleEndian.PutUint32(bytes[9:13], uint32(request.TopicId))
-	binary.LittleEndian.PutUint32(bytes[13:17], uint32(request.PartitionId))
+	position := 5
+	copy(bytes[position:position+streamTopicIdLength], append(append([]byte{}, GetBytesFromIdentifier(request.StreamId)...), GetBytesFromIdentifier(request.TopicId)...))
 
-	switch request.PollingStrategy {
-	case Offset:
-		bytes[17] = 0
-	case Timestamp:
-		bytes[17] = 1
-	case First:
-		bytes[17] = 2
-	case Last:
-		bytes[17] = 3
-	case Next:
-		bytes[17] = 4
-	}
+	position += streamTopicIdLength
+	binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(request.PartitionId))
+	bytes[position+4] = byte(request.PollingStrategy.Kind)
 
-	binary.LittleEndian.PutUint64(bytes[18:26], uint64(request.Value))
-	binary.LittleEndian.PutUint32(bytes[26:30], uint32(request.Count))
+	position += 5
+	binary.LittleEndian.PutUint64(bytes[position:position+8], uint64(request.PollingStrategy.Value))
+	binary.LittleEndian.PutUint32(bytes[position+8:position+12], uint32(request.Count))
 
+	position += 12
 	if request.AutoCommit {
-		bytes[30] = 1
+		bytes[position] = 1
 	} else {
-		bytes[30] = 0
+		bytes[position] = 0
 	}
 
 	return bytes
 }
 
-func CreateMessage(request MessageSendRequest) []byte {
+func CreateMessage(request SendMessagesRequest) []byte {
 	streamTopicIdLength := 2 + request.StreamId.Length + 2 + request.TopicId.Length
 	messageBytesCount := calculateMessageBytesCount(request.Messages)
 	totalSize := streamTopicIdLength + messageBytesCount + request.Partitioning.Length + 2
@@ -210,7 +204,7 @@ func DeleteTopic(streamId, topicId Identifier) []byte {
 func UpdateOffset(request StoreOffsetRequest) []byte {
 	bytes := make([]byte, 4+request.StreamId.Length+request.TopicId.Length+17)
 	bytes[0] = byte(request.Consumer.Kind)
-	binary.LittleEndian.PutUint32(bytes[1:5], uint32(request.Consumer.ID))
+	binary.LittleEndian.PutUint32(bytes[1:5], uint32(request.Consumer.Id))
 	copy(bytes[5:7+request.StreamId.Length], GetBytesFromIdentifier(request.StreamId))
 	copy(bytes[7+request.StreamId.Length:9+request.StreamId.Length+request.TopicId.Length], GetBytesFromIdentifier(request.TopicId))
 	position := 9 + request.StreamId.Length + request.TopicId.Length
@@ -222,7 +216,7 @@ func UpdateOffset(request StoreOffsetRequest) []byte {
 func GetOffset(request GetOffsetRequest) []byte {
 	bytes := make([]byte, 4+request.StreamId.Length+request.TopicId.Length+9)
 	bytes[0] = byte(request.Consumer.Kind)
-	binary.LittleEndian.PutUint32(bytes[1:5], uint32(request.Consumer.ID))
+	binary.LittleEndian.PutUint32(bytes[1:5], uint32(request.Consumer.Id))
 	copy(bytes[5:7+request.StreamId.Length], GetBytesFromIdentifier(request.StreamId))
 	copy(bytes[7+request.StreamId.Length:9+request.StreamId.Length+request.TopicId.Length], GetBytesFromIdentifier(request.TopicId))
 	position := 9 + request.StreamId.Length + request.TopicId.Length
