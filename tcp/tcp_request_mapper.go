@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 
 	. "github.com/iggy-rs/iggy-go-client/contracts"
+	tcpserialization "github.com/iggy-rs/iggy-go-client/tcp/serialization"
 )
 
 func GetMessages(request FetchMessagesRequest) []byte {
@@ -14,7 +15,7 @@ func GetMessages(request FetchMessagesRequest) []byte {
 	binary.LittleEndian.PutUint32(bytes[1:5], uint32(request.Consumer.Id))
 
 	position := 5
-	copy(bytes[position:position+streamTopicIdLength], append(append([]byte{}, GetBytesFromIdentifier(request.StreamId)...), GetBytesFromIdentifier(request.TopicId)...))
+	copy(bytes[position:position+streamTopicIdLength], append(append([]byte{}, tcpserialization.SerializeIdentifier(request.StreamId)...), tcpserialization.SerializeIdentifier(request.TopicId)...))
 
 	position += streamTopicIdLength
 	binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(request.PartitionId))
@@ -41,8 +42,8 @@ func CreateMessage(request SendMessagesRequest) []byte {
 	bytes := make([]byte, totalSize)
 	position := 0
 	//ids
-	copy(bytes[position:2+request.StreamId.Length], GetBytesFromIdentifier(request.StreamId))
-	copy(bytes[position+2+request.StreamId.Length:streamTopicIdLength], GetBytesFromIdentifier(request.TopicId))
+	copy(bytes[position:2+request.StreamId.Length], tcpserialization.SerializeIdentifier(request.StreamId))
+	copy(bytes[position+2+request.StreamId.Length:streamTopicIdLength], tcpserialization.SerializeIdentifier(request.TopicId))
 	position = streamTopicIdLength
 
 	//partitioning
@@ -139,16 +140,16 @@ func GetGroup(streamId Identifier, topicId Identifier, groupId int) []byte {
 func baseGroupMapping(streamId Identifier, topicId Identifier, groupId int) []byte {
 	customIdOffset := 4 + streamId.Length + topicId.Length
 	bytes := make([]byte, customIdOffset+4)
-	copy(bytes[0:2+streamId.Length], GetBytesFromIdentifier(streamId))
-	copy(bytes[2+streamId.Length:4+streamId.Length+topicId.Length], GetBytesFromIdentifier(topicId))
+	copy(bytes[0:2+streamId.Length], tcpserialization.SerializeIdentifier(streamId))
+	copy(bytes[2+streamId.Length:4+streamId.Length+topicId.Length], tcpserialization.SerializeIdentifier(topicId))
 	binary.LittleEndian.PutUint32(bytes[customIdOffset:customIdOffset+4], uint32(groupId))
 	return bytes
 }
 
 func GetGroups(streamId, topicId Identifier) []byte {
 	bytes := make([]byte, 4+streamId.Length+topicId.Length)
-	copy(bytes[0:2+streamId.Length], GetBytesFromIdentifier(streamId))
-	copy(bytes[2+streamId.Length:], GetBytesFromIdentifier(topicId))
+	copy(bytes[0:2+streamId.Length], tcpserialization.SerializeIdentifier(streamId))
+	copy(bytes[2+streamId.Length:], tcpserialization.SerializeIdentifier(topicId))
 	return bytes
 }
 
@@ -158,7 +159,7 @@ func CreateTopic(request CreateTopicRequest) []byte {
 
 	bytes := make([]byte, 15+totalIdSize+totalNameSize)
 
-	copy(bytes[0:totalIdSize], GetBytesFromIdentifier(request.StreamId))
+	copy(bytes[0:totalIdSize], tcpserialization.SerializeIdentifier(request.StreamId))
 
 	position := totalIdSize
 	binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(request.TopicId))
@@ -180,15 +181,15 @@ func CreateTopic(request CreateTopicRequest) []byte {
 
 func GetTopicByIdMessage(streamId, topicId Identifier) []byte {
 	bytes := make([]byte, 4+streamId.Length+topicId.Length)
-	copy(bytes[0:2+streamId.Length], GetBytesFromIdentifier(streamId))
-	copy(bytes[2+topicId.Length:], GetBytesFromIdentifier(topicId))
+	copy(bytes[0:2+streamId.Length], tcpserialization.SerializeIdentifier(streamId))
+	copy(bytes[2+topicId.Length:], tcpserialization.SerializeIdentifier(topicId))
 	return bytes
 }
 
 func DeleteTopic(streamId, topicId Identifier) []byte {
 	bytes := make([]byte, 4+streamId.Length+topicId.Length)
-	copy(bytes[0:2+streamId.Length], GetBytesFromIdentifier(streamId))
-	copy(bytes[2+topicId.Length:], GetBytesFromIdentifier(topicId))
+	copy(bytes[0:2+streamId.Length], tcpserialization.SerializeIdentifier(streamId))
+	copy(bytes[2+topicId.Length:], tcpserialization.SerializeIdentifier(topicId))
 	return bytes
 }
 
@@ -196,8 +197,8 @@ func UpdateOffset(request StoreOffsetRequest) []byte {
 	bytes := make([]byte, 4+request.StreamId.Length+request.TopicId.Length+17)
 	bytes[0] = byte(request.Consumer.Kind)
 	binary.LittleEndian.PutUint32(bytes[1:5], uint32(request.Consumer.Id))
-	copy(bytes[5:7+request.StreamId.Length], GetBytesFromIdentifier(request.StreamId))
-	copy(bytes[7+request.StreamId.Length:9+request.StreamId.Length+request.TopicId.Length], GetBytesFromIdentifier(request.TopicId))
+	copy(bytes[5:7+request.StreamId.Length], tcpserialization.SerializeIdentifier(request.StreamId))
+	copy(bytes[7+request.StreamId.Length:9+request.StreamId.Length+request.TopicId.Length], tcpserialization.SerializeIdentifier(request.TopicId))
 	position := 9 + request.StreamId.Length + request.TopicId.Length
 	binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(request.PartitionId))
 	binary.LittleEndian.PutUint64(bytes[position+4:position+12], uint64(request.Offset))
@@ -208,26 +209,9 @@ func GetOffset(request GetOffsetRequest) []byte {
 	bytes := make([]byte, 4+request.StreamId.Length+request.TopicId.Length+9)
 	bytes[0] = byte(request.Consumer.Kind)
 	binary.LittleEndian.PutUint32(bytes[1:5], uint32(request.Consumer.Id))
-	copy(bytes[5:7+request.StreamId.Length], GetBytesFromIdentifier(request.StreamId))
-	copy(bytes[7+request.StreamId.Length:9+request.StreamId.Length+request.TopicId.Length], GetBytesFromIdentifier(request.TopicId))
+	copy(bytes[5:7+request.StreamId.Length], tcpserialization.SerializeIdentifier(request.StreamId))
+	copy(bytes[7+request.StreamId.Length:9+request.StreamId.Length+request.TopicId.Length], tcpserialization.SerializeIdentifier(request.TopicId))
 	position := 9 + request.StreamId.Length + request.TopicId.Length
 	binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(request.PartitionId))
-	return bytes
-}
-
-func GetBytesFromIdentifier(identifier Identifier) []byte {
-	bytes := make([]byte, int(identifier.Length)+2)
-	bytes[0] = byte(identifier.Kind)
-	bytes[1] = byte(identifier.Length)
-
-	if identifier.Kind == StringId {
-		valAsString := identifier.Value.(string)
-		for i := 0; i < int(identifier.Length); i++ {
-			bytes[i+2] = valAsString[i]
-		}
-	} else if identifier.Kind == NumericId {
-		valAsInt := identifier.Value.(int)
-		binary.LittleEndian.PutUint32(bytes[2:6], uint32(valAsInt))
-	}
 	return bytes
 }

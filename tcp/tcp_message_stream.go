@@ -76,7 +76,7 @@ func (tms *TcpMessageStream) GetStreams() ([]StreamResponse, error) {
 }
 
 func (tms *TcpMessageStream) GetStreamById(request GetStreamRequest) (*StreamResponse, error) {
-	var message = GetBytesFromIdentifier(request.StreamID)
+	var message = tcpserialization.SerializeIdentifier(request.StreamID)
 	buffer, err := tms.SendAndFetchResponse(message, GetStreamCode)
 	if err != nil {
 		return nil, err
@@ -97,7 +97,7 @@ func (tms *TcpMessageStream) GetStreamById(request GetStreamRequest) (*StreamRes
 }
 
 func (tms *TcpMessageStream) DeleteStream(id Identifier) error {
-	message := GetBytesFromIdentifier(id)
+	var message = tcpserialization.SerializeIdentifier(id)
 	_, err := tms.SendAndFetchResponse(message, DeleteStreamCode)
 	return err
 }
@@ -123,7 +123,7 @@ func (tms *TcpMessageStream) GetTopicById(streamId Identifier, topicId Identifie
 }
 
 func (tms *TcpMessageStream) GetTopics(streamId Identifier) ([]TopicResponse, error) {
-	message := GetBytesFromIdentifier(streamId)
+	var message = tcpserialization.SerializeIdentifier(streamId)
 	buffer, err := tms.SendAndFetchResponse(message, GetTopicsCode)
 	if err != nil {
 		return nil, err
