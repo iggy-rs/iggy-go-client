@@ -106,7 +106,7 @@ func baseGroupMapping(streamId Identifier, topicId Identifier, groupId int) []by
 	customIdOffset := 4 + streamId.Length + topicId.Length
 	bytes := make([]byte, customIdOffset+4)
 	copy(bytes[0:2+streamId.Length], GetBytesFromIdentifier(streamId))
-	copy(bytes[2+streamId.Length:], GetBytesFromIdentifier(topicId))
+	copy(bytes[2+streamId.Length:4+streamId.Length+topicId.Length], GetBytesFromIdentifier(topicId))
 	binary.LittleEndian.PutUint32(bytes[customIdOffset:customIdOffset+4], uint32(groupId))
 	return bytes
 }
@@ -147,35 +147,37 @@ func CreateTopic(request CreateTopicRequest) []byte {
 func GetTopicByIdMessage(streamId, topicId Identifier) []byte {
 	bytes := make([]byte, 4+streamId.Length+topicId.Length)
 	copy(bytes[0:2+streamId.Length], GetBytesFromIdentifier(streamId))
-	copy(bytes[2+streamId.Length:], GetBytesFromIdentifier(topicId))
+	copy(bytes[2+topicId.Length:], GetBytesFromIdentifier(topicId))
 	return bytes
 }
 
 func DeleteTopic(streamId, topicId Identifier) []byte {
 	bytes := make([]byte, 4+streamId.Length+topicId.Length)
 	copy(bytes[0:2+streamId.Length], GetBytesFromIdentifier(streamId))
-	copy(bytes[2+streamId.Length:], GetBytesFromIdentifier(topicId))
+	copy(bytes[2+topicId.Length:], GetBytesFromIdentifier(topicId))
 	return bytes
 }
 
-func UpdateOffset(streamId, topicId int, contract OffsetContract) []byte {
-	bytes := make([]byte, 17)
-	bytes[0] = 0
-	binary.LittleEndian.PutUint32(bytes[1:5], uint32(streamId))
-	binary.LittleEndian.PutUint32(bytes[5:9], uint32(topicId))
-	binary.LittleEndian.PutUint32(bytes[9:13], uint32(contract.ConsumerId))
-	binary.LittleEndian.PutUint32(bytes[13:17], uint32(contract.PartitionId))
-	binary.LittleEndian.PutUint64(bytes[17:25], uint64(contract.Offset))
+func UpdateOffset(request StoreOffsetRequest) []byte {
+	bytes := make([]byte, 4+request.StreamId.Length+request.TopicId.Length+17)
+	bytes[0] = byte(request.Consumer.Kind)
+	binary.LittleEndian.PutUint32(bytes[1:5], uint32(request.Consumer.ID))
+	copy(bytes[5:7+request.StreamId.Length], GetBytesFromIdentifier(request.StreamId))
+	copy(bytes[7+request.StreamId.Length:9+request.StreamId.Length+request.TopicId.Length], GetBytesFromIdentifier(request.TopicId))
+	position := 9 + request.StreamId.Length + request.TopicId.Length
+	binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(request.PartitionId))
+	binary.LittleEndian.PutUint64(bytes[position+4:position+12], uint64(request.Offset))
 	return bytes
 }
 
-func GetOffset(request OffsetRequest) []byte {
-	bytes := make([]byte, 17)
-	bytes[0] = 0
-	binary.LittleEndian.PutUint32(bytes[1:5], uint32(request.StreamId))
-	binary.LittleEndian.PutUint32(bytes[5:9], uint32(request.TopicId))
-	binary.LittleEndian.PutUint32(bytes[9:13], uint32(request.ConsumerId))
-	binary.LittleEndian.PutUint32(bytes[13:17], uint32(request.PartitionId))
+func GetOffset(request GetOffsetRequest) []byte {
+	bytes := make([]byte, 4+request.StreamId.Length+request.TopicId.Length+9)
+	bytes[0] = byte(request.Consumer.Kind)
+	binary.LittleEndian.PutUint32(bytes[1:5], uint32(request.Consumer.ID))
+	copy(bytes[5:7+request.StreamId.Length], GetBytesFromIdentifier(request.StreamId))
+	copy(bytes[7+request.StreamId.Length:9+request.StreamId.Length+request.TopicId.Length], GetBytesFromIdentifier(request.TopicId))
+	position := 9 + request.StreamId.Length + request.TopicId.Length
+	binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(request.PartitionId))
 	return bytes
 }
 

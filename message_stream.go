@@ -13,11 +13,13 @@ type IMessageStream interface {
 	GetTopics(streamId Identifier) ([]TopicResponse, error)
 	DeleteTopic(streamId, topicId Identifier) error
 
+	//TODO update contracts
 	SendMessages(streamId int, topicId int, request MessageSendRequest) error
 	PollMessages(request MessageFetchRequest) ([]MessageResponse, error)
 
-	StoreOffset(streamId int, topicId int, offset OffsetContract) error
-	GetOffset(request OffsetRequest) (*OffsetResponse, error)
+	//TODO update contracts
+	StoreOffset(request StoreOffsetRequest) error
+	GetOffset(request GetOffsetRequest) (*OffsetResponse, error)
 
 	GetConsumerGroups(streamId Identifier, topicId Identifier) ([]ConsumerGroupResponse, error)
 	GetConsumerGroupById(streamId Identifier, topicId Identifier, groupId int) (*ConsumerGroupResponse, error)

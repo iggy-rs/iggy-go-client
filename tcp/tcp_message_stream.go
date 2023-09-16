@@ -269,7 +269,7 @@ func (tms *TcpMessageStream) GetConsumerGroups(streamId Identifier, topicId Iden
 	return MapConsumerGroups(responseBuffer), err
 }
 
-func (tms *TcpMessageStream) GetOffset(request OffsetRequest) (*OffsetResponse, error) {
+func (tms *TcpMessageStream) GetOffset(request GetOffsetRequest) (*OffsetResponse, error) {
 	message := GetOffset(request)
 	buffer, err := tms.SendAndFetchResponse(message, GetOffsetCode)
 	if err != nil {
@@ -309,8 +309,8 @@ func (tms *TcpMessageStream) LeaveConsumerGroup(request LeaveConsumerGroupReques
 	return nil
 }
 
-func (tms *TcpMessageStream) StoreOffset(streamId int, topicId int, offset OffsetContract) error {
-	message := UpdateOffset(streamId, topicId, offset)
+func (tms *TcpMessageStream) StoreOffset(request StoreOffsetRequest) error {
+	message := UpdateOffset(request)
 	_, err := tms.SendAndFetchResponse(message, StoreOffsetCode)
 	if err != nil {
 		return err
