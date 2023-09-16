@@ -1,6 +1,6 @@
 package iggcon
 
-type StreamRequest struct {
+type CreateStreamRequest struct {
 	StreamId int    `json:"streamId"`
 	Name     string `json:"name"`
 }

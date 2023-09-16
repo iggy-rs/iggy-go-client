@@ -136,7 +136,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		err := ms.CreateStream(StreamRequest{
+		err := ms.CreateStream(CreateStreamRequest{
 			StreamId: cs_streamId,
 			Name:     cs_name,
 		})

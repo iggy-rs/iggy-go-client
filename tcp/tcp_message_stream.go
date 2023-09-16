@@ -2,6 +2,7 @@ package tcp
 
 import (
 	"encoding/binary"
+	tcpserialization "github.com/iggy-rs/iggy-go-client/tcp/serialization"
 	"net"
 
 	. "github.com/iggy-rs/iggy-go-client/contracts"
@@ -48,7 +49,10 @@ func (tms *TcpMessageStream) GetStats() (*Stats, error) {
 		return nil, err
 	}
 
-	return MapStats(responseBuffer), nil
+	stats := &tcpserialization.TcpStats{}
+	err = stats.Deserialize(responseBuffer)
+
+	return &stats.Stats, err
 }
 
 func (tms *TcpMessageStream) GetStreams() ([]StreamResponse, error) {
@@ -151,8 +155,9 @@ func (tms *TcpMessageStream) DeleteTopic(streamId, topicId Identifier) error {
 	return err
 }
 
-func (tms *TcpMessageStream) CreateStream(request StreamRequest) error {
-	message := CreateStream(request)
+func (tms *TcpMessageStream) CreateStream(request CreateStreamRequest) error {
+	serializedRequest := tcpserialization.TcpCreateStreamRequest{CreateStreamRequest: request}
+	message := serializedRequest.Serialize()
 	_, err := tms.SendAndFetchResponse(message, CreateStreamCode)
 	return err
 }

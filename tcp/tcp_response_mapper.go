@@ -5,8 +5,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"errors"
-	"unsafe"
-
 	"github.com/google/uuid"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
 )
@@ -338,44 +336,4 @@ func MapToConsumerGroup(payload []byte, position int) (*ConsumerGroupResponse, i
 	}
 
 	return &consumerGroup, readBytes
-}
-
-func MapStats(payload []byte) *Stats {
-	stats := Stats{}
-
-	stats.ProcessId = int(binary.LittleEndian.Uint32(payload[0:4]))
-	stats.CpuUsage = *(*float32)(unsafe.Pointer(&payload[4]))
-	stats.MemoryUsage = binary.LittleEndian.Uint64(payload[8:16])
-	stats.TotalMemory = binary.LittleEndian.Uint64(payload[16:24])
-	stats.AvailableMemory = binary.LittleEndian.Uint64(payload[24:32])
-	stats.RunTime = binary.LittleEndian.Uint64(payload[32:40])
-	stats.StartTime = binary.LittleEndian.Uint64(payload[40:48])
-	stats.ReadBytes = binary.LittleEndian.Uint64(payload[48:56])
-	stats.WrittenBytes = binary.LittleEndian.Uint64(payload[56:64])
-	stats.MessagesSizeBytes = binary.LittleEndian.Uint64(payload[64:72])
-	stats.StreamsCount = int(binary.LittleEndian.Uint32(payload[72:76]))
-	stats.TopicsCount = int(binary.LittleEndian.Uint32(payload[76:80]))
-	stats.PartitionsCount = int(binary.LittleEndian.Uint32(payload[80:84]))
-	stats.SegmentsCount = int(binary.LittleEndian.Uint32(payload[84:88]))
-	stats.MessagesCount = binary.LittleEndian.Uint64(payload[88:96])
-	stats.ClientsCount = int(binary.LittleEndian.Uint32(payload[96:100]))
-	stats.ConsumerGroupsCount = int(binary.LittleEndian.Uint32(payload[100:104]))
-
-	position := 104
-	hostnameLength := int(binary.LittleEndian.Uint32(payload[position : position+4]))
-	stats.Hostname = string(payload[position+4 : position+4+hostnameLength])
-	position += 4 + hostnameLength
-
-	osNameLength := int(binary.LittleEndian.Uint32(payload[position : position+4]))
-	stats.OsName = string(payload[position+4 : position+4+osNameLength])
-	position += 4 + osNameLength
-
-	osVersionLength := int(binary.LittleEndian.Uint32(payload[position : position+4]))
-	stats.OsVersion = string(payload[position+4 : position+4+osVersionLength])
-	position += 4 + osVersionLength
-
-	kernelVersionLength := int(binary.LittleEndian.Uint32(payload[position : position+4]))
-	stats.KernelVersion = string(payload[position+4 : position+4+kernelVersionLength])
-
-	return &stats
 }

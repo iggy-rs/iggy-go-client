@@ -46,7 +46,7 @@ func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
 	if _, streamErr := messageStream.GetStreamById(GetStreamRequest{
 		StreamID: NewIdentifier(DefaultStreamId),
 	}); streamErr != nil {
-		streamErr = messageStream.CreateStream(StreamRequest{
+		streamErr = messageStream.CreateStream(CreateStreamRequest{
 			StreamId: DefaultStreamId,
 			Name:     "Test Producer Stream",
 		})

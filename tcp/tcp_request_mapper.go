@@ -115,15 +115,6 @@ func GetBytesFromHeader(key HeaderKey, value HeaderValue) []byte {
 	return headerBytes
 }
 
-func CreateStream(request StreamRequest) []byte {
-	nameLength := len(request.Name)
-	bytes := make([]byte, nameLength+5)
-	binary.LittleEndian.PutUint32(bytes[0:4], uint32(request.StreamId))
-	bytes[4] = byte(nameLength)
-	copy(bytes[5:], []byte(request.Name))
-	return bytes
-}
-
 func CreateGroup(request CreateConsumerGroupRequest) []byte {
 	return baseGroupMapping(request.StreamId, request.TopicId, request.ConsumerGroupId)
 }
