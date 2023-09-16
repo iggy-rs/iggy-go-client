@@ -1,25 +1,27 @@
 package iggcon
 
+type CommandCode int
+
 const (
-	KillCode         = 0
-	PingCode         = 1
-	GetStatsCode     = 10
-	SendMessagesCode = 101
-	PollMessagesCode = 100
-	StoreOffsetCode  = 121
-	GetOffsetCode    = 120
-	GetStreamCode    = 200
-	GetStreamsCode   = 201
-	CreateStreamCode = 202
-	DeleteStreamCode = 203
-	GetTopicCode     = 300
-	GetTopicsCode    = 301
-	CreateTopicCode  = 302
-	DeleteTopicCode  = 303
-	GetGroupCode     = 600
-	GetGroupsCode    = 601
-	CreateGroupCode  = 602
-	DeleteGroupCode  = 603
-	JoinGroupCode    = 604
-	LeaveGroupCode   = 605
+	KillCode         CommandCode = 0
+	PingCode         CommandCode = 1
+	GetStatsCode     CommandCode = 10
+	SendMessagesCode CommandCode = 101
+	PollMessagesCode CommandCode = 100
+	StoreOffsetCode  CommandCode = 121
+	GetOffsetCode    CommandCode = 120
+	GetStreamCode    CommandCode = 200
+	GetStreamsCode   CommandCode = 201
+	CreateStreamCode CommandCode = 202
+	DeleteStreamCode CommandCode = 203
+	GetTopicCode     CommandCode = 300
+	GetTopicsCode    CommandCode = 301
+	CreateTopicCode  CommandCode = 302
+	DeleteTopicCode  CommandCode = 303
+	GetGroupCode     CommandCode = 600
+	GetGroupsCode    CommandCode = 601
+	CreateGroupCode  CommandCode = 602
+	DeleteGroupCode  CommandCode = 603
+	JoinGroupCode    CommandCode = 604
+	LeaveGroupCode   CommandCode = 605
 )

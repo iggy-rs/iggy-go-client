@@ -273,7 +273,7 @@ func (tms *TcpMessageStream) StoreOffset(request StoreOffsetRequest) error {
 	return err
 }
 
-func (tms *TcpMessageStream) SendAndFetchResponse(message []byte, command int) ([]byte, error) {
+func (tms *TcpMessageStream) SendAndFetchResponse(message []byte, command CommandCode) ([]byte, error) {
 	payload := CreatePayload(message, command)
 
 	if _, err := tms.client.Write(payload); err != nil {
@@ -292,7 +292,7 @@ func (tms *TcpMessageStream) SendAndFetchResponse(message []byte, command int) (
 	return buffer, nil
 }
 
-func CreatePayload(message []byte, command int) []byte {
+func CreatePayload(message []byte, command CommandCode) []byte {
 	messageLength := len(message) + 4
 	messageBytes := make([]byte, InitialBytesLength+messageLength)
 	binary.LittleEndian.PutUint32(messageBytes[:4], uint32(messageLength))
