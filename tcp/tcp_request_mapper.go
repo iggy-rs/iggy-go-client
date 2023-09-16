@@ -40,36 +40,85 @@ func GetMessages(request MessageFetchRequest) []byte {
 	return bytes
 }
 
-func CreateMessage(streamId, topicId int, request MessageSendRequest) []byte {
-	messageBytesCount := 0
+func CreateMessage(request MessageSendRequest) []byte {
+	streamTopicIdLength := 2 + request.StreamId.Length + 2 + request.TopicId.Length
+	messageBytesCount := calculateMessageBytesCount(request.Messages)
+	totalSize := streamTopicIdLength + messageBytesCount + request.Partitioning.Length + 2
+	bytes := make([]byte, totalSize)
+	position := 0
+	//ids
+	copy(bytes[position:2+request.StreamId.Length], GetBytesFromIdentifier(request.StreamId))
+	copy(bytes[position+2+request.StreamId.Length:streamTopicIdLength], GetBytesFromIdentifier(request.TopicId))
+	position = streamTopicIdLength
+
+	//partitioning
+	bytes[streamTopicIdLength] = byte(request.Partitioning.Kind)
+	bytes[streamTopicIdLength+1] = byte(request.Partitioning.Length)
+	copy(bytes[streamTopicIdLength+2:streamTopicIdLength+2+request.Partitioning.Length], []byte(request.Partitioning.Value))
+	position = streamTopicIdLength + 2 + request.Partitioning.Length
+
+	emptyHeaders := make([]byte, 4)
+
 	for _, message := range request.Messages {
-		messageBytesCount += 16 + 1 + 4 + len(message.Payload)
-	}
 
-	bytes := make([]byte, 17+messageBytesCount)
-	binary.LittleEndian.PutUint32(bytes[0:4], uint32(streamId))
-	binary.LittleEndian.PutUint32(bytes[4:8], uint32(topicId))
-
-	switch request.Key.KeyKind {
-	case PartitionId:
-		bytes[8] = 0
-	case EntityId:
-		bytes[8] = 1
-	}
-
-	bytes[9] = 4 // default message length
-	binary.LittleEndian.PutUint32(bytes[10:14], uint32(request.Key.Value))
-	binary.LittleEndian.PutUint32(bytes[14:18], uint32(len(request.Messages)))
-
-	position := 18
-	for _, message := range request.Messages {
 		copy(bytes[position:position+16], message.Id[:])
-		binary.LittleEndian.PutUint32(bytes[position+16:position+20], uint32(len(message.Payload)))
-		copy(bytes[position+20:position+20+len(message.Payload)], message.Payload)
-		position += 20 + len(message.Payload)
+		if message.Headers != nil {
+			headersBytes := GetHeadersBytes(message.Headers)
+			binary.LittleEndian.PutUint32(bytes[position+16:position+20], uint32(len(headersBytes)))
+			copy(bytes[position+20:position+20+len(headersBytes)], headersBytes)
+			position += len(headersBytes) + 20
+		} else {
+			copy(bytes[position+16:position+16+len(emptyHeaders)], emptyHeaders)
+			position += 20
+		}
+
+		binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(len(message.Payload)))
+		copy(bytes[position+4:position+4+len(message.Payload)], message.Payload)
+		position += len(message.Payload) + 4
 	}
 
 	return bytes
+}
+
+func calculateMessageBytesCount(messages []Message) int {
+	count := 0
+	for _, msg := range messages {
+		count += 16 + 4 + len(msg.Payload) + 4
+		for key, header := range msg.Headers {
+			count += 4 + len(key.Value) + 1 + 4 + len(header.Value)
+		}
+	}
+	return count
+}
+
+func GetHeadersBytes(headers map[HeaderKey]HeaderValue) []byte {
+	headersLength := 0
+	for key, header := range headers {
+		headersLength += 4 + len(key.Value) + 1 + 4 + len(header.Value)
+	}
+	headersBytes := make([]byte, headersLength)
+	position := 0
+	for key, value := range headers {
+		headerBytes := GetBytesFromHeader(key, value)
+		copy(headersBytes[position:position+len(headerBytes)], headerBytes)
+		position += len(headerBytes)
+	}
+	return headersBytes
+}
+
+func GetBytesFromHeader(key HeaderKey, value HeaderValue) []byte {
+	headerBytesLength := 4 + len(key.Value) + 1 + 4 + len(value.Value)
+	headerBytes := make([]byte, headerBytesLength)
+
+	binary.LittleEndian.PutUint32(headerBytes[:4], uint32(len(key.Value)))
+	copy(headerBytes[4:4+len(key.Value)], key.Value)
+
+	headerBytes[4+len(key.Value)] = byte(value.Kind)
+
+	binary.LittleEndian.PutUint32(headerBytes[4+len(key.Value)+1:4+len(key.Value)+1+4], uint32(len(value.Value)))
+	copy(headerBytes[4+len(key.Value)+1+4:], value.Value)
+
+	return headerBytes
 }
 
 func CreateStream(request StreamRequest) []byte {

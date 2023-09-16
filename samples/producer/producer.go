@@ -42,11 +42,13 @@ func main() {
 
 func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
 	if _, streamErr := messageStream.GetStreamById(GetStreamRequest{
-		StreamID: NewIdentifier(StringId)}); streamErr != nil {
+		StreamID: NewIdentifier(StreamId)}); streamErr != nil {
 		streamErr = messageStream.CreateStream(StreamRequest{
 			StreamId: StreamId,
-			Name:     "Test Producer Stream",
+			Name:     "TestProducerStream",
 		})
+
+		fmt.Println(StreamId)
 
 		if streamErr != nil {
 			panic(streamErr)
@@ -96,12 +98,11 @@ func PublishMessages(messageStream IMessageStream) error {
 			})
 		}
 
-		err := messageStream.SendMessages(StreamId, TopicId, MessageSendRequest{
-			Messages: messages,
-			Key: Key{
-				KeyKind: PartitionId,
-				Value:   Partition,
-			},
+		err := messageStream.SendMessages(MessageSendRequest{
+			StreamId:     NewIdentifier(StreamId),
+			TopicId:      NewIdentifier(TopicId),
+			Messages:     messages,
+			Partitioning: PartitionId(Partition),
 		})
 		if err != nil {
 			return nil

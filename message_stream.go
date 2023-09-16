@@ -13,11 +13,9 @@ type IMessageStream interface {
 	GetTopics(streamId Identifier) ([]TopicResponse, error)
 	DeleteTopic(streamId, topicId Identifier) error
 
-	//TODO update contracts
-	SendMessages(streamId int, topicId int, request MessageSendRequest) error
+	SendMessages(request MessageSendRequest) error
 	PollMessages(request MessageFetchRequest) ([]MessageResponse, error)
 
-	//TODO update contracts
 	StoreOffset(request StoreOffsetRequest) error
 	GetOffset(request GetOffsetRequest) (*OffsetResponse, error)
 

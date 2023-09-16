@@ -2,6 +2,7 @@ package tcp
 
 import (
 	"encoding/binary"
+	"fmt"
 	"net"
 
 	. "github.com/iggy-rs/iggy-go-client/contracts"
@@ -171,6 +172,8 @@ func (tms *TcpMessageStream) DeleteTopic(streamId, topicId Identifier) error {
 
 func (tms *TcpMessageStream) CreateStream(request StreamRequest) error {
 	message := CreateStream(request)
+
+	fmt.Println(message)
 	_, err := tms.SendAndFetchResponse(message, CreateStreamCode)
 	if err != nil {
 		return err
@@ -179,8 +182,8 @@ func (tms *TcpMessageStream) CreateStream(request StreamRequest) error {
 	return nil
 }
 
-func (tms *TcpMessageStream) SendMessages(streamId int, topicId int, request MessageSendRequest) error {
-	message := CreateMessage(streamId, topicId, request)
+func (tms *TcpMessageStream) SendMessages(request MessageSendRequest) error {
+	message := CreateMessage(request)
 	_, err := tms.SendAndFetchResponse(message, SendMessagesCode)
 	if err != nil {
 		return err
