@@ -81,50 +81,40 @@ func CreateStream(request StreamRequest) []byte {
 	return bytes
 }
 
-func CreateGroup(streamId, topicId int, request CreateConsumerGroupRequest) []byte {
-	bytes := make([]byte, 12)
-	binary.LittleEndian.PutUint32(bytes[0:4], uint32(streamId))
-	binary.LittleEndian.PutUint32(bytes[4:8], uint32(topicId))
-	binary.LittleEndian.PutUint32(bytes[8:12], uint32(request.ConsumerGroupId))
-	return bytes
+func CreateGroup(request CreateConsumerGroupRequest) []byte {
+	return baseGroupMapping(request.StreamId, request.TopicId, request.ConsumerGroupId)
 }
 
 func JoinGroup(request JoinConsumerGroupRequest) []byte {
-	bytes := make([]byte, 12)
-	binary.LittleEndian.PutUint32(bytes[0:4], uint32(request.StreamId))
-	binary.LittleEndian.PutUint32(bytes[4:8], uint32(request.TopicId))
-	binary.LittleEndian.PutUint32(bytes[8:12], uint32(request.ConsumerGroupId))
-	return bytes
+	return baseGroupMapping(request.StreamId, request.TopicId, request.ConsumerGroupId)
 }
 
 func LeaveGroup(request LeaveConsumerGroupRequest) []byte {
-	bytes := make([]byte, 12)
-	binary.LittleEndian.PutUint32(bytes[0:4], uint32(request.StreamId))
-	binary.LittleEndian.PutUint32(bytes[4:8], uint32(request.TopicId))
-	binary.LittleEndian.PutUint32(bytes[8:12], uint32(request.ConsumerGroupId))
+	return baseGroupMapping(request.StreamId, request.TopicId, request.ConsumerGroupId)
+}
+
+func DeleteGroup(request DeleteConsumerGroupRequest) []byte {
+	return baseGroupMapping(request.StreamId, request.TopicId, request.ConsumerGroupId)
+}
+
+func GetGroup(streamId Identifier, topicId Identifier, groupId int) []byte {
+	return baseGroupMapping(streamId, topicId, groupId)
+}
+
+// this is extracted for later refactoring
+func baseGroupMapping(streamId Identifier, topicId Identifier, groupId int) []byte {
+	customIdOffset := 4 + streamId.Length + topicId.Length
+	bytes := make([]byte, customIdOffset+4)
+	copy(bytes[0:2+streamId.Length], GetBytesFromIdentifier(streamId))
+	copy(bytes[2+streamId.Length:], GetBytesFromIdentifier(topicId))
+	binary.LittleEndian.PutUint32(bytes[customIdOffset:customIdOffset+4], uint32(groupId))
 	return bytes
 }
 
-func DeleteGroup(streamId, topicId, groupId int) []byte {
-	bytes := make([]byte, 12)
-	binary.LittleEndian.PutUint32(bytes[0:4], uint32(streamId))
-	binary.LittleEndian.PutUint32(bytes[4:8], uint32(topicId))
-	binary.LittleEndian.PutUint32(bytes[8:12], uint32(groupId))
-	return bytes
-}
-
-func GetGroups(streamId, topicId int) []byte {
-	bytes := make([]byte, 8)
-	binary.LittleEndian.PutUint32(bytes[0:4], uint32(streamId))
-	binary.LittleEndian.PutUint32(bytes[4:8], uint32(topicId))
-	return bytes
-}
-
-func GetGroup(streamId, topicId, groupId int) []byte {
-	bytes := make([]byte, 12)
-	binary.LittleEndian.PutUint32(bytes[0:4], uint32(streamId))
-	binary.LittleEndian.PutUint32(bytes[4:8], uint32(topicId))
-	binary.LittleEndian.PutUint32(bytes[8:12], uint32(groupId))
+func GetGroups(streamId, topicId Identifier) []byte {
+	bytes := make([]byte, 4+streamId.Length+topicId.Length)
+	copy(bytes[0:2+streamId.Length], GetBytesFromIdentifier(streamId))
+	copy(bytes[2+streamId.Length:], GetBytesFromIdentifier(topicId))
 	return bytes
 }
 

@@ -7,17 +7,25 @@ type ConsumerGroupResponse struct {
 }
 
 type CreateConsumerGroupRequest struct {
-	ConsumerGroupId int `json:"consumerGroupId"`
+	StreamId        Identifier `json:"streamId"`
+	TopicId         Identifier `json:"topicId"`
+	ConsumerGroupId int        `json:"consumerGroupId"`
+}
+
+type DeleteConsumerGroupRequest struct {
+	StreamId        Identifier `json:"streamId"`
+	TopicId         Identifier `json:"topicId"`
+	ConsumerGroupId int        `json:"consumerGroupId"`
 }
 
 type JoinConsumerGroupRequest struct {
-	StreamId        int `json:"streamId"`
-	TopicId         int `json:"topicId"`
-	ConsumerGroupId int `json:"consumerGroupId"`
+	StreamId        Identifier `json:"streamId"`
+	TopicId         Identifier `json:"topicId"`
+	ConsumerGroupId int        `json:"consumerGroupId"`
 }
 
 type LeaveConsumerGroupRequest struct {
-	StreamId        int `json:"streamId"`
-	TopicId         int `json:"topicId"`
-	ConsumerGroupId int `json:"consumerGroupId"`
+	StreamId        Identifier `json:"streamId"`
+	TopicId         Identifier `json:"topicId"`
+	ConsumerGroupId int        `json:"consumerGroupId"`
 }

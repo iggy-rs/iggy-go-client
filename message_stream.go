@@ -19,10 +19,10 @@ type IMessageStream interface {
 	StoreOffset(streamId int, topicId int, offset OffsetContract) error
 	GetOffset(request OffsetRequest) (*OffsetResponse, error)
 
-	GetConsumerGroups(streamId int, topicId int) ([]ConsumerGroupResponse, error)
-	GetConsumerGroupById(streamId int, topicId int, groupId int) (*ConsumerGroupResponse, error)
-	CreateConsumerGroup(streamId int, topicId int, request CreateConsumerGroupRequest) error
-	DeleteConsumerGroup(streamId int, topicId int, groupId int) error
+	GetConsumerGroups(streamId Identifier, topicId Identifier) ([]ConsumerGroupResponse, error)
+	GetConsumerGroupById(streamId Identifier, topicId Identifier, groupId int) (*ConsumerGroupResponse, error)
+	CreateConsumerGroup(request CreateConsumerGroupRequest) error
+	DeleteConsumerGroup(request DeleteConsumerGroupRequest) error
 	JoinConsumerGroup(request JoinConsumerGroupRequest) error
 	LeaveConsumerGroup(request LeaveConsumerGroupRequest) error
 

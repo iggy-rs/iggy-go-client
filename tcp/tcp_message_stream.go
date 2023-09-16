@@ -209,8 +209,8 @@ func (tms *TcpMessageStream) PollMessages(request MessageFetchRequest) ([]Messag
 	return MapMessages(responseBuffer)
 }
 
-func (tms *TcpMessageStream) CreateConsumerGroup(streamId int, topicId int, request CreateConsumerGroupRequest) error {
-	message := CreateGroup(streamId, topicId, request)
+func (tms *TcpMessageStream) CreateConsumerGroup(request CreateConsumerGroupRequest) error {
+	message := CreateGroup(request)
 	_, err := tms.SendAndFetchResponse(message, CreateGroupCode)
 	if err != nil {
 		return err
@@ -219,8 +219,8 @@ func (tms *TcpMessageStream) CreateConsumerGroup(streamId int, topicId int, requ
 	return nil
 }
 
-func (tms *TcpMessageStream) DeleteConsumerGroup(streamId int, topicId int, groupId int) error {
-	message := DeleteGroup(streamId, topicId, groupId)
+func (tms *TcpMessageStream) DeleteConsumerGroup(request DeleteConsumerGroupRequest) error {
+	message := DeleteGroup(request)
 	_, err := tms.SendAndFetchResponse(message, DeleteGroupCode)
 	if err != nil {
 		return err
@@ -229,7 +229,7 @@ func (tms *TcpMessageStream) DeleteConsumerGroup(streamId int, topicId int, grou
 	return nil
 }
 
-func (tms *TcpMessageStream) GetConsumerGroupById(streamId int, topicId int, groupId int) (*ConsumerGroupResponse, error) {
+func (tms *TcpMessageStream) GetConsumerGroupById(streamId Identifier, topicId Identifier, groupId int) (*ConsumerGroupResponse, error) {
 	message := GetGroup(streamId, topicId, groupId)
 	buffer, err := tms.SendAndFetchResponse(message, GetGroupCode)
 	if err != nil {
@@ -249,7 +249,7 @@ func (tms *TcpMessageStream) GetConsumerGroupById(streamId int, topicId int, gro
 	return MapConsumerGroup(responseBuffer)
 }
 
-func (tms *TcpMessageStream) GetConsumerGroups(streamId int, topicId int) ([]ConsumerGroupResponse, error) {
+func (tms *TcpMessageStream) GetConsumerGroups(streamId Identifier, topicId Identifier) ([]ConsumerGroupResponse, error) {
 	message := GetGroups(streamId, topicId)
 	buffer, err := tms.SendAndFetchResponse(message, GetGroupsCode)
 	if err != nil {
