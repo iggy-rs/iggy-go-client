@@ -32,16 +32,14 @@ func NewTcpMessageStream(url string) (*TcpMessageStream, error) {
 }
 
 func (tms *TcpMessageStream) GetStats() (*Stats, error) {
-	var message []byte
-	buffer, err := tms.SendAndFetchResponse(message, GetStatsCode)
+	buffer, err := tms.SendAndFetchResponse([]byte{}, GetStatsCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength := GetResponseLength(buffer)
-
-	if responseLength <= 1 {
-		return nil, nil
+	responseLength, err := GetResponseLength(buffer)
+	if err != nil {
+		return nil, err
 	}
 
 	responseBuffer := make([]byte, responseLength)
@@ -54,16 +52,14 @@ func (tms *TcpMessageStream) GetStats() (*Stats, error) {
 }
 
 func (tms *TcpMessageStream) GetStreams() ([]StreamResponse, error) {
-	var message []byte
-	buffer, err := tms.SendAndFetchResponse(message, GetStreamsCode)
+	buffer, err := tms.SendAndFetchResponse([]byte{}, GetStreamsCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength := GetResponseLength(buffer)
-
-	if responseLength <= 1 {
-		return nil, nil
+	responseLength, err := GetResponseLength(buffer)
+	if err != nil {
+		return nil, err
 	}
 
 	responseBuffer := make([]byte, responseLength)
@@ -75,18 +71,16 @@ func (tms *TcpMessageStream) GetStreams() ([]StreamResponse, error) {
 	return MapStreams(responseBuffer), nil
 }
 
-func (tms *TcpMessageStream) GetStreamById(id int) (*StreamResponse, error) {
-	message := make([]byte, 4)
-	binary.LittleEndian.PutUint32(message, uint32(id))
+func (tms *TcpMessageStream) GetStreamById(request GetStreamRequest) (*StreamResponse, error) {
+	var message = GetBytesFromIdentifier(request.StreamID)
 	buffer, err := tms.SendAndFetchResponse(message, GetStreamCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength := GetResponseLength(buffer)
-
-	if responseLength <= 1 {
-		return nil, nil
+	responseLength, err := GetResponseLength(buffer)
+	if err != nil {
+		return nil, err
 	}
 
 	responseBuffer := make([]byte, responseLength)
@@ -98,27 +92,22 @@ func (tms *TcpMessageStream) GetStreamById(id int) (*StreamResponse, error) {
 	return MapStream(responseBuffer), nil
 }
 
-func (tms *TcpMessageStream) DeleteStream(id int) error {
-	message := make([]byte, 4)
-	binary.LittleEndian.PutUint32(message, uint32(id))
+func (tms *TcpMessageStream) DeleteStream(id Identifier) error {
+	message := GetBytesFromIdentifier(id)
 	_, err := tms.SendAndFetchResponse(message, DeleteStreamCode)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
-func (tms *TcpMessageStream) GetTopicById(streamId int, topicId int) (*TopicResponse, error) {
+func (tms *TcpMessageStream) GetTopicById(streamId Identifier, topicId Identifier) (*TopicResponse, error) {
 	message := GetTopicByIdMessage(streamId, topicId)
 	buffer, err := tms.SendAndFetchResponse(message, GetTopicCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength := GetResponseLength(buffer)
-	if responseLength <= 1 {
-		return nil, nil
+	responseLength, err := GetResponseLength(buffer)
+	if err != nil {
+		return nil, err
 	}
 
 	responseBuffer := make([]byte, responseLength)
@@ -129,18 +118,16 @@ func (tms *TcpMessageStream) GetTopicById(streamId int, topicId int) (*TopicResp
 	return MapTopic(responseBuffer)
 }
 
-func (tms *TcpMessageStream) GetTopics(streamId int) ([]TopicResponse, error) {
-	message := make([]byte, 4)
-	binary.LittleEndian.PutUint32(message, uint32(streamId))
+func (tms *TcpMessageStream) GetTopics(streamId Identifier) ([]TopicResponse, error) {
+	message := GetBytesFromIdentifier(streamId)
 	buffer, err := tms.SendAndFetchResponse(message, GetTopicsCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength := GetResponseLength(buffer)
-
-	if responseLength <= 1 {
-		return nil, nil
+	responseLength, err := GetResponseLength(buffer)
+	if err != nil {
+		return nil, err
 	}
 
 	responseBuffer := make([]byte, responseLength)
@@ -152,56 +139,40 @@ func (tms *TcpMessageStream) GetTopics(streamId int) ([]TopicResponse, error) {
 	return MapTopics(responseBuffer)
 }
 
-func (tms *TcpMessageStream) CreateTopic(streamId int, request TopicRequest) error {
-	message := CreateTopic(streamId, request)
+func (tms *TcpMessageStream) CreateTopic(request CreateTopicRequest) error {
+	message := CreateTopic(request)
 	_, err := tms.SendAndFetchResponse(message, CreateTopicCode)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
-func (tms *TcpMessageStream) DeleteTopic(streamId int, topicId int) error {
+func (tms *TcpMessageStream) DeleteTopic(streamId, topicId Identifier) error {
 	message := DeleteTopic(streamId, topicId)
 	_, err := tms.SendAndFetchResponse(message, DeleteTopicCode)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (tms *TcpMessageStream) CreateStream(request StreamRequest) error {
 	message := CreateStream(request)
 	_, err := tms.SendAndFetchResponse(message, CreateStreamCode)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
-func (tms *TcpMessageStream) SendMessages(streamId int, topicId int, request MessageSendRequest) error {
-	message := CreateMessage(streamId, topicId, request)
+func (tms *TcpMessageStream) SendMessages(request SendMessagesRequest) error {
+	message := CreateMessage(request)
 	_, err := tms.SendAndFetchResponse(message, SendMessagesCode)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
-func (tms *TcpMessageStream) PollMessages(request MessageFetchRequest) ([]MessageResponse, error) {
+func (tms *TcpMessageStream) PollMessages(request FetchMessagesRequest) (*FetchMessagesResponse, error) {
 	message := GetMessages(request)
 	buffer, err := tms.SendAndFetchResponse(message, PollMessagesCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength := GetResponseLength(buffer)
-	if responseLength <= 1 {
-		return []MessageResponse{}, nil
+	responseLength, err := GetResponseLength(buffer)
+	if err != nil {
+		return nil, err
 	}
 
 	responseBuffer := make([]byte, responseLength)
@@ -212,36 +183,28 @@ func (tms *TcpMessageStream) PollMessages(request MessageFetchRequest) ([]Messag
 	return MapMessages(responseBuffer)
 }
 
-func (tms *TcpMessageStream) CreateConsumerGroup(streamId int, topicId int, request CreateConsumerGroupRequest) error {
-	message := CreateGroup(streamId, topicId, request)
+func (tms *TcpMessageStream) CreateConsumerGroup(request CreateConsumerGroupRequest) error {
+	message := CreateGroup(request)
 	_, err := tms.SendAndFetchResponse(message, CreateGroupCode)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
-func (tms *TcpMessageStream) DeleteConsumerGroup(streamId int, topicId int, groupId int) error {
-	message := DeleteGroup(streamId, topicId, groupId)
+func (tms *TcpMessageStream) DeleteConsumerGroup(request DeleteConsumerGroupRequest) error {
+	message := DeleteGroup(request)
 	_, err := tms.SendAndFetchResponse(message, DeleteGroupCode)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
-func (tms *TcpMessageStream) GetConsumerGroupById(streamId int, topicId int, groupId int) (*ConsumerGroupResponse, error) {
+func (tms *TcpMessageStream) GetConsumerGroupById(streamId Identifier, topicId Identifier, groupId int) (*ConsumerGroupResponse, error) {
 	message := GetGroup(streamId, topicId, groupId)
 	buffer, err := tms.SendAndFetchResponse(message, GetGroupCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength := GetResponseLength(buffer)
-	if responseLength <= 1 {
-		return nil, nil
+	responseLength, err := GetResponseLength(buffer)
+	if err != nil {
+		return nil, err
 	}
 
 	responseBuffer := make([]byte, responseLength)
@@ -252,16 +215,16 @@ func (tms *TcpMessageStream) GetConsumerGroupById(streamId int, topicId int, gro
 	return MapConsumerGroup(responseBuffer)
 }
 
-func (tms *TcpMessageStream) GetConsumerGroups(streamId int, topicId int) ([]ConsumerGroupResponse, error) {
+func (tms *TcpMessageStream) GetConsumerGroups(streamId Identifier, topicId Identifier) ([]ConsumerGroupResponse, error) {
 	message := GetGroups(streamId, topicId)
 	buffer, err := tms.SendAndFetchResponse(message, GetGroupsCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength := GetResponseLength(buffer)
-	if responseLength <= 1 {
-		return nil, nil
+	responseLength, err := GetResponseLength(buffer)
+	if err != nil {
+		return nil, err
 	}
 
 	responseBuffer := make([]byte, responseLength)
@@ -272,16 +235,16 @@ func (tms *TcpMessageStream) GetConsumerGroups(streamId int, topicId int) ([]Con
 	return MapConsumerGroups(responseBuffer), err
 }
 
-func (tms *TcpMessageStream) GetOffset(request OffsetRequest) (*OffsetResponse, error) {
+func (tms *TcpMessageStream) GetOffset(request GetOffsetRequest) (*OffsetResponse, error) {
 	message := GetOffset(request)
 	buffer, err := tms.SendAndFetchResponse(message, GetOffsetCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength := GetResponseLength(buffer)
-	if responseLength <= 1 {
-		return nil, nil
+	responseLength, err := GetResponseLength(buffer)
+	if err != nil {
+		return nil, err
 	}
 
 	responseBuffer := make([]byte, responseLength)
@@ -295,34 +258,22 @@ func (tms *TcpMessageStream) GetOffset(request OffsetRequest) (*OffsetResponse, 
 func (tms *TcpMessageStream) JoinConsumerGroup(request JoinConsumerGroupRequest) error {
 	message := JoinGroup(request)
 	_, err := tms.SendAndFetchResponse(message, JoinGroupCode)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (tms *TcpMessageStream) LeaveConsumerGroup(request LeaveConsumerGroupRequest) error {
 	message := LeaveGroup(request)
 	_, err := tms.SendAndFetchResponse(message, LeaveGroupCode)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
-func (tms *TcpMessageStream) StoreOffset(streamId int, topicId int, offset OffsetContract) error {
-	message := UpdateOffset(streamId, topicId, offset)
+func (tms *TcpMessageStream) StoreOffset(request StoreOffsetRequest) error {
+	message := UpdateOffset(request)
 	_, err := tms.SendAndFetchResponse(message, StoreOffsetCode)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
-func (tms *TcpMessageStream) SendAndFetchResponse(message []byte, command int) ([]byte, error) {
+func (tms *TcpMessageStream) SendAndFetchResponse(message []byte, command CommandCode) ([]byte, error) {
 	payload := CreatePayload(message, command)
 
 	if _, err := tms.client.Write(payload); err != nil {
@@ -341,7 +292,7 @@ func (tms *TcpMessageStream) SendAndFetchResponse(message []byte, command int) (
 	return buffer, nil
 }
 
-func CreatePayload(message []byte, command int) []byte {
+func CreatePayload(message []byte, command CommandCode) []byte {
 	messageLength := len(message) + 4
 	messageBytes := make([]byte, InitialBytesLength+messageLength)
 	binary.LittleEndian.PutUint32(messageBytes[:4], uint32(messageLength))
@@ -354,6 +305,13 @@ func GetResponseCode(buffer []byte) int {
 	return int(binary.LittleEndian.Uint32(buffer[:4]))
 }
 
-func GetResponseLength(buffer []byte) int {
-	return int(binary.LittleEndian.Uint32(buffer[4:]))
+func GetResponseLength(buffer []byte) (int, error) {
+	length := int(binary.LittleEndian.Uint32(buffer[4:]))
+	if length <= 1 {
+		return 0, &ierror.IggyError{
+			Code:    0,
+			Message: "Received empty response.",
+		}
+	}
+	return length, nil
 }

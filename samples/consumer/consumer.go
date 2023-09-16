@@ -13,7 +13,7 @@ import (
 
 // config
 const (
-	StreamId          = 1
+	DefaultStreamId   = 1
 	TopicId           = 1
 	MessageBatchCount = 1
 	Partition         = 1
@@ -43,9 +43,11 @@ func main() {
 }
 
 func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
-	if _, streamErr := messageStream.GetStreamById(StreamId); streamErr != nil {
+	if _, streamErr := messageStream.GetStreamById(GetStreamRequest{
+		StreamID: NewIdentifier(DefaultStreamId),
+	}); streamErr != nil {
 		streamErr = messageStream.CreateStream(StreamRequest{
-			StreamId: StreamId,
+			StreamId: DefaultStreamId,
 			Name:     "Test Producer Stream",
 		})
 
@@ -53,16 +55,17 @@ func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
 			panic(streamErr)
 		}
 
-		fmt.Printf("Created stream with ID: %d.\n", StreamId)
+		fmt.Printf("Created stream with ID: %d.\n", DefaultStreamId)
 	}
 
-	fmt.Printf("Stream with ID: %d exists.\n", StreamId)
+	fmt.Printf("Stream with ID: %d exists.\n", DefaultStreamId)
 
-	if _, topicErr := messageStream.GetTopicById(StreamId, TopicId); topicErr != nil {
-		topicErr = messageStream.CreateTopic(StreamId, TopicRequest{
+	if _, topicErr := messageStream.GetTopicById(NewIdentifier(DefaultStreamId), NewIdentifier(TopicId)); topicErr != nil {
+		topicErr = messageStream.CreateTopic(CreateTopicRequest{
 			TopicId:         TopicId,
 			Name:            "Test Topic From Producer Sample",
 			PartitionsCount: 12,
+			StreamId:        NewIdentifier(DefaultStreamId),
 		})
 
 		if topicErr != nil {
@@ -78,24 +81,25 @@ func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
 }
 
 func ConsumeMessages(messageStream IMessageStream) error {
-	fmt.Printf("Messages will be polled from stream '%d', topic '%d', partition '%d' with interval %d ms.\n", StreamId, TopicId, Partition, Interval)
+	fmt.Printf("Messages will be polled from stream '%d', topic '%d', partition '%d' with interval %d ms.\n", DefaultStreamId, TopicId, Partition, Interval)
 
 	for {
-		messages, err := messageStream.PollMessages(MessageFetchRequest{
+		messagesWrapper, err := messageStream.PollMessages(FetchMessagesRequest{
 			Count:           1,
-			StreamId:        StreamId,
-			TopicId:         TopicId,
-			ConsumerId:      ConsumerId,
+			StreamId:        NewIdentifier(DefaultStreamId),
+			TopicId:         NewIdentifier(TopicId),
+			Consumer:        Consumer{Kind: ConsumerSingle, Id: ConsumerId},
 			PartitionId:     Partition,
-			PollingStrategy: Next,
-			Value:           0,
+			PollingStrategy: NextPollingStrategy(),
 			AutoCommit:      true,
-			ConsumerType:    Consumer,
 		})
 		if err != nil {
 			return err
 		}
-
+		if messagesWrapper == nil {
+			panic("Something went wrong - this edge case handling will be refactored")
+		}
+		messages := messagesWrapper.Messages
 		if len(messages) != 0 {
 			for _, message := range messages {
 				if err := HandleMessage(message); err != nil {

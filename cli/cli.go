@@ -67,8 +67,8 @@ func getUsage() {
 func init() {
 	getStreamCmd.StringVar(&url, "url", "127.0.0.1", "Iggy server url")
 	getStreamCmd.StringVar(&port, "port", "8090", "Iggy server port")
-	getStreamCmd.IntVar(&gs_streamId, "streamid", -1, "Stream Id. Returns all streams for default value.")
-	getStreamCmd.IntVar(&gs_streamId, "sid", -1, "Alias for Stream Id")
+	getStreamCmd.IntVar(&gs_streamId, "streamname", -1, "Stream Id. Returns all streams for default value.")
+	getStreamCmd.IntVar(&gs_streamId, "sname", -1, "Alias for Stream Id")
 	getStreamCmd.IntVar(&gs_streamId, "s", -1, "Alias for Stream Id")
 
 	createStreamCmd.StringVar(&url, "url", "127.0.0.1", "Iggy server url")
@@ -156,7 +156,10 @@ func main() {
 			return
 		}
 
-		stream, err := ms.GetStreamById(gs_streamId)
+		stream, err := ms.GetStreamById(
+			GetStreamRequest{
+				StreamID: NewIdentifier(gs_streamId),
+			})
 		if err != nil {
 			HandleError(err)
 		}
@@ -171,7 +174,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		err := ms.DeleteStream(ds_streamId)
+		err := ms.DeleteStream(NewIdentifier(ds_streamId))
 		if err != nil {
 			HandleError(err)
 		}
@@ -185,10 +188,11 @@ func main() {
 			os.Exit(1)
 		}
 
-		err := ms.CreateTopic(ct_streamId, TopicRequest{
+		err := ms.CreateTopic(CreateTopicRequest{
 			TopicId:         ct_topicId,
 			Name:            ct_name,
 			PartitionsCount: ct_partitionsCount,
+			StreamId:        NewIdentifier(ct_streamId),
 		})
 		if err != nil {
 			HandleError(err)
@@ -198,14 +202,14 @@ func main() {
 		ms := CreateMessageStream()
 
 		if gt_topicId == -1 {
-			topics, err := ms.GetTopics(gt_streamId)
+			topics, err := ms.GetTopics(NewIdentifier(gt_streamId))
 			if err != nil {
 				HandleError(err)
 			}
 			SerializeAndPrint(topics)
 			return
 		}
-		topic, err := ms.GetTopicById(gt_streamId, gt_topicId)
+		topic, err := ms.GetTopicById(NewIdentifier(gt_streamId), NewIdentifier(gt_topicId))
 		if err != nil {
 			HandleError(err)
 		}
@@ -226,7 +230,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		err := ms.DeleteTopic(dt_streamId, dt_topicId)
+		err := ms.DeleteTopic(NewIdentifier(dt_streamId), NewIdentifier(dt_topicId))
 		if err != nil {
 			HandleError(err)
 		}

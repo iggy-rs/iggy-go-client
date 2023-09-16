@@ -4,25 +4,25 @@ import . "github.com/iggy-rs/iggy-go-client/contracts"
 
 type IMessageStream interface {
 	CreateStream(request StreamRequest) error
-	GetStreamById(id int) (*StreamResponse, error)
+	GetStreamById(request GetStreamRequest) (*StreamResponse, error)
 	GetStreams() ([]StreamResponse, error)
-	DeleteStream(id int) error
+	DeleteStream(id Identifier) error
 
-	CreateTopic(streamId int, request TopicRequest) error
-	GetTopicById(streamId, topicId int) (*TopicResponse, error)
-	GetTopics(streamId int) ([]TopicResponse, error)
-	DeleteTopic(streamId int, topicId int) error
+	CreateTopic(request CreateTopicRequest) error
+	GetTopicById(streamId, topicId Identifier) (*TopicResponse, error)
+	GetTopics(streamId Identifier) ([]TopicResponse, error)
+	DeleteTopic(streamId, topicId Identifier) error
 
-	SendMessages(streamId int, topicId int, request MessageSendRequest) error
-	PollMessages(request MessageFetchRequest) ([]MessageResponse, error)
+	SendMessages(request SendMessagesRequest) error
+	PollMessages(request FetchMessagesRequest) (*FetchMessagesResponse, error)
 
-	StoreOffset(streamId int, topicId int, offset OffsetContract) error
-	GetOffset(request OffsetRequest) (*OffsetResponse, error)
+	StoreOffset(request StoreOffsetRequest) error
+	GetOffset(request GetOffsetRequest) (*OffsetResponse, error)
 
-	GetConsumerGroups(streamId int, topicId int) ([]ConsumerGroupResponse, error)
-	GetConsumerGroupById(streamId int, topicId int, groupId int) (*ConsumerGroupResponse, error)
-	CreateConsumerGroup(streamId int, topicId int, request CreateConsumerGroupRequest) error
-	DeleteConsumerGroup(streamId int, topicId int, groupId int) error
+	GetConsumerGroups(streamId Identifier, topicId Identifier) ([]ConsumerGroupResponse, error)
+	GetConsumerGroupById(streamId Identifier, topicId Identifier, groupId int) (*ConsumerGroupResponse, error)
+	CreateConsumerGroup(request CreateConsumerGroupRequest) error
+	DeleteConsumerGroup(request DeleteConsumerGroupRequest) error
 	JoinConsumerGroup(request JoinConsumerGroupRequest) error
 	LeaveConsumerGroup(request LeaveConsumerGroupRequest) error
 

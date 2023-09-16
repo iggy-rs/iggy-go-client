@@ -41,11 +41,14 @@ func main() {
 }
 
 func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
-	if _, streamErr := messageStream.GetStreamById(StreamId); streamErr != nil {
+	if _, streamErr := messageStream.GetStreamById(GetStreamRequest{
+		StreamID: NewIdentifier(StreamId)}); streamErr != nil {
 		streamErr = messageStream.CreateStream(StreamRequest{
 			StreamId: StreamId,
 			Name:     "Test Producer Stream",
 		})
+
+		fmt.Println(StreamId)
 
 		if streamErr != nil {
 			panic(streamErr)
@@ -56,11 +59,12 @@ func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
 
 	fmt.Printf("Stream with ID: %d exists.\n", StreamId)
 
-	if _, topicErr := messageStream.GetTopicById(StreamId, TopicId); topicErr != nil {
-		topicErr = messageStream.CreateTopic(StreamId, TopicRequest{
+	if _, topicErr := messageStream.GetTopicById(NewIdentifier(StreamId), NewIdentifier(TopicId)); topicErr != nil {
+		topicErr = messageStream.CreateTopic(CreateTopicRequest{
 			TopicId:         TopicId,
 			Name:            "Test Topic From Producer Sample",
 			PartitionsCount: 12,
+			StreamId:        NewIdentifier(StreamId),
 		})
 
 		if topicErr != nil {
@@ -94,12 +98,11 @@ func PublishMessages(messageStream IMessageStream) error {
 			})
 		}
 
-		err := messageStream.SendMessages(StreamId, TopicId, MessageSendRequest{
-			Messages: messages,
-			Key: Key{
-				KeyKind: PartitionId,
-				Value:   Partition,
-			},
+		err := messageStream.SendMessages(SendMessagesRequest{
+			StreamId:     NewIdentifier(StreamId),
+			TopicId:      NewIdentifier(TopicId),
+			Messages:     messages,
+			Partitioning: PartitionId(Partition),
 		})
 		if err != nil {
 			return nil
