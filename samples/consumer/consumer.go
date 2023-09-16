@@ -13,12 +13,11 @@ import (
 
 // config
 const (
-	DefaultStreamId   = 1
-	TopicId           = 1
-	MessageBatchCount = 1
-	Partition         = 1
-	Interval          = 1000
-	ConsumerId        = 1
+	DefaultStreamId = 1
+	TopicId         = 1
+	Partition       = 1
+	Interval        = 1000
+	ConsumerId      = 1
 )
 
 func main() {

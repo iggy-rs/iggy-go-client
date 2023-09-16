@@ -7,34 +7,6 @@ import (
 	tcpserialization "github.com/iggy-rs/iggy-go-client/tcp/serialization"
 )
 
-func GetMessages(request FetchMessagesRequest) []byte {
-	streamTopicIdLength := 2 + request.StreamId.Length + 2 + request.TopicId.Length
-	messageSize := 18 + 5 + streamTopicIdLength
-	bytes := make([]byte, messageSize)
-	bytes[0] = byte(request.Consumer.Kind)
-	binary.LittleEndian.PutUint32(bytes[1:5], uint32(request.Consumer.Id))
-
-	position := 5
-	copy(bytes[position:position+streamTopicIdLength], append(append([]byte{}, tcpserialization.SerializeIdentifier(request.StreamId)...), tcpserialization.SerializeIdentifier(request.TopicId)...))
-
-	position += streamTopicIdLength
-	binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(request.PartitionId))
-	bytes[position+4] = byte(request.PollingStrategy.Kind)
-
-	position += 5
-	binary.LittleEndian.PutUint64(bytes[position:position+8], uint64(request.PollingStrategy.Value))
-	binary.LittleEndian.PutUint32(bytes[position+8:position+12], uint32(request.Count))
-
-	position += 12
-	if request.AutoCommit {
-		bytes[position] = 1
-	} else {
-		bytes[position] = 0
-	}
-
-	return bytes
-}
-
 func CreateMessage(request SendMessagesRequest) []byte {
 	streamTopicIdLength := 2 + request.StreamId.Length + 2 + request.TopicId.Length
 	messageBytesCount := calculateMessageBytesCount(request.Messages)

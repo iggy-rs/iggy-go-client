@@ -169,7 +169,8 @@ func (tms *TcpMessageStream) SendMessages(request SendMessagesRequest) error {
 }
 
 func (tms *TcpMessageStream) PollMessages(request FetchMessagesRequest) (*FetchMessagesResponse, error) {
-	message := GetMessages(request)
+	serializedRequest := tcpserialization.TcpFetchMessagesRequest{FetchMessagesRequest: request}
+	message := serializedRequest.Serialize()
 	buffer, err := tms.SendAndFetchResponse(message, PollMessagesCode)
 	if err != nil {
 		return nil, err
