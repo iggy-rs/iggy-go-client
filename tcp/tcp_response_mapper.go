@@ -11,12 +11,14 @@ import (
 )
 
 func MapOffsets(payload []byte) *OffsetResponse {
-	consumerId := int(binary.LittleEndian.Uint32(payload[0:4]))
-	offset := int(binary.LittleEndian.Uint32(payload[4:8]))
+	partitionId := int(binary.LittleEndian.Uint32(payload[0:4]))
+	currentOffset := binary.LittleEndian.Uint64(payload[4:12])
+	storedOffset := binary.LittleEndian.Uint64(payload[12:20])
 
 	return &OffsetResponse{
-		Offset:     offset,
-		ConsumerId: consumerId,
+		PartitionId:   partitionId,
+		CurrentOffset: currentOffset,
+		StoredOffset:  storedOffset,
 	}
 }
 
