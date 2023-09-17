@@ -2,16 +2,17 @@ package iggy
 
 import . "github.com/iggy-rs/iggy-go-client/contracts"
 
-type IMessageStream interface {
+type MessageStream interface {
 	GetStreamById(request GetStreamRequest) (*StreamResponse, error)
 	GetStreams() ([]StreamResponse, error)
 	CreateStream(request CreateStreamRequest) error
 	UpdateStream(request UpdateStreamRequest) error
 	DeleteStream(id Identifier) error
 
-	CreateTopic(request CreateTopicRequest) error
 	GetTopicById(streamId, topicId Identifier) (*TopicResponse, error)
 	GetTopics(streamId Identifier) ([]TopicResponse, error)
+	CreateTopic(request CreateTopicRequest) error
+	UpdateTopic(request UpdateTopicRequest) error
 	DeleteTopic(streamId, topicId Identifier) error
 
 	SendMessages(request SendMessagesRequest) error

@@ -8,6 +8,13 @@ type CreateTopicRequest struct {
 	PartitionsCount int        `json:"partitionsCount"`
 }
 
+type UpdateTopicRequest struct {
+	TopicId       Identifier `json:"topicId"`
+	StreamId      Identifier `json:"streamId"`
+	Name          string     `json:"name"`
+	MessageExpiry int        `json:"messageExpiry"`
+}
+
 type TopicResponse struct {
 	Id              int                 `json:"id"`
 	CreatedAt       int                 `json:"createdAt"`

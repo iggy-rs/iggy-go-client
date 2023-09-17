@@ -41,7 +41,7 @@ func main() {
 	}
 }
 
-func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
+func EnsureInsfrastructureIsInitialized(messageStream MessageStream) error {
 	if _, streamErr := messageStream.GetStreamById(GetStreamRequest{
 		StreamID: NewIdentifier(DefaultStreamId),
 	}); streamErr != nil {
@@ -79,7 +79,7 @@ func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
 	return nil
 }
 
-func ConsumeMessages(messageStream IMessageStream) error {
+func ConsumeMessages(messageStream MessageStream) error {
 	fmt.Printf("Messages will be polled from stream '%d', topic '%d', partition '%d' with interval %d ms.\n", DefaultStreamId, TopicId, Partition, Interval)
 
 	for {

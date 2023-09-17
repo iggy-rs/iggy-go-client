@@ -149,6 +149,12 @@ func (tms *TcpMessageStream) CreateTopic(request CreateTopicRequest) error {
 	return err
 }
 
+func (tms *TcpMessageStream) UpdateTopic(request UpdateTopicRequest) error {
+	serializedRequest := tcpserialization.TcpUpdateTopicRequest{UpdateTopicRequest: request}
+	_, err := tms.SendAndFetchResponse(serializedRequest.Serialize(), CreateTopicCode)
+	return err
+}
+
 func (tms *TcpMessageStream) DeleteTopic(streamId, topicId Identifier) error {
 	message := DeleteTopic(streamId, topicId)
 	_, err := tms.SendAndFetchResponse(message, DeleteTopicCode)
@@ -157,15 +163,13 @@ func (tms *TcpMessageStream) DeleteTopic(streamId, topicId Identifier) error {
 
 func (tms *TcpMessageStream) CreateStream(request CreateStreamRequest) error {
 	serializedRequest := tcpserialization.TcpCreateStreamRequest{CreateStreamRequest: request}
-	message := serializedRequest.Serialize()
-	_, err := tms.SendAndFetchResponse(message, CreateStreamCode)
+	_, err := tms.SendAndFetchResponse(serializedRequest.Serialize(), CreateStreamCode)
 	return err
 }
 
 func (tms *TcpMessageStream) UpdateStream(request UpdateStreamRequest) error {
 	serializedRequest := tcpserialization.TcpUpdateStreamRequest{UpdateStreamRequest: request}
-	message := serializedRequest.Serialize()
-	_, err := tms.SendAndFetchResponse(message, UpdateStreamCode)
+	_, err := tms.SendAndFetchResponse(serializedRequest.Serialize(), UpdateStreamCode)
 	return err
 }
 
@@ -177,8 +181,7 @@ func (tms *TcpMessageStream) SendMessages(request SendMessagesRequest) error {
 
 func (tms *TcpMessageStream) PollMessages(request FetchMessagesRequest) (*FetchMessagesResponse, error) {
 	serializedRequest := tcpserialization.TcpFetchMessagesRequest{FetchMessagesRequest: request}
-	message := serializedRequest.Serialize()
-	buffer, err := tms.SendAndFetchResponse(message, PollMessagesCode)
+	buffer, err := tms.SendAndFetchResponse(serializedRequest.Serialize(), PollMessagesCode)
 	if err != nil {
 		return nil, err
 	}
