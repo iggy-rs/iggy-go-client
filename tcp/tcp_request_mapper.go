@@ -154,14 +154,14 @@ func CreateTopic(request CreateTopicRequest) []byte {
 func GetTopicByIdMessage(streamId, topicId Identifier) []byte {
 	bytes := make([]byte, 4+streamId.Length+topicId.Length)
 	copy(bytes[0:2+streamId.Length], tcpserialization.SerializeIdentifier(streamId))
-	copy(bytes[2+topicId.Length:], tcpserialization.SerializeIdentifier(topicId))
+	copy(bytes[2+streamId.Length:], tcpserialization.SerializeIdentifier(topicId))
 	return bytes
 }
 
 func DeleteTopic(streamId, topicId Identifier) []byte {
 	bytes := make([]byte, 4+streamId.Length+topicId.Length)
 	copy(bytes[0:2+streamId.Length], tcpserialization.SerializeIdentifier(streamId))
-	copy(bytes[2+topicId.Length:], tcpserialization.SerializeIdentifier(topicId))
+	copy(bytes[2+streamId.Length:], tcpserialization.SerializeIdentifier(topicId))
 	return bytes
 }
 
