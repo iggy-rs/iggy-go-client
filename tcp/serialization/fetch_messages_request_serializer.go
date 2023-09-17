@@ -19,7 +19,7 @@ type TcpFetchMessagesRequest struct {
 
 func (request *TcpFetchMessagesRequest) Serialize() []byte {
 	streamTopicIdLength := streamTopicIdHeader + request.StreamId.Length + streamTopicIdHeader + request.TopicId.Length
-	messageSize := headerSize + offsetSize + streamTopicIdLength + partitionStrategySize + offsetSize + commitFlagSize
+	messageSize := headerSize + streamTopicIdLength + partitionStrategySize + offsetSize + commitFlagSize
 	bytes := make([]byte, messageSize)
 
 	bytes[0] = byte(request.Consumer.Kind)

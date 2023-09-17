@@ -2,7 +2,6 @@ package tcpserialization
 
 import (
 	"encoding/binary"
-	"fmt"
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
 )
 
@@ -18,6 +17,5 @@ func (request *TcpUpdateTopicRequest) Serialize() []byte {
 	binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(request.MessageExpiry))
 	bytes[position+4] = byte(len(request.Name))
 	copy(bytes[position+5:], []byte(request.Name))
-	fmt.Println(bytes)
 	return bytes
 }
