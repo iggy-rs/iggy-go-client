@@ -8,12 +8,12 @@ import (
 )
 
 type IMessageStreamFactory interface {
-	CreateStream(config iggcon.MessageStreamConfiguration) (IMessageStream, error)
+	CreateStream(config iggcon.MessageStreamConfiguration) (MessageStream, error)
 }
 
 type MessageStreamFactory struct{}
 
-func (msf *MessageStreamFactory) CreateMessageStream(config iggcon.MessageStreamConfiguration) (IMessageStream, error) {
+func (msf *MessageStreamFactory) CreateMessageStream(config iggcon.MessageStreamConfiguration) (MessageStream, error) {
 	if config.Protocol == iggcon.Tcp {
 		tcpMessageStream, err := tcp.NewTcpMessageStream(config.BaseAddress)
 		if err != nil {

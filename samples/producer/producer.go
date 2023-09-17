@@ -40,10 +40,10 @@ func main() {
 	}
 }
 
-func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
+func EnsureInsfrastructureIsInitialized(messageStream MessageStream) error {
 	if _, streamErr := messageStream.GetStreamById(GetStreamRequest{
 		StreamID: NewIdentifier(StreamId)}); streamErr != nil {
-		streamErr = messageStream.CreateStream(StreamRequest{
+		streamErr = messageStream.CreateStream(CreateStreamRequest{
 			StreamId: StreamId,
 			Name:     "Test Producer Stream",
 		})
@@ -79,7 +79,7 @@ func EnsureInsfrastructureIsInitialized(messageStream IMessageStream) error {
 	return nil
 }
 
-func PublishMessages(messageStream IMessageStream) error {
+func PublishMessages(messageStream MessageStream) error {
 	fmt.Printf("Messages will be sent to stream '%d', topic '%d', partition '%d' with interval %d ms.\n", StreamId, TopicId, Partition, Interval)
 	messageGenerator := NewMessageGenerator()
 

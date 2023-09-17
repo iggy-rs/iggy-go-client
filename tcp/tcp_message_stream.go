@@ -2,6 +2,7 @@ package tcp
 
 import (
 	"encoding/binary"
+	tcpserialization "github.com/iggy-rs/iggy-go-client/tcp/serialization"
 	"net"
 
 	. "github.com/iggy-rs/iggy-go-client/contracts"
@@ -48,7 +49,10 @@ func (tms *TcpMessageStream) GetStats() (*Stats, error) {
 		return nil, err
 	}
 
-	return MapStats(responseBuffer), nil
+	stats := &tcpserialization.TcpStats{}
+	err = stats.Deserialize(responseBuffer)
+
+	return &stats.Stats, err
 }
 
 func (tms *TcpMessageStream) GetStreams() ([]StreamResponse, error) {
@@ -72,7 +76,7 @@ func (tms *TcpMessageStream) GetStreams() ([]StreamResponse, error) {
 }
 
 func (tms *TcpMessageStream) GetStreamById(request GetStreamRequest) (*StreamResponse, error) {
-	var message = GetBytesFromIdentifier(request.StreamID)
+	var message = tcpserialization.SerializeIdentifier(request.StreamID)
 	buffer, err := tms.SendAndFetchResponse(message, GetStreamCode)
 	if err != nil {
 		return nil, err
@@ -93,7 +97,7 @@ func (tms *TcpMessageStream) GetStreamById(request GetStreamRequest) (*StreamRes
 }
 
 func (tms *TcpMessageStream) DeleteStream(id Identifier) error {
-	message := GetBytesFromIdentifier(id)
+	var message = tcpserialization.SerializeIdentifier(id)
 	_, err := tms.SendAndFetchResponse(message, DeleteStreamCode)
 	return err
 }
@@ -119,7 +123,7 @@ func (tms *TcpMessageStream) GetTopicById(streamId Identifier, topicId Identifie
 }
 
 func (tms *TcpMessageStream) GetTopics(streamId Identifier) ([]TopicResponse, error) {
-	message := GetBytesFromIdentifier(streamId)
+	var message = tcpserialization.SerializeIdentifier(streamId)
 	buffer, err := tms.SendAndFetchResponse(message, GetTopicsCode)
 	if err != nil {
 		return nil, err
@@ -145,15 +149,27 @@ func (tms *TcpMessageStream) CreateTopic(request CreateTopicRequest) error {
 	return err
 }
 
+func (tms *TcpMessageStream) UpdateTopic(request UpdateTopicRequest) error {
+	serializedRequest := tcpserialization.TcpUpdateTopicRequest{UpdateTopicRequest: request}
+	_, err := tms.SendAndFetchResponse(serializedRequest.Serialize(), CreateTopicCode)
+	return err
+}
+
 func (tms *TcpMessageStream) DeleteTopic(streamId, topicId Identifier) error {
 	message := DeleteTopic(streamId, topicId)
 	_, err := tms.SendAndFetchResponse(message, DeleteTopicCode)
 	return err
 }
 
-func (tms *TcpMessageStream) CreateStream(request StreamRequest) error {
-	message := CreateStream(request)
-	_, err := tms.SendAndFetchResponse(message, CreateStreamCode)
+func (tms *TcpMessageStream) CreateStream(request CreateStreamRequest) error {
+	serializedRequest := tcpserialization.TcpCreateStreamRequest{CreateStreamRequest: request}
+	_, err := tms.SendAndFetchResponse(serializedRequest.Serialize(), CreateStreamCode)
+	return err
+}
+
+func (tms *TcpMessageStream) UpdateStream(request UpdateStreamRequest) error {
+	serializedRequest := tcpserialization.TcpUpdateStreamRequest{UpdateStreamRequest: request}
+	_, err := tms.SendAndFetchResponse(serializedRequest.Serialize(), UpdateStreamCode)
 	return err
 }
 
@@ -164,8 +180,8 @@ func (tms *TcpMessageStream) SendMessages(request SendMessagesRequest) error {
 }
 
 func (tms *TcpMessageStream) PollMessages(request FetchMessagesRequest) (*FetchMessagesResponse, error) {
-	message := GetMessages(request)
-	buffer, err := tms.SendAndFetchResponse(message, PollMessagesCode)
+	serializedRequest := tcpserialization.TcpFetchMessagesRequest{FetchMessagesRequest: request}
+	buffer, err := tms.SendAndFetchResponse(serializedRequest.Serialize(), PollMessagesCode)
 	if err != nil {
 		return nil, err
 	}

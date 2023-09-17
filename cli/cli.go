@@ -13,10 +13,12 @@ import (
 // CLI commands
 var (
 	createStreamCmd = flag.NewFlagSet("createstream", flag.ExitOnError)
+	updateStreamCmd = flag.NewFlagSet("updatestream", flag.ExitOnError)
 	getStreamCmd    = flag.NewFlagSet("getstream", flag.ExitOnError)
 	deleteStreamCmd = flag.NewFlagSet("deletestream", flag.ExitOnError)
 
 	createTopicCmd = flag.NewFlagSet("createtopic", flag.ExitOnError)
+	updateTopicCmd = flag.NewFlagSet("updatetopic", flag.ExitOnError)
 	getTopicCmd    = flag.NewFlagSet("gettopic", flag.ExitOnError)
 	deleteTopicCmd = flag.NewFlagSet("deletetopic", flag.ExitOnError)
 
@@ -35,6 +37,10 @@ var (
 	cs_streamId int
 	cs_name     string
 
+	//update stream
+	us_streamId int
+	us_name     string
+
 	//delete stream
 	ds_streamId int
 
@@ -48,6 +54,11 @@ var (
 	ct_name            string
 	ct_partitionsCount int
 
+	//update topic
+	ut_streamId int
+	ut_topicId  int
+	ut_name     string
+
 	//delete topic
 	dt_streamId int
 	dt_topicId  int
@@ -57,6 +68,7 @@ func getUsage() {
 	fmt.Println("Usage:")
 	fmt.Println("  getstream    -url <url> -port <port> -streamId <streamId>")
 	fmt.Println("  createstream -url <url> -port <port> -streamId <streamId> -name <name>")
+	fmt.Println("  updatestream -url <url> -port <port> -streamId <streamId> -name <name>")
 	fmt.Println("  deletestream -url <url> -port <port> -streamId <streamId>")
 	fmt.Println("  gettopic     -url <url> -port <port> -streamId <streamId> -topicId <topicId>")
 	fmt.Println("  createtopic  -url <url> -port <port> -streamId <streamId> -topicId <topicId> -name <name> -partitionsCount <partitionsCount>")
@@ -78,6 +90,14 @@ func init() {
 	createStreamCmd.IntVar(&cs_streamId, "s", 1, "Alias for Stream Id")
 	createStreamCmd.StringVar(&cs_name, "name", "", "Stream name")
 	createStreamCmd.StringVar(&cs_name, "n", "", "Stream name")
+
+	updateStreamCmd.StringVar(&url, "url", "127.0.0.1", "Iggy server url")
+	updateStreamCmd.StringVar(&port, "port", "8090", "Iggy server port")
+	updateStreamCmd.IntVar(&us_streamId, "streamid", 1, "Stream Id")
+	updateStreamCmd.IntVar(&us_streamId, "sid", 1, "Alias for Stream Id")
+	updateStreamCmd.IntVar(&us_streamId, "s", 1, "Alias for Stream Id")
+	updateStreamCmd.StringVar(&us_name, "name", "", "Stream name")
+	updateStreamCmd.StringVar(&us_name, "n", "", "Stream name")
 
 	deleteStreamCmd.StringVar(&url, "url", "127.0.0.1", "Iggy server url")
 	deleteStreamCmd.StringVar(&port, "port", "8090", "Iggy server port")
@@ -106,6 +126,17 @@ func init() {
 	createTopicCmd.StringVar(&ct_name, "n", "", "Alias for Topic name")
 	createTopicCmd.IntVar(&ct_partitionsCount, "partitionsCount", 1, "Number of partitions in topic")
 	createTopicCmd.IntVar(&ct_partitionsCount, "pc", 1, "Alias for Number of partitions in topic")
+
+	updateTopicCmd.StringVar(&url, "url", "127.0.0.1", "Iggy server url")
+	updateTopicCmd.StringVar(&port, "port", "8090", "Iggy server port")
+	updateTopicCmd.IntVar(&ut_streamId, "streamid", 1, "Stream Id")
+	updateTopicCmd.IntVar(&ut_streamId, "sid", 1, "Alias for Stream Id")
+	updateTopicCmd.IntVar(&ut_streamId, "s", 1, "Alias for Stream Id")
+	updateTopicCmd.IntVar(&ut_topicId, "topicid", 2, "Topic Id")
+	updateTopicCmd.IntVar(&ut_topicId, "tid", 1, "Alias for Topic Id")
+	updateTopicCmd.IntVar(&ut_topicId, "t", 1, "Alias for Topic Id")
+	updateTopicCmd.StringVar(&ut_name, "name", "", "Topic name")
+	updateTopicCmd.StringVar(&ut_name, "n", "", "Alias for Topic name")
 
 	deleteTopicCmd.StringVar(&url, "url", "127.0.0.1", "Iggy server url")
 	deleteTopicCmd.StringVar(&port, "port", "8090", "Iggy server port")
@@ -136,9 +167,26 @@ func main() {
 			os.Exit(1)
 		}
 
-		err := ms.CreateStream(StreamRequest{
+		err := ms.CreateStream(CreateStreamRequest{
 			StreamId: cs_streamId,
 			Name:     cs_name,
+		})
+		if err != nil {
+			HandleError(err)
+		}
+
+	case "updatestream":
+		updateStreamCmd.Parse(os.Args[2:])
+		ms := CreateMessageStream()
+		if us_name == "" {
+			fmt.Println("Error: Name flag is required.")
+			updateStreamCmd.PrintDefaults()
+			os.Exit(1)
+		}
+
+		err := ms.UpdateStream(UpdateStreamRequest{
+			StreamId: NewIdentifier(us_streamId),
+			Name:     us_name,
 		})
 		if err != nil {
 			HandleError(err)
@@ -197,6 +245,24 @@ func main() {
 		if err != nil {
 			HandleError(err)
 		}
+	case "updatetopic":
+		updateTopicCmd.Parse(os.Args[2:])
+		ms := CreateMessageStream()
+		if ut_name == "" {
+			fmt.Println("Error: Name flag is required.")
+			updateTopicCmd.PrintDefaults()
+			os.Exit(1)
+		}
+
+		err := ms.UpdateTopic(UpdateTopicRequest{
+			TopicId:  NewIdentifier(ut_topicId),
+			Name:     ut_name,
+			StreamId: NewIdentifier(ut_streamId),
+		})
+		if err != nil {
+			HandleError(err)
+		}
+
 	case "gettopic":
 		getTopicCmd.Parse(os.Args[2:])
 		ms := CreateMessageStream()
@@ -253,7 +319,7 @@ func main() {
 	}
 }
 
-func CreateMessageStream() IMessageStream {
+func CreateMessageStream() MessageStream {
 	factory := &MessageStreamFactory{}
 	config := MessageStreamConfiguration{
 		BaseAddress: url + ":" + port,
