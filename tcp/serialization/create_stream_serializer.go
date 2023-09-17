@@ -17,9 +17,11 @@ const (
 
 func (request *TcpCreateStreamRequest) Serialize() []byte {
 	nameLength := len(request.Name)
-	bytes := make([]byte, nameLength+payloadOffset)
-	binary.LittleEndian.PutUint32(bytes[streamIDOffset:streamIDOffset+4], uint32(request.StreamId))
-	bytes[nameLengthOffset] = byte(nameLength)
-	copy(bytes[payloadOffset:], []byte(request.Name))
-	return bytes
+	serialized := make([]byte, payloadOffset+nameLength)
+
+	binary.LittleEndian.PutUint32(serialized[streamIDOffset:], uint32(request.StreamId))
+	serialized[nameLengthOffset] = byte(nameLength)
+	copy(serialized[payloadOffset:], []byte(request.Name))
+
+	return serialized
 }
