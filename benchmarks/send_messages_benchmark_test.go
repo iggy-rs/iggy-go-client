@@ -1,4 +1,4 @@
-package send_messages_benchmark
+package benchmarks
 
 import (
 	"fmt"
