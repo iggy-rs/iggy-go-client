@@ -33,12 +33,12 @@ func NewTcpMessageStream(url string) (*TcpMessageStream, error) {
 }
 
 func (tms *TcpMessageStream) GetStats() (*Stats, error) {
-	buffer, err := tms.SendAndFetchResponse([]byte{}, GetStatsCode)
+	buffer, err := tms.sendAndFetchResponse([]byte{}, GetStatsCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength, err := GetResponseLength(buffer)
+	responseLength, err := getResponseLength(buffer)
 	if err != nil {
 		return nil, err
 	}
@@ -56,12 +56,12 @@ func (tms *TcpMessageStream) GetStats() (*Stats, error) {
 }
 
 func (tms *TcpMessageStream) GetStreams() ([]StreamResponse, error) {
-	buffer, err := tms.SendAndFetchResponse([]byte{}, GetStreamsCode)
+	buffer, err := tms.sendAndFetchResponse([]byte{}, GetStreamsCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength, err := GetResponseLength(buffer)
+	responseLength, err := getResponseLength(buffer)
 	if err != nil {
 		return nil, err
 	}
@@ -76,13 +76,13 @@ func (tms *TcpMessageStream) GetStreams() ([]StreamResponse, error) {
 }
 
 func (tms *TcpMessageStream) GetStreamById(request GetStreamRequest) (*StreamResponse, error) {
-	var message = tcpserialization.SerializeIdentifier(request.StreamID)
-	buffer, err := tms.SendAndFetchResponse(message, GetStreamCode)
+	message := tcpserialization.SerializeIdentifier(request.StreamID)
+	buffer, err := tms.sendAndFetchResponse(message, GetStreamCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength, err := GetResponseLength(buffer)
+	responseLength, err := getResponseLength(buffer)
 	if err != nil {
 		return nil, err
 	}
@@ -97,19 +97,19 @@ func (tms *TcpMessageStream) GetStreamById(request GetStreamRequest) (*StreamRes
 }
 
 func (tms *TcpMessageStream) DeleteStream(id Identifier) error {
-	var message = tcpserialization.SerializeIdentifier(id)
-	_, err := tms.SendAndFetchResponse(message, DeleteStreamCode)
+	message := tcpserialization.SerializeIdentifier(id)
+	_, err := tms.sendAndFetchResponse(message, DeleteStreamCode)
 	return err
 }
 
 func (tms *TcpMessageStream) GetTopicById(streamId Identifier, topicId Identifier) (*TopicResponse, error) {
 	message := GetTopicByIdMessage(streamId, topicId)
-	buffer, err := tms.SendAndFetchResponse(message, GetTopicCode)
+	buffer, err := tms.sendAndFetchResponse(message, GetTopicCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength, err := GetResponseLength(buffer)
+	responseLength, err := getResponseLength(buffer)
 	if err != nil {
 		return nil, err
 	}
@@ -123,13 +123,13 @@ func (tms *TcpMessageStream) GetTopicById(streamId Identifier, topicId Identifie
 }
 
 func (tms *TcpMessageStream) GetTopics(streamId Identifier) ([]TopicResponse, error) {
-	var message = tcpserialization.SerializeIdentifier(streamId)
-	buffer, err := tms.SendAndFetchResponse(message, GetTopicsCode)
+	message := tcpserialization.SerializeIdentifier(streamId)
+	buffer, err := tms.sendAndFetchResponse(message, GetTopicsCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength, err := GetResponseLength(buffer)
+	responseLength, err := getResponseLength(buffer)
 	if err != nil {
 		return nil, err
 	}
@@ -145,48 +145,48 @@ func (tms *TcpMessageStream) GetTopics(streamId Identifier) ([]TopicResponse, er
 
 func (tms *TcpMessageStream) CreateTopic(request CreateTopicRequest) error {
 	message := CreateTopic(request)
-	_, err := tms.SendAndFetchResponse(message, CreateTopicCode)
+	_, err := tms.sendAndFetchResponse(message, CreateTopicCode)
 	return err
 }
 
 func (tms *TcpMessageStream) UpdateTopic(request UpdateTopicRequest) error {
 	serializedRequest := tcpserialization.TcpUpdateTopicRequest{UpdateTopicRequest: request}
-	_, err := tms.SendAndFetchResponse(serializedRequest.Serialize(), CreateTopicCode)
+	_, err := tms.sendAndFetchResponse(serializedRequest.Serialize(), CreateTopicCode)
 	return err
 }
 
 func (tms *TcpMessageStream) DeleteTopic(streamId, topicId Identifier) error {
 	message := DeleteTopic(streamId, topicId)
-	_, err := tms.SendAndFetchResponse(message, DeleteTopicCode)
+	_, err := tms.sendAndFetchResponse(message, DeleteTopicCode)
 	return err
 }
 
 func (tms *TcpMessageStream) CreateStream(request CreateStreamRequest) error {
 	serializedRequest := tcpserialization.TcpCreateStreamRequest{CreateStreamRequest: request}
-	_, err := tms.SendAndFetchResponse(serializedRequest.Serialize(), CreateStreamCode)
+	_, err := tms.sendAndFetchResponse(serializedRequest.Serialize(), CreateStreamCode)
 	return err
 }
 
 func (tms *TcpMessageStream) UpdateStream(request UpdateStreamRequest) error {
 	serializedRequest := tcpserialization.TcpUpdateStreamRequest{UpdateStreamRequest: request}
-	_, err := tms.SendAndFetchResponse(serializedRequest.Serialize(), UpdateStreamCode)
+	_, err := tms.sendAndFetchResponse(serializedRequest.Serialize(), UpdateStreamCode)
 	return err
 }
 
 func (tms *TcpMessageStream) SendMessages(request SendMessagesRequest) error {
 	message := CreateMessage(request)
-	_, err := tms.SendAndFetchResponse(message, SendMessagesCode)
+	_, err := tms.sendAndFetchResponse(message, SendMessagesCode)
 	return err
 }
 
 func (tms *TcpMessageStream) PollMessages(request FetchMessagesRequest) (*FetchMessagesResponse, error) {
 	serializedRequest := tcpserialization.TcpFetchMessagesRequest{FetchMessagesRequest: request}
-	buffer, err := tms.SendAndFetchResponse(serializedRequest.Serialize(), PollMessagesCode)
+	buffer, err := tms.sendAndFetchResponse(serializedRequest.Serialize(), PollMessagesCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength, err := GetResponseLength(buffer)
+	responseLength, err := getResponseLength(buffer)
 	if err != nil {
 		return nil, err
 	}
@@ -201,24 +201,24 @@ func (tms *TcpMessageStream) PollMessages(request FetchMessagesRequest) (*FetchM
 
 func (tms *TcpMessageStream) CreateConsumerGroup(request CreateConsumerGroupRequest) error {
 	message := CreateGroup(request)
-	_, err := tms.SendAndFetchResponse(message, CreateGroupCode)
+	_, err := tms.sendAndFetchResponse(message, CreateGroupCode)
 	return err
 }
 
 func (tms *TcpMessageStream) DeleteConsumerGroup(request DeleteConsumerGroupRequest) error {
 	message := DeleteGroup(request)
-	_, err := tms.SendAndFetchResponse(message, DeleteGroupCode)
+	_, err := tms.sendAndFetchResponse(message, DeleteGroupCode)
 	return err
 }
 
 func (tms *TcpMessageStream) GetConsumerGroupById(streamId Identifier, topicId Identifier, groupId int) (*ConsumerGroupResponse, error) {
 	message := GetGroup(streamId, topicId, groupId)
-	buffer, err := tms.SendAndFetchResponse(message, GetGroupCode)
+	buffer, err := tms.sendAndFetchResponse(message, GetGroupCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength, err := GetResponseLength(buffer)
+	responseLength, err := getResponseLength(buffer)
 	if err != nil {
 		return nil, err
 	}
@@ -233,12 +233,12 @@ func (tms *TcpMessageStream) GetConsumerGroupById(streamId Identifier, topicId I
 
 func (tms *TcpMessageStream) GetConsumerGroups(streamId Identifier, topicId Identifier) ([]ConsumerGroupResponse, error) {
 	message := GetGroups(streamId, topicId)
-	buffer, err := tms.SendAndFetchResponse(message, GetGroupsCode)
+	buffer, err := tms.sendAndFetchResponse(message, GetGroupsCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength, err := GetResponseLength(buffer)
+	responseLength, err := getResponseLength(buffer)
 	if err != nil {
 		return nil, err
 	}
@@ -253,12 +253,12 @@ func (tms *TcpMessageStream) GetConsumerGroups(streamId Identifier, topicId Iden
 
 func (tms *TcpMessageStream) GetOffset(request GetOffsetRequest) (*OffsetResponse, error) {
 	message := GetOffset(request)
-	buffer, err := tms.SendAndFetchResponse(message, GetOffsetCode)
+	buffer, err := tms.sendAndFetchResponse(message, GetOffsetCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength, err := GetResponseLength(buffer)
+	responseLength, err := getResponseLength(buffer)
 	if err != nil {
 		return nil, err
 	}
@@ -273,24 +273,24 @@ func (tms *TcpMessageStream) GetOffset(request GetOffsetRequest) (*OffsetRespons
 
 func (tms *TcpMessageStream) JoinConsumerGroup(request JoinConsumerGroupRequest) error {
 	message := JoinGroup(request)
-	_, err := tms.SendAndFetchResponse(message, JoinGroupCode)
+	_, err := tms.sendAndFetchResponse(message, JoinGroupCode)
 	return err
 }
 
 func (tms *TcpMessageStream) LeaveConsumerGroup(request LeaveConsumerGroupRequest) error {
 	message := LeaveGroup(request)
-	_, err := tms.SendAndFetchResponse(message, LeaveGroupCode)
+	_, err := tms.sendAndFetchResponse(message, LeaveGroupCode)
 	return err
 }
 
 func (tms *TcpMessageStream) StoreOffset(request StoreOffsetRequest) error {
 	message := UpdateOffset(request)
-	_, err := tms.SendAndFetchResponse(message, StoreOffsetCode)
+	_, err := tms.sendAndFetchResponse(message, StoreOffsetCode)
 	return err
 }
 
-func (tms *TcpMessageStream) SendAndFetchResponse(message []byte, command CommandCode) ([]byte, error) {
-	payload := CreatePayload(message, command)
+func (tms *TcpMessageStream) sendAndFetchResponse(message []byte, command CommandCode) ([]byte, error) {
+	payload := createPayload(message, command)
 
 	if _, err := tms.client.Write(payload); err != nil {
 		return nil, err
@@ -301,14 +301,14 @@ func (tms *TcpMessageStream) SendAndFetchResponse(message []byte, command Comman
 		return nil, err
 	}
 
-	if responseCode := GetResponseCode(buffer); responseCode != 0 {
+	if responseCode := getResponseCode(buffer); responseCode != 0 {
 		return nil, ierror.MapFromCode(responseCode)
 	}
 
 	return buffer, nil
 }
 
-func CreatePayload(message []byte, command CommandCode) []byte {
+func createPayload(message []byte, command CommandCode) []byte {
 	messageLength := len(message) + 4
 	messageBytes := make([]byte, InitialBytesLength+messageLength)
 	binary.LittleEndian.PutUint32(messageBytes[:4], uint32(messageLength))
@@ -317,11 +317,11 @@ func CreatePayload(message []byte, command CommandCode) []byte {
 	return messageBytes
 }
 
-func GetResponseCode(buffer []byte) int {
+func getResponseCode(buffer []byte) int {
 	return int(binary.LittleEndian.Uint32(buffer[:4]))
 }
 
-func GetResponseLength(buffer []byte) (int, error) {
+func getResponseLength(buffer []byte) (int, error) {
 	length := int(binary.LittleEndian.Uint32(buffer[4:]))
 	if length <= 1 {
 		return 0, &ierror.IggyError{
