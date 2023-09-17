@@ -162,6 +162,13 @@ func (tms *TcpMessageStream) CreateStream(request CreateStreamRequest) error {
 	return err
 }
 
+func (tms *TcpMessageStream) UpdateStream(request UpdateStreamRequest) error {
+	serializedRequest := tcpserialization.TcpUpdateStreamRequest{UpdateStreamRequest: request}
+	message := serializedRequest.Serialize()
+	_, err := tms.SendAndFetchResponse(message, UpdateStreamCode)
+	return err
+}
+
 func (tms *TcpMessageStream) SendMessages(request SendMessagesRequest) error {
 	message := CreateMessage(request)
 	_, err := tms.SendAndFetchResponse(message, SendMessagesCode)

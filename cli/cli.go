@@ -13,6 +13,7 @@ import (
 // CLI commands
 var (
 	createStreamCmd = flag.NewFlagSet("createstream", flag.ExitOnError)
+	updateStreamCmd = flag.NewFlagSet("updatestream", flag.ExitOnError)
 	getStreamCmd    = flag.NewFlagSet("getstream", flag.ExitOnError)
 	deleteStreamCmd = flag.NewFlagSet("deletestream", flag.ExitOnError)
 
@@ -34,6 +35,10 @@ var (
 	//create stream
 	cs_streamId int
 	cs_name     string
+
+	//update stream
+	us_streamId int
+	us_name     string
 
 	//delete stream
 	ds_streamId int
@@ -57,6 +62,7 @@ func getUsage() {
 	fmt.Println("Usage:")
 	fmt.Println("  getstream    -url <url> -port <port> -streamId <streamId>")
 	fmt.Println("  createstream -url <url> -port <port> -streamId <streamId> -name <name>")
+	fmt.Println("  updatestream -url <url> -port <port> -streamId <streamId> -name <name>")
 	fmt.Println("  deletestream -url <url> -port <port> -streamId <streamId>")
 	fmt.Println("  gettopic     -url <url> -port <port> -streamId <streamId> -topicId <topicId>")
 	fmt.Println("  createtopic  -url <url> -port <port> -streamId <streamId> -topicId <topicId> -name <name> -partitionsCount <partitionsCount>")
@@ -78,6 +84,14 @@ func init() {
 	createStreamCmd.IntVar(&cs_streamId, "s", 1, "Alias for Stream Id")
 	createStreamCmd.StringVar(&cs_name, "name", "", "Stream name")
 	createStreamCmd.StringVar(&cs_name, "n", "", "Stream name")
+
+	updateStreamCmd.StringVar(&url, "url", "127.0.0.1", "Iggy server url")
+	updateStreamCmd.StringVar(&port, "port", "8090", "Iggy server port")
+	updateStreamCmd.IntVar(&us_streamId, "streamid", 1, "Stream Id")
+	updateStreamCmd.IntVar(&us_streamId, "sid", 1, "Alias for Stream Id")
+	updateStreamCmd.IntVar(&us_streamId, "s", 1, "Alias for Stream Id")
+	updateStreamCmd.StringVar(&us_name, "name", "", "Stream name")
+	updateStreamCmd.StringVar(&us_name, "n", "", "Stream name")
 
 	deleteStreamCmd.StringVar(&url, "url", "127.0.0.1", "Iggy server url")
 	deleteStreamCmd.StringVar(&port, "port", "8090", "Iggy server port")
@@ -139,6 +153,23 @@ func main() {
 		err := ms.CreateStream(CreateStreamRequest{
 			StreamId: cs_streamId,
 			Name:     cs_name,
+		})
+		if err != nil {
+			HandleError(err)
+		}
+
+	case "updatestream":
+		updateStreamCmd.Parse(os.Args[2:])
+		ms := CreateMessageStream()
+		if us_name == "" {
+			fmt.Println("Error: Name flag is required.")
+			updateStreamCmd.PrintDefaults()
+			os.Exit(1)
+		}
+
+		err := ms.UpdateStream(UpdateStreamRequest{
+			StreamId: NewIdentifier(us_streamId),
+			Name:     us_name,
 		})
 		if err != nil {
 			HandleError(err)

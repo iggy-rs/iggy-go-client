@@ -5,6 +5,11 @@ type CreateStreamRequest struct {
 	Name     string `json:"name"`
 }
 
+type UpdateStreamRequest struct {
+	StreamId Identifier `json:"streamId"`
+	Name     string     `json:"name"`
+}
+
 type StreamResponse struct {
 	Id            int             `json:"id"`
 	Name          string          `json:"name"`

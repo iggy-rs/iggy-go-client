@@ -3,9 +3,10 @@ package iggy
 import . "github.com/iggy-rs/iggy-go-client/contracts"
 
 type IMessageStream interface {
-	CreateStream(request CreateStreamRequest) error
 	GetStreamById(request GetStreamRequest) (*StreamResponse, error)
 	GetStreams() ([]StreamResponse, error)
+	CreateStream(request CreateStreamRequest) error
+	UpdateStream(request UpdateStreamRequest) error
 	DeleteStream(id Identifier) error
 
 	CreateTopic(request CreateTopicRequest) error
