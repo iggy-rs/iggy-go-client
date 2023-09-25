@@ -1,4 +1,4 @@
-package tcpserialization
+package binaryserialization
 
 import "encoding/binary"
 import iggcon "github.com/iggy-rs/iggy-go-client/contracts"
@@ -22,5 +22,21 @@ func SerializeIdentifier(identifier iggcon.Identifier) []byte {
 		valAsInt := identifier.Value.(int)
 		binary.LittleEndian.PutUint32(bytes[stringIdLength:stringIdLength+numericIdLength], uint32(valAsInt))
 	}
+	return bytes
+}
+
+func SerializeIdentifiers(identifiers ...iggcon.Identifier) []byte {
+	size := 0
+	for i := 0; i < len(identifiers); i++ {
+		size += 2 + identifiers[i].Length
+	}
+
+	bytes := make([]byte, size)
+	position := 0
+	for _, identifier := range identifiers {
+		copy(bytes[position:2+identifier.Length], SerializeIdentifier(identifier))
+		position += 2 + identifier.Length
+	}
+
 	return bytes
 }

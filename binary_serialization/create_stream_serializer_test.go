@@ -1,4 +1,4 @@
-package tcpserialization
+package binaryserialization
 
 import (
 	"encoding/binary"

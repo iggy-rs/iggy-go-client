@@ -1,4 +1,4 @@
-package tcp
+package binaryserialization
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 	. "github.com/iggy-rs/iggy-go-client/contracts"
 )
 
-func MapOffsets(payload []byte) *OffsetResponse {
+func DeserializeOffset(payload []byte) *OffsetResponse {
 	partitionId := int(binary.LittleEndian.Uint32(payload[0:4]))
 	currentOffset := binary.LittleEndian.Uint64(payload[4:12])
 	storedOffset := binary.LittleEndian.Uint64(payload[12:20])
@@ -21,12 +21,12 @@ func MapOffsets(payload []byte) *OffsetResponse {
 	}
 }
 
-func MapStreams(payload []byte) []StreamResponse {
+func DeserializeStreams(payload []byte) []StreamResponse {
 	streams := make([]StreamResponse, 0)
 	position := 0
 
 	for position < len(payload) {
-		stream, readBytes := MapToStream(payload, position)
+		stream, readBytes := DeserializeToStream(payload, position)
 		streams = append(streams, stream)
 		position += readBytes
 	}
@@ -34,13 +34,13 @@ func MapStreams(payload []byte) []StreamResponse {
 	return streams
 }
 
-func MapStream(payload []byte) *StreamResponse {
-	stream, position := MapToStream(payload, 0)
+func DeserializerStream(payload []byte) *StreamResponse {
+	stream, position := DeserializeToStream(payload, 0)
 	topics := make([]TopicResponse, 0)
 	length := len(payload)
 
 	for position < length {
-		topic, readBytes, _ := MapToTopic(payload, position)
+		topic, readBytes, _ := DeserializeToTopic(payload, position)
 		topics = append(topics, topic)
 		position += readBytes
 	}
@@ -56,7 +56,7 @@ func MapStream(payload []byte) *StreamResponse {
 	}
 }
 
-func MapToStream(payload []byte, position int) (StreamResponse, int) {
+func DeserializeToStream(payload []byte, position int) (StreamResponse, int) {
 	id := int(binary.LittleEndian.Uint32(payload[position : position+4]))
 	createdAt := binary.LittleEndian.Uint64(payload[position+4 : position+12])
 	topicsCount := int(binary.LittleEndian.Uint32(payload[position+12 : position+16]))
@@ -79,7 +79,7 @@ func MapToStream(payload []byte, position int) (StreamResponse, int) {
 	}, readBytes
 }
 
-func MapMessages(payload []byte) (*FetchMessagesResponse, error) {
+func DeserializeFetchMessagesResponse(payload []byte) (*FetchMessagesResponse, error) {
 	const propertiesSize = 45
 	length := len(payload)
 	partitionId := int(binary.LittleEndian.Uint32(payload[0:4]))
@@ -105,7 +105,7 @@ func MapMessages(payload []byte) (*FetchMessagesResponse, error) {
 		id, err := uuid.FromBytes(payload[position+17 : position+33])
 		checksum := binary.LittleEndian.Uint32(payload[position+33 : position+37])
 		headersLength := int(binary.LittleEndian.Uint32(payload[position+37 : position+41]))
-		headers, err := mapHeaders(payload[(position + 41):(position + 41 + headersLength)])
+		headers, err := deserializeHeaders(payload[(position + 41):(position + 41 + headersLength)])
 		if err != nil {
 			return nil, err
 		}
@@ -157,7 +157,7 @@ func mapMessageState(state byte) (MessageState, error) {
 	}
 }
 
-func mapHeaders(payload []byte) (map[HeaderKey]HeaderValue, error) {
+func deserializeHeaders(payload []byte) (map[HeaderKey]HeaderValue, error) {
 	headers := make(map[HeaderKey]HeaderValue)
 	position := 0
 
@@ -180,7 +180,7 @@ func mapHeaders(payload []byte) (map[HeaderKey]HeaderValue, error) {
 		key := string(payload[position : position+int(keyLength)])
 		position += int(keyLength)
 
-		headerKind, err := mapHeaderKind(payload, position)
+		headerKind, err := deserializeHeaderKind(payload, position)
 		if err != nil {
 			return nil, err
 		}
@@ -213,7 +213,7 @@ func mapHeaders(payload []byte) (map[HeaderKey]HeaderValue, error) {
 	return headers, nil
 }
 
-func mapHeaderKind(payload []byte, position int) (HeaderKind, error) {
+func deserializeHeaderKind(payload []byte, position int) (HeaderKind, error) {
 	if position >= len(payload) {
 		return 0, errors.New("Invalid header kind position")
 	}
@@ -221,13 +221,13 @@ func mapHeaderKind(payload []byte, position int) (HeaderKind, error) {
 	return HeaderKind(payload[position]), nil
 }
 
-func MapTopics(payload []byte) ([]TopicResponse, error) {
+func DeserializeTopics(payload []byte) ([]TopicResponse, error) {
 	topics := make([]TopicResponse, 0)
 	length := len(payload)
 	position := 0
 
 	for position < length {
-		topic, readBytes, err := MapToTopic(payload, position)
+		topic, readBytes, err := DeserializeToTopic(payload, position)
 		if err != nil {
 			return nil, err
 		}
@@ -238,8 +238,8 @@ func MapTopics(payload []byte) ([]TopicResponse, error) {
 	return topics, nil
 }
 
-func MapTopic(payload []byte) (*TopicResponse, error) {
-	topic, position, err := MapToTopic(payload, 0)
+func DeserializeTopic(payload []byte) (*TopicResponse, error) {
+	topic, position, err := DeserializeToTopic(payload, 0)
 	if err != nil {
 		return &TopicResponse{}, err
 	}
@@ -248,7 +248,7 @@ func MapTopic(payload []byte) (*TopicResponse, error) {
 	length := len(payload)
 
 	for position < length {
-		partition, readBytes := MapToPartition(payload, position)
+		partition, readBytes := DeserializePartition(payload, position)
 		if err != nil {
 			return &TopicResponse{}, err
 		}
@@ -261,7 +261,7 @@ func MapTopic(payload []byte) (*TopicResponse, error) {
 	return &topic, nil
 }
 
-func MapToTopic(payload []byte, position int) (TopicResponse, int, error) {
+func DeserializeToTopic(payload []byte, position int) (TopicResponse, int, error) {
 	topic := TopicResponse{}
 	topic.Id = int(binary.LittleEndian.Uint32(payload[position : position+4]))
 	topic.CreatedAt = int(binary.LittleEndian.Uint64(payload[position+4 : position+12]))
@@ -283,7 +283,7 @@ func MapToTopic(payload []byte, position int) (TopicResponse, int, error) {
 	return topic, readBytes, nil
 }
 
-func MapToPartition(payload []byte, position int) (PartitionContract, int) {
+func DeserializePartition(payload []byte, position int) (PartitionContract, int) {
 	id := int(binary.LittleEndian.Uint32(payload[position : position+4]))
 	createdAt := binary.LittleEndian.Uint64(payload[position+4 : position+12])
 	segmentsCount := int(binary.LittleEndian.Uint32(payload[position+12 : position+16]))
@@ -304,13 +304,13 @@ func MapToPartition(payload []byte, position int) (PartitionContract, int) {
 	return partition, readBytes
 }
 
-func MapConsumerGroups(payload []byte) []ConsumerGroupResponse {
+func DeserializeConsumerGroups(payload []byte) []ConsumerGroupResponse {
 	var consumerGroups []ConsumerGroupResponse
 	length := len(payload)
 	position := 0
 
 	for position < length {
-		consumerGroup, readBytes := MapToConsumerGroup(payload, position)
+		consumerGroup, readBytes := DeserializeToConsumerGroup(payload, position)
 		consumerGroups = append(consumerGroups, *consumerGroup)
 		position += readBytes
 	}
@@ -318,12 +318,13 @@ func MapConsumerGroups(payload []byte) []ConsumerGroupResponse {
 	return consumerGroups
 }
 
-func MapConsumerGroup(payload []byte) (*ConsumerGroupResponse, error) {
-	consumerGroup, _ := MapToConsumerGroup(payload, 0)
+func DeserializeConsumerGroup(payload []byte) (*ConsumerGroupResponse, error) {
+	consumerGroup, _ := DeserializeToConsumerGroup(payload, 0)
 	return consumerGroup, nil
 }
 
-func MapToConsumerGroup(payload []byte, position int) (*ConsumerGroupResponse, int) {
+// use slices
+func DeserializeToConsumerGroup(payload []byte, position int) (*ConsumerGroupResponse, int) {
 	id := int(binary.LittleEndian.Uint32(payload[position : position+4]))
 	membersCount := int(binary.LittleEndian.Uint32(payload[position+4 : position+8]))
 	partitionsCount := int(binary.LittleEndian.Uint32(payload[position+8 : position+12]))
