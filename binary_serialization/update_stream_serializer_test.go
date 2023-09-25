@@ -1,4 +1,4 @@
-package tcpserialization
+package binaryserialization
 
 import (
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
