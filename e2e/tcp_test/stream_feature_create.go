@@ -7,7 +7,7 @@ import (
 
 var _ = Describe("CREATE STREAM:", func() {
 	When("User is logged in", func() {
-		Context("and tries to create stream unique name and id", func() {
+		Context("and tries to create stream with unique name and id", func() {
 			client := createAuthorizedStream()
 			streamId := int(createRandomUInt32())
 			name := createRandomString(32)
