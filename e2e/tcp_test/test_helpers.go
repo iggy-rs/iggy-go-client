@@ -1,4 +1,4 @@
-package tcp
+package tcp_test
 
 import (
 	. "github.com/iggy-rs/iggy-go-client"
@@ -38,7 +38,7 @@ func createRandomUInt32() uint32 {
 	return rand.Uint32()
 }
 
-func CreateRandomString(length int) string {
+func createRandomString(length int) string {
 	// Define the character set from which to create the random string
 	const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
 

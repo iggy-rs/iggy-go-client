@@ -1,4 +1,4 @@
-package tcp_test
+package tcp_test_test
 
 import (
 	"testing"

@@ -1,4 +1,4 @@
-package tcp
+package tcp_test
 
 import (
 	. "github.com/onsi/ginkgo"
