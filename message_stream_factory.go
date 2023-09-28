@@ -2,18 +2,18 @@ package iggy
 
 import (
 	"errors"
+	"github.com/iggy-rs/iggy-go-client/tcp"
 
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
-	tcp "github.com/iggy-rs/iggy-go-client/tcp"
 )
 
 type IMessageStreamFactory interface {
-	CreateStream(config iggcon.MessageStreamConfiguration) (MessageStream, error)
+	CreateStream(config iggcon.IggyConfiguration) (MessageStream, error)
 }
 
-type MessageStreamFactory struct{}
+type IggyClientFactory struct{}
 
-func (msf *MessageStreamFactory) CreateMessageStream(config iggcon.MessageStreamConfiguration) (MessageStream, error) {
+func (msf *IggyClientFactory) CreateMessageStream(config iggcon.IggyConfiguration) (MessageStream, error) {
 	if config.Protocol == iggcon.Tcp {
 		tcpMessageStream, err := tcp.NewTcpMessageStream(config.BaseAddress)
 		if err != nil {

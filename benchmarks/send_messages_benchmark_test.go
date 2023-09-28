@@ -21,11 +21,11 @@ const (
 )
 
 func BenchmarkSendMessage(b *testing.B) {
-	rand.Seed(42) // Seed the random number generator for consistent results
+	rand.New(rand.NewSource(42)) // Seed the random number generator for consistent results
 	streams := make([]iggy.MessageStream, producerCount)
 
-	factory := &iggy.MessageStreamFactory{}
-	config := iggcon.MessageStreamConfiguration{
+	factory := &iggy.IggyClientFactory{}
+	config := iggcon.IggyConfiguration{
 		BaseAddress: "127.0.0.1:8090",
 		Protocol:    iggcon.Tcp,
 	}
@@ -34,6 +34,13 @@ func BenchmarkSendMessage(b *testing.B) {
 		ms, err := factory.CreateMessageStream(config)
 		if err != nil {
 			panic("COULD NOT CREATE MESSAGE STREAM")
+		}
+		_, err = ms.LogIn(iggcon.LogInRequest{
+			Username: "iggy",
+			Password: "iggy",
+		})
+		if err != nil {
+			panic("COULD NOT LOG IN")
 		}
 		streams[i] = ms
 	}
@@ -140,7 +147,7 @@ func SendMessage(bus iggy.MessageStream, producerNumber, messagesCount, messages
 
 	for i := 0; i < messagesBatch; i++ {
 		startTime := time.Now()
-		bus.SendMessages(iggcon.SendMessagesRequest{
+		_ = bus.SendMessages(iggcon.SendMessagesRequest{
 			StreamId:     busStreamId,
 			TopicId:      busTopicId,
 			Partitioning: iggcon.PartitionId(1),

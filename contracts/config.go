@@ -1,6 +1,6 @@
 package iggcon
 
-type MessageStreamConfiguration struct {
+type IggyConfiguration struct {
 	BaseAddress string   `json:"baseAddress"`
 	Protocol    Protocol `json:"protocol"`
 }

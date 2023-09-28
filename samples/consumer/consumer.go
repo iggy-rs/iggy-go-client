@@ -21,8 +21,8 @@ const (
 )
 
 func main() {
-	factory := &MessageStreamFactory{}
-	config := MessageStreamConfiguration{
+	factory := &IggyClientFactory{}
+	config := IggyConfiguration{
 		BaseAddress: "127.0.0.1:8090",
 		Protocol:    Tcp,
 	}
@@ -30,6 +30,14 @@ func main() {
 	messageStream, err := factory.CreateMessageStream(config)
 	if err != nil {
 		panic(err)
+	}
+
+	_, err = messageStream.LogIn(LogInRequest{
+		Username: "iggy",
+		Password: "iggy",
+	})
+	if err != nil {
+		panic("COULD NOT LOG IN")
 	}
 
 	if err = EnsureInsfrastructureIsInitialized(messageStream); err != nil {
