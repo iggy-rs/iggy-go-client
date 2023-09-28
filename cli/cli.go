@@ -152,6 +152,7 @@ func init() {
 }
 
 func main() {
+	fmt.Println("THIS CLI IS NOT SUPPORTED, IT WILL BE REPLACED IN A CLOSE FUTURE.")
 	if len(os.Args) < 2 {
 		fmt.Println("No command provided.")
 		os.Exit(1)
