@@ -9,6 +9,13 @@ import (
 	. "github.com/iggy-rs/iggy-go-client/contracts"
 )
 
+func DeserializeLogInResponse(payload []byte) *LogInResponse {
+	userId := binary.LittleEndian.Uint32(payload[0:4])
+	return &LogInResponse{
+		UserId: userId,
+	}
+}
+
 func DeserializeOffset(payload []byte) *OffsetResponse {
 	partitionId := int(binary.LittleEndian.Uint32(payload[0:4]))
 	currentOffset := binary.LittleEndian.Uint64(payload[4:12])
@@ -310,6 +317,7 @@ func DeserializeConsumerGroups(payload []byte) []ConsumerGroupResponse {
 	position := 0
 
 	for position < length {
+		// use slices
 		consumerGroup, readBytes := DeserializeToConsumerGroup(payload, position)
 		consumerGroups = append(consumerGroups, *consumerGroup)
 		position += readBytes
@@ -323,7 +331,6 @@ func DeserializeConsumerGroup(payload []byte) (*ConsumerGroupResponse, error) {
 	return consumerGroup, nil
 }
 
-// use slices
 func DeserializeToConsumerGroup(payload []byte, position int) (*ConsumerGroupResponse, int) {
 	id := int(binary.LittleEndian.Uint32(payload[position : position+4]))
 	membersCount := int(binary.LittleEndian.Uint32(payload[position+4 : position+8]))

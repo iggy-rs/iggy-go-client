@@ -3,7 +3,7 @@ package iggcon
 type Identifier struct {
 	Kind   IdKind
 	Length int
-	Value  interface{}
+	Value  any
 }
 
 type IdKind int
@@ -13,7 +13,7 @@ const (
 	StringId  IdKind = 2
 )
 
-func NewIdentifier(id interface{}) Identifier {
+func NewIdentifier(id any) Identifier {
 	var kind IdKind
 	var length int
 

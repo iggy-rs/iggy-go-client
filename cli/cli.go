@@ -157,10 +157,20 @@ func main() {
 		os.Exit(1)
 	}
 
+	//this is very temporary
+	ms := CreateMessageStream()
+	_, err := ms.LogIn(LogInRequest{
+		Username: "iggy",
+		Password: "iggy",
+	})
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 	switch os.Args[1] {
 	case "createstream":
 		createStreamCmd.Parse(os.Args[2:])
-		ms := CreateMessageStream()
 		if cs_name == "" {
 			fmt.Println("Error: Name flag is required.")
 			createStreamCmd.PrintDefaults()
@@ -177,7 +187,6 @@ func main() {
 
 	case "updatestream":
 		updateStreamCmd.Parse(os.Args[2:])
-		ms := CreateMessageStream()
 		if us_name == "" {
 			fmt.Println("Error: Name flag is required.")
 			updateStreamCmd.PrintDefaults()
@@ -194,7 +203,6 @@ func main() {
 
 	case "getstream":
 		getStreamCmd.Parse(os.Args[2:])
-		ms := CreateMessageStream()
 		if gs_streamId == -1 {
 			streams, err := ms.GetStreams()
 			if err != nil {
@@ -215,7 +223,6 @@ func main() {
 
 	case "deletestream":
 		deleteStreamCmd.Parse(os.Args[2:])
-		ms := CreateMessageStream()
 		if ds_streamId == -1 {
 			fmt.Println("Error: Stream Id is required.")
 			deleteStreamCmd.PrintDefaults()
@@ -229,7 +236,6 @@ func main() {
 
 	case "createtopic":
 		createTopicCmd.Parse(os.Args[2:])
-		ms := CreateMessageStream()
 		if ct_name == "" {
 			fmt.Println("Error: Name flag is required.")
 			createTopicCmd.PrintDefaults()
@@ -247,7 +253,6 @@ func main() {
 		}
 	case "updatetopic":
 		updateTopicCmd.Parse(os.Args[2:])
-		ms := CreateMessageStream()
 		if ut_name == "" {
 			fmt.Println("Error: Name flag is required.")
 			updateTopicCmd.PrintDefaults()
@@ -265,7 +270,6 @@ func main() {
 
 	case "gettopic":
 		getTopicCmd.Parse(os.Args[2:])
-		ms := CreateMessageStream()
 
 		if gt_topicId == -1 {
 			topics, err := ms.GetTopics(NewIdentifier(gt_streamId))
@@ -283,7 +287,6 @@ func main() {
 
 	case "deletetopic":
 		deleteTopicCmd.Parse(os.Args[2:])
-		ms := CreateMessageStream()
 		if dt_streamId == -1 {
 			fmt.Println("Error: Stream Id is required.")
 			deleteStreamCmd.PrintDefaults()
@@ -303,7 +306,6 @@ func main() {
 
 	case "getstats":
 		getStatsCmd.Parse(os.Args[2:])
-		ms := CreateMessageStream()
 		stats, err := ms.GetStats()
 		if err != nil {
 			HandleError(err)
@@ -320,8 +322,8 @@ func main() {
 }
 
 func CreateMessageStream() MessageStream {
-	factory := &MessageStreamFactory{}
-	config := MessageStreamConfiguration{
+	factory := &IggyClientFactory{}
+	config := IggyConfiguration{
 		BaseAddress: url + ":" + port,
 		Protocol:    Tcp,
 	}
@@ -333,7 +335,7 @@ func CreateMessageStream() MessageStream {
 	return ms
 }
 
-func SerializeAndPrint(obj interface{}) {
+func SerializeAndPrint(obj any) {
 	jsonData, err := json.MarshalIndent(&obj, "", "  ")
 	if err != nil {
 		HandleError(err)

@@ -28,5 +28,21 @@ type MessageStream interface {
 	JoinConsumerGroup(request JoinConsumerGroupRequest) error
 	LeaveConsumerGroup(request LeaveConsumerGroupRequest) error
 
+	//CreatePartition(request CreatePartitionRequest) error
+	//DeletePartition(request DeletePartitionRequest) error
+
+	//GetUser(identifier Identifier) (*UserResponse, error)
+	//GetUsers() ([]UserResponse, error)
+	//CreateUser(request CreateUserRequest) error
+	//UpdateUser(request UpdateUserRequest) error
+	//UpdateUserPermissions(request UpdateUserPermissions) error
+	//ChangePassword(request ChangePasswordRequest) error
+	DeleteUser(identifier Identifier) error
+
+	LogIn(request LogInRequest) (*LogInResponse, error)
+	LogOut() error
+
 	GetStats() (*Stats, error)
+	GetClients() ([]ClientResponse, error)
+	GetClientById(clientId int) (*ClientResponse, error)
 }

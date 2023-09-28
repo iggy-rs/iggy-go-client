@@ -24,8 +24,8 @@ func BenchmarkSendMessage(b *testing.B) {
 	rand.Seed(42) // Seed the random number generator for consistent results
 	streams := make([]iggy.MessageStream, producerCount)
 
-	factory := &iggy.MessageStreamFactory{}
-	config := iggcon.MessageStreamConfiguration{
+	factory := &iggy.IggyClientFactory{}
+	config := iggcon.IggyConfiguration{
 		BaseAddress: "127.0.0.1:8090",
 		Protocol:    iggcon.Tcp,
 	}

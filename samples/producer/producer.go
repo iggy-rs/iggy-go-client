@@ -20,8 +20,8 @@ const (
 )
 
 func main() {
-	factory := &MessageStreamFactory{}
-	config := MessageStreamConfiguration{
+	factory := &IggyClientFactory{}
+	config := IggyConfiguration{
 		BaseAddress: "127.0.0.1:8090",
 		Protocol:    Tcp,
 	}

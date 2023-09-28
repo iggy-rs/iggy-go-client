@@ -29,3 +29,9 @@ type LeaveConsumerGroupRequest struct {
 	TopicId         Identifier `json:"topicId"`
 	ConsumerGroupId int        `json:"consumerGroupId"`
 }
+
+type ConsumerGroupInfo struct {
+	StreamId        int `json:"streamId"`
+	TopicId         int `json:"topicId"`
+	ConsumerGroupId int `json:"consumerGroupId"`
+}
