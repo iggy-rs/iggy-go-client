@@ -20,6 +20,19 @@ var _ = Describe("UPDATE STREAM:", func() {
 			itShouldSuccessfullyUpdateStream(streamId, newName, client)
 		})
 
+		Context("and tries to update stream with duplicate stream name", func() {
+			client := createAuthorizedStream()
+			_, stream1Name := successfullyCreateStream(client)
+			stream2Id, _ := successfullyCreateStream(client)
+
+			err := client.UpdateStream(iggcon.UpdateStreamRequest{
+				StreamId: iggcon.NewIdentifier(stream2Id),
+				Name:     stream1Name,
+			})
+
+			itShouldReturnSpecificError(err, "stream_name_already_exists")
+		})
+
 		Context("and tries to update non-existing stream", func() {
 			client := createAuthorizedStream()
 			err := client.UpdateStream(iggcon.UpdateStreamRequest{
