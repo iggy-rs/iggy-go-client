@@ -30,12 +30,12 @@ func SerializeIdentifiers(identifiers ...iggcon.Identifier) []byte {
 	for i := 0; i < len(identifiers); i++ {
 		size += 2 + identifiers[i].Length
 	}
-
 	bytes := make([]byte, size)
 	position := 0
-	for _, identifier := range identifiers {
-		copy(bytes[position:2+identifier.Length], SerializeIdentifier(identifier))
-		position += 2 + identifier.Length
+
+	for i := 0; i < len(identifiers); i++ {
+		copy(bytes[position:position+2+identifiers[i].Length], SerializeIdentifier(identifiers[i]))
+		position += 2 + identifiers[i].Length
 	}
 
 	return bytes
