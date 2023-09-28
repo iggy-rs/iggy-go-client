@@ -35,6 +35,13 @@ func BenchmarkSendMessage(b *testing.B) {
 		if err != nil {
 			panic("COULD NOT CREATE MESSAGE STREAM")
 		}
+		_, err = ms.LogIn(iggcon.LogInRequest{
+			Username: "iggy",
+			Password: "iggy",
+		})
+		if err != nil {
+			panic("COULD NOT LOG IN")
+		}
 		streams[i] = ms
 	}
 

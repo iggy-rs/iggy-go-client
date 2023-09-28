@@ -32,6 +32,14 @@ func main() {
 		panic(err)
 	}
 
+	_, err = messageStream.LogIn(LogInRequest{
+		Username: "iggy",
+		Password: "iggy",
+	})
+	if err != nil {
+		panic("COULD NOT LOG IN")
+	}
+
 	if err = EnsureInsfrastructureIsInitialized(messageStream); err != nil {
 		panic(err)
 	}
