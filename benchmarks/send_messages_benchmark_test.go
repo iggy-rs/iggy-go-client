@@ -21,7 +21,7 @@ const (
 )
 
 func BenchmarkSendMessage(b *testing.B) {
-	rand.Seed(42) // Seed the random number generator for consistent results
+	rand.New(rand.NewSource(42)) // Seed the random number generator for consistent results
 	streams := make([]iggy.MessageStream, producerCount)
 
 	factory := &iggy.IggyClientFactory{}
@@ -147,7 +147,7 @@ func SendMessage(bus iggy.MessageStream, producerNumber, messagesCount, messages
 
 	for i := 0; i < messagesBatch; i++ {
 		startTime := time.Now()
-		bus.SendMessages(iggcon.SendMessagesRequest{
+		_ = bus.SendMessages(iggcon.SendMessagesRequest{
 			StreamId:     busStreamId,
 			TopicId:      busTopicId,
 			Partitioning: iggcon.PartitionId(1),

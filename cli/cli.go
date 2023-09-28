@@ -171,7 +171,7 @@ func main() {
 
 	switch os.Args[1] {
 	case "createstream":
-		createStreamCmd.Parse(os.Args[2:])
+		_ = createStreamCmd.Parse(os.Args[2:])
 		if cs_name == "" {
 			fmt.Println("Error: Name flag is required.")
 			createStreamCmd.PrintDefaults()
@@ -187,7 +187,7 @@ func main() {
 		}
 
 	case "updatestream":
-		updateStreamCmd.Parse(os.Args[2:])
+		_ = updateStreamCmd.Parse(os.Args[2:])
 		if us_name == "" {
 			fmt.Println("Error: Name flag is required.")
 			updateStreamCmd.PrintDefaults()
@@ -203,7 +203,7 @@ func main() {
 		}
 
 	case "getstream":
-		getStreamCmd.Parse(os.Args[2:])
+		_ = getStreamCmd.Parse(os.Args[2:])
 		if gs_streamId == -1 {
 			streams, err := ms.GetStreams()
 			if err != nil {
@@ -223,7 +223,7 @@ func main() {
 		SerializeAndPrint(stream)
 
 	case "deletestream":
-		deleteStreamCmd.Parse(os.Args[2:])
+		_ = deleteStreamCmd.Parse(os.Args[2:])
 		if ds_streamId == -1 {
 			fmt.Println("Error: Stream Id is required.")
 			deleteStreamCmd.PrintDefaults()
@@ -236,7 +236,7 @@ func main() {
 		}
 
 	case "createtopic":
-		createTopicCmd.Parse(os.Args[2:])
+		_ = createTopicCmd.Parse(os.Args[2:])
 		if ct_name == "" {
 			fmt.Println("Error: Name flag is required.")
 			createTopicCmd.PrintDefaults()
@@ -253,7 +253,7 @@ func main() {
 			HandleError(err)
 		}
 	case "updatetopic":
-		updateTopicCmd.Parse(os.Args[2:])
+		_ = updateTopicCmd.Parse(os.Args[2:])
 		if ut_name == "" {
 			fmt.Println("Error: Name flag is required.")
 			updateTopicCmd.PrintDefaults()
@@ -270,7 +270,7 @@ func main() {
 		}
 
 	case "gettopic":
-		getTopicCmd.Parse(os.Args[2:])
+		_ = getTopicCmd.Parse(os.Args[2:])
 
 		if gt_topicId == -1 {
 			topics, err := ms.GetTopics(NewIdentifier(gt_streamId))
@@ -287,7 +287,7 @@ func main() {
 		SerializeAndPrint(topic)
 
 	case "deletetopic":
-		deleteTopicCmd.Parse(os.Args[2:])
+		_ = deleteTopicCmd.Parse(os.Args[2:])
 		if dt_streamId == -1 {
 			fmt.Println("Error: Stream Id is required.")
 			deleteStreamCmd.PrintDefaults()
@@ -306,7 +306,7 @@ func main() {
 		}
 
 	case "getstats":
-		getStatsCmd.Parse(os.Args[2:])
+		_ = getStatsCmd.Parse(os.Args[2:])
 		stats, err := ms.GetStats()
 		if err != nil {
 			HandleError(err)

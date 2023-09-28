@@ -34,7 +34,7 @@ func createMessageStream() MessageStream {
 }
 
 func createRandomUInt32() uint32 {
-	rand.Seed(time.Now().UnixNano())
+	rand.New(rand.NewSource(time.Now().UnixNano()))
 	return rand.Uint32()
 }
 
@@ -43,7 +43,7 @@ func createRandomString(length int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
 
 	// Initialize the random number generator with a seed based on the current time
-	rand.Seed(time.Now().UnixNano())
+	rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	// Create the random string
 	result := make([]byte, length)
