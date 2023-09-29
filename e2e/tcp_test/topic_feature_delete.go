@@ -6,10 +6,12 @@ import (
 )
 
 var _ = Describe("DELETE TOPIC:", func() {
+	prefix := "DeleteTopic"
 	When("User is logged in", func() {
 		Context("and tries to delete existing topic", func() {
 			client := createAuthorizedStream()
-			streamId, _ := successfullyCreateStream(client)
+			streamId, _ := successfullyCreateStream(prefix, client)
+			defer deleteStreamAfterTests(streamId, client)
 			topicId, _ := successfullyCreateTopic(streamId, client)
 			err := client.DeleteTopic(iggcon.NewIdentifier(streamId), iggcon.NewIdentifier(topicId))
 
@@ -19,7 +21,8 @@ var _ = Describe("DELETE TOPIC:", func() {
 
 		Context("and tries to delete non-existing topic", func() {
 			client := createAuthorizedStream()
-			streamId, _ := successfullyCreateStream(client)
+			streamId, _ := successfullyCreateStream(prefix, client)
+			defer deleteStreamAfterTests(streamId, client)
 			topicId := int(createRandomUInt32())
 
 			err := client.DeleteTopic(iggcon.NewIdentifier(streamId), iggcon.NewIdentifier(topicId))

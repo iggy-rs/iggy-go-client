@@ -11,6 +11,20 @@ func (e *IggyError) Error() string {
 	return fmt.Sprintf("%v: '%v'", e.Code, e.Message)
 }
 
+func CustomError(message string) error {
+	return &IggyError{
+		Code:    9999,
+		Message: message,
+	}
+}
+
+func TextTooLong(message string) error {
+	return &IggyError{
+		Code:    9999,
+		Message: message + "_too_long",
+	}
+}
+
 func MapFromCode(code int) error {
 	return &IggyError{
 		Code:    code,

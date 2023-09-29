@@ -7,30 +7,6 @@ import (
 )
 
 var _ = Describe("LOGIN FEATURE:", func() {
-	When("user is not logged in", func() {
-		Context("and tries to log with correct data", func() {
-			client := createMessageStream()
-			user, err := client.LogIn(LogInRequest{
-				Username: "iggy",
-				Password: "iggy",
-			})
-
-			itShouldNotReturnError(err)
-			itShouldReturnUserId(user, 1)
-		})
-
-		Context("and tries to log with invalid credentials", func() {
-			client := createMessageStream()
-			user, err := client.LogIn(LogInRequest{
-				Username: "incorrect",
-				Password: "random",
-			})
-
-			itShouldReturnError(err)
-			itShouldNotReturnUser(user)
-		})
-	})
-
 	When("user is already logged in", func() {
 		Context("and tries to log with correct data", func() {
 			client := createAuthorizedStream()
@@ -45,6 +21,30 @@ var _ = Describe("LOGIN FEATURE:", func() {
 
 		Context("and tries to log with invalid credentials", func() {
 			client := createAuthorizedStream()
+			user, err := client.LogIn(LogInRequest{
+				Username: "incorrect",
+				Password: "random",
+			})
+
+			itShouldReturnError(err)
+			itShouldNotReturnUser(user)
+		})
+	})
+
+	When("user is not logged in", func() {
+		Context("and tries to log with correct data", func() {
+			client := createMessageStream()
+			user, err := client.LogIn(LogInRequest{
+				Username: "iggy",
+				Password: "iggy",
+			})
+
+			itShouldNotReturnError(err)
+			itShouldReturnUserId(user, 1)
+		})
+
+		Context("and tries to log with invalid credentials", func() {
+			client := createMessageStream()
 			user, err := client.LogIn(LogInRequest{
 				Username: "incorrect",
 				Password: "random",

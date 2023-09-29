@@ -6,10 +6,12 @@ import (
 )
 
 var _ = Describe("GET TOPIC BY ID:", func() {
+	prefix := "GetTopicById"
 	When("User is logged in", func() {
 		Context("and tries to get existing topic", func() {
 			client := createAuthorizedStream()
-			streamId, _ := successfullyCreateStream(client)
+			streamId, _ := successfullyCreateStream(prefix, client)
+			defer deleteStreamAfterTests(streamId, client)
 			topicId, name := successfullyCreateTopic(streamId, client)
 			topic, err := client.GetTopicById(iggcon.NewIdentifier(streamId), iggcon.NewIdentifier(topicId))
 
@@ -28,7 +30,8 @@ var _ = Describe("GET TOPIC BY ID:", func() {
 
 		Context("and tries to get non-existing topic", func() {
 			client := createAuthorizedStream()
-			streamId, _ := successfullyCreateStream(client)
+			streamId, _ := successfullyCreateStream(prefix, client)
+			defer deleteStreamAfterTests(streamId, client)
 
 			_, err := client.GetTopicById(iggcon.NewIdentifier(streamId), iggcon.NewIdentifier(int(createRandomUInt32())))
 

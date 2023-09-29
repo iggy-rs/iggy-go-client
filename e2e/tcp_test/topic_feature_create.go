@@ -6,10 +6,12 @@ import (
 )
 
 var _ = Describe("CREATE TOPIC:", func() {
+	prefix := "CreateTopic"
 	When("User is logged in", func() {
 		Context("and tries to create topic unique name and id", func() {
 			client := createAuthorizedStream()
-			streamId, _ := successfullyCreateStream(client)
+			streamId, _ := successfullyCreateStream(prefix, client)
+			defer deleteStreamAfterTests(streamId, client)
 
 			request := iggcon.CreateTopicRequest{
 				TopicId:         1,
@@ -24,9 +26,26 @@ var _ = Describe("CREATE TOPIC:", func() {
 			itShouldSuccessfullyCreateTopic(streamId, request.TopicId, request.Name, client)
 		})
 
+		Context("and tries to create topic for a non existing stream", func() {
+			client := createAuthorizedStream()
+			streamId := int(createRandomUInt32())
+
+			request := iggcon.CreateTopicRequest{
+				TopicId:         1,
+				StreamId:        iggcon.NewIdentifier(streamId),
+				Name:            createRandomString(32),
+				MessageExpiry:   1000,
+				PartitionsCount: 2,
+			}
+			err := client.CreateTopic(request)
+
+			itShouldReturnSpecificError(err, "stream_id_not_found")
+		})
+
 		Context("and tries to create topic with duplicate topic name", func() {
 			client := createAuthorizedStream()
-			streamId, _ := successfullyCreateStream(client)
+			streamId, _ := successfullyCreateStream(prefix, client)
+			defer deleteStreamAfterTests(streamId, client)
 			_, name := successfullyCreateTopic(streamId, client)
 
 			request := iggcon.CreateTopicRequest{
@@ -42,7 +61,8 @@ var _ = Describe("CREATE TOPIC:", func() {
 
 		Context("and tries to create topic with duplicate topic id", func() {
 			client := createAuthorizedStream()
-			streamId, _ := successfullyCreateStream(client)
+			streamId, _ := successfullyCreateStream(prefix, client)
+			defer deleteStreamAfterTests(streamId, client)
 			topicId, _ := successfullyCreateTopic(streamId, client)
 
 			request := iggcon.CreateTopicRequest{
@@ -58,7 +78,8 @@ var _ = Describe("CREATE TOPIC:", func() {
 
 		Context("and tries to create topic with name that's over 255 characters", func() {
 			client := createAuthorizedStream()
-			streamId, _ := successfullyCreateStream(client)
+			streamId, _ := successfullyCreateStream(prefix, client)
+			defer deleteStreamAfterTests(streamId, createAuthorizedStream())
 
 			request := iggcon.CreateTopicRequest{
 				TopicId:         int(createRandomUInt32()),
@@ -69,7 +90,7 @@ var _ = Describe("CREATE TOPIC:", func() {
 			}
 			err := client.CreateTopic(request)
 
-			itShouldReturnError(err)
+			itShouldReturnSpecificError(err, "topic_name_too_long")
 		})
 	})
 

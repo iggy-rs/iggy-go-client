@@ -6,10 +6,12 @@ import (
 )
 
 var _ = Describe("UPDATE STREAM:", func() {
+	prefix := "UpdateStream"
 	When("User is logged in", func() {
 		Context("and tries to update existing stream with a valid name", func() {
 			client := createAuthorizedStream()
-			streamId, _ := successfullyCreateStream(client)
+			streamId, _ := successfullyCreateStream(prefix, client)
+			defer deleteStreamAfterTests(streamId, client)
 			newName := createRandomString(128)
 
 			err := client.UpdateStream(iggcon.UpdateStreamRequest{
@@ -22,8 +24,10 @@ var _ = Describe("UPDATE STREAM:", func() {
 
 		Context("and tries to update stream with duplicate stream name", func() {
 			client := createAuthorizedStream()
-			_, stream1Name := successfullyCreateStream(client)
-			stream2Id, _ := successfullyCreateStream(client)
+			stream1Id, stream1Name := successfullyCreateStream(prefix, client)
+			stream2Id, _ := successfullyCreateStream(prefix, client)
+			defer deleteStreamAfterTests(stream1Id, client)
+			defer deleteStreamAfterTests(stream2Id, client)
 
 			err := client.UpdateStream(iggcon.UpdateStreamRequest{
 				StreamId: iggcon.NewIdentifier(stream2Id),
@@ -45,13 +49,15 @@ var _ = Describe("UPDATE STREAM:", func() {
 
 		Context("and tries to update existing stream with a name that's over 255 characters", func() {
 			client := createAuthorizedStream()
-			streamId, _ := successfullyCreateStream(client)
+			streamId, _ := successfullyCreateStream(prefix, client)
+			defer deleteStreamAfterTests(streamId, createAuthorizedStream())
 
 			err := client.UpdateStream(iggcon.UpdateStreamRequest{
 				StreamId: iggcon.NewIdentifier(streamId),
 				Name:     createRandomString(256),
 			})
-			itShouldReturnError(err)
+
+			itShouldReturnSpecificError(err, "stream_name_too_long")
 		})
 	})
 

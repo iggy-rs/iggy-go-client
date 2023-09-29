@@ -16,6 +16,7 @@ var _ = Describe("CREATE STREAM:", func() {
 				StreamId: streamId,
 				Name:     name,
 			})
+			defer deleteStreamAfterTests(streamId, client)
 
 			itShouldNotReturnError(err)
 			itShouldSuccessfullyCreateStream(streamId, name, client)
@@ -30,6 +31,7 @@ var _ = Describe("CREATE STREAM:", func() {
 				StreamId: streamId,
 				Name:     name,
 			})
+			defer deleteStreamAfterTests(streamId, client)
 
 			itShouldNotReturnError(err)
 			itShouldSuccessfullyCreateStream(streamId, name, client)
@@ -51,6 +53,7 @@ var _ = Describe("CREATE STREAM:", func() {
 				StreamId: streamId,
 				Name:     name,
 			})
+			defer deleteStreamAfterTests(streamId, client)
 
 			itShouldNotReturnError(err)
 			itShouldSuccessfullyCreateStream(streamId, name, client)
@@ -73,7 +76,7 @@ var _ = Describe("CREATE STREAM:", func() {
 				Name:     name,
 			})
 
-			itShouldReturnError(err)
+			itShouldReturnSpecificError(err, "stream_name_too_long")
 		})
 	})
 

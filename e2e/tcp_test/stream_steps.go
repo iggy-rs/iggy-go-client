@@ -10,9 +10,9 @@ import (
 
 //operations
 
-func successfullyCreateStream(client iggy.MessageStream) (int, string) {
+func successfullyCreateStream(prefix string, client iggy.MessageStream) (int, string) {
 	streamId := int(createRandomUInt32())
-	name := createRandomString(128)
+	name := createRandomStringWithPrefix(prefix, 128)
 
 	err := client.CreateStream(iggcon.CreateStreamRequest{
 		StreamId: streamId,
@@ -96,4 +96,8 @@ func itShouldSuccessfullyDeletedStream(id int, client iggy.MessageStream) {
 	It("should not return stream", func() {
 		Expect(stream).To(BeNil())
 	})
+}
+
+func deleteStreamAfterTests(streamId int, client iggy.MessageStream) {
+	_ = client.DeleteStream(iggcon.NewIdentifier(streamId))
 }

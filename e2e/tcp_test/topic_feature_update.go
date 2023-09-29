@@ -6,10 +6,12 @@ import (
 )
 
 var _ = Describe("UPDATE TOPIC:", func() {
+	prefix := "UpdateTopic"
 	When("User is logged in", func() {
 		Context("and tries to update existing topic with a valid data", func() {
 			client := createAuthorizedStream()
-			streamId, _ := successfullyCreateStream(client)
+			streamId, _ := successfullyCreateStream(prefix, client)
+			defer deleteStreamAfterTests(streamId, client)
 			topicId, _ := successfullyCreateTopic(streamId, client)
 			newName := createRandomString(128)
 			request := iggcon.UpdateTopicRequest{
@@ -25,7 +27,8 @@ var _ = Describe("UPDATE TOPIC:", func() {
 
 		Context("and tries to create topic with duplicate topic name", func() {
 			client := createAuthorizedStream()
-			streamId, _ := successfullyCreateStream(client)
+			streamId, _ := successfullyCreateStream(prefix, client)
+			defer deleteStreamAfterTests(streamId, client)
 			_, topic1Name := successfullyCreateTopic(streamId, client)
 			topic2Id, _ := successfullyCreateTopic(streamId, client)
 
@@ -47,34 +50,34 @@ var _ = Describe("UPDATE TOPIC:", func() {
 			request := iggcon.UpdateTopicRequest{
 				TopicId:       iggcon.NewIdentifier(topicId),
 				StreamId:      iggcon.NewIdentifier(streamId),
-				Name:          createRandomString(256),
+				Name:          createRandomString(128),
 				MessageExpiry: 0,
 			}
 			err := client.UpdateTopic(request)
 
-			//itShouldReturnSpecificError(err, "stream_id_not_found")
-			itShouldReturnError(err)
+			itShouldReturnSpecificError(err, "stream_id_not_found")
 		})
 
 		Context("and tries to update non-existing stream", func() {
 			client := createAuthorizedStream()
-			streamId, _ := successfullyCreateStream(client)
+			streamId, _ := successfullyCreateStream(prefix, client)
+			defer deleteStreamAfterTests(streamId, createAuthorizedStream())
 			topicId := int(createRandomUInt32())
 			request := iggcon.UpdateTopicRequest{
 				TopicId:       iggcon.NewIdentifier(topicId),
 				StreamId:      iggcon.NewIdentifier(streamId),
-				Name:          createRandomString(256),
+				Name:          createRandomString(128),
 				MessageExpiry: 0,
 			}
 			err := client.UpdateTopic(request)
 
-			//itShouldReturnSpecificError(err, "topic_id_not_found")
-			itShouldReturnError(err)
+			itShouldReturnSpecificError(err, "topic_id_not_found")
 		})
 
 		Context("and tries to update existing topic with a name that's over 255 characters", func() {
 			client := createAuthorizedStream()
-			streamId, _ := successfullyCreateStream(client)
+			streamId, _ := successfullyCreateStream(prefix, client)
+			defer deleteStreamAfterTests(streamId, createAuthorizedStream())
 			topicId, _ := successfullyCreateTopic(streamId, client)
 			request := iggcon.UpdateTopicRequest{
 				TopicId:       iggcon.NewIdentifier(topicId),
@@ -82,8 +85,10 @@ var _ = Describe("UPDATE TOPIC:", func() {
 				Name:          createRandomString(256),
 				MessageExpiry: 0,
 			}
+
 			err := client.UpdateTopic(request)
-			itShouldReturnError(err)
+
+			itShouldReturnSpecificError(err, "topic_name_too_long")
 		})
 	})
 

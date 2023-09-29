@@ -51,3 +51,11 @@ type Message struct {
 	Payload []byte
 	Headers map[HeaderKey]HeaderValue
 }
+
+func NewMessage(payload []byte, headers map[HeaderKey]HeaderValue) Message {
+	return Message{
+		Id:      uuid.New(),
+		Payload: payload,
+		Headers: headers,
+	}
+}
