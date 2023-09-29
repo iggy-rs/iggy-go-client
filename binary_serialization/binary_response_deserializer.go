@@ -32,6 +32,8 @@ func DeserializeStreams(payload []byte) []StreamResponse {
 	streams := make([]StreamResponse, 0)
 	position := 0
 
+	//TODO there's a deserialization bug, investigate this
+	//it occurs only with payload greater than 2 pow 16
 	for position < len(payload) {
 		stream, readBytes := DeserializeToStream(payload, position)
 		streams = append(streams, stream)

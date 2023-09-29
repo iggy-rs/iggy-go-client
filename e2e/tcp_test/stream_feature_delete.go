@@ -6,10 +6,11 @@ import (
 )
 
 var _ = Describe("DELETE STREAM:", func() {
+	prefix := "DeleteStream"
 	When("User is logged in", func() {
 		Context("and tries to delete existing stream", func() {
 			client := createAuthorizedStream()
-			streamId, _ := successfullyCreateStream(client)
+			streamId, _ := successfullyCreateStream(prefix, client)
 			err := client.DeleteStream(iggcon.NewIdentifier(streamId))
 
 			itShouldNotReturnError(err)

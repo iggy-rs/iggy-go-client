@@ -3,6 +3,7 @@ package tcp
 import (
 	"github.com/iggy-rs/iggy-go-client/binary_serialization"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
+	ierror "github.com/iggy-rs/iggy-go-client/errors"
 )
 
 func (tms *IggyTcpClient) GetTopics(streamId Identifier) ([]TopicResponse, error) {
@@ -47,12 +48,18 @@ func (tms *IggyTcpClient) GetTopicById(streamId Identifier, topicId Identifier) 
 }
 
 func (tms *IggyTcpClient) CreateTopic(request CreateTopicRequest) error {
+	if MaxStringLength < len(request.Name) {
+		return ierror.TextTooLong("topic_name")
+	}
 	serializedRequest := binaryserialization.TcpCreateTopicRequest{CreateTopicRequest: request}
 	_, err := tms.sendAndFetchResponse(serializedRequest.Serialize(), CreateTopicCode)
 	return err
 }
 
 func (tms *IggyTcpClient) UpdateTopic(request UpdateTopicRequest) error {
+	if MaxStringLength < len(request.Name) {
+		return ierror.TextTooLong("topic_name")
+	}
 	serializedRequest := binaryserialization.TcpUpdateTopicRequest{UpdateTopicRequest: request}
 	_, err := tms.sendAndFetchResponse(serializedRequest.Serialize(), UpdateTopicCode)
 	return err

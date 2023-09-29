@@ -6,10 +6,12 @@ import (
 )
 
 var _ = Describe("GET STREAM BY ID:", func() {
+	prefix := "GetStreamById"
 	When("User is logged in", func() {
 		Context("and tries to get existing stream", func() {
 			client := createAuthorizedStream()
-			streamId, name := successfullyCreateStream(client)
+			streamId, name := successfullyCreateStream(prefix, client)
+			defer deleteStreamAfterTests(streamId, client)
 			stream, err := client.GetStreamById(iggcon.GetStreamRequest{StreamID: iggcon.NewIdentifier(streamId)})
 
 			itShouldNotReturnError(err)

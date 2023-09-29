@@ -4,6 +4,7 @@ import (
 	. "github.com/iggy-rs/iggy-go-client"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -51,4 +52,19 @@ func createRandomString(length int) string {
 		result[i] = charset[rand.Intn(len(charset))]
 	}
 	return string(result)
+}
+
+func createRandomStringWithPrefix(prefix string, length int) string {
+	// Define the character set from which to create the random string
+	const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
+
+	// Initialize the random number generator with a seed based on the current time
+	rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	// Create the random string
+	result := make([]byte, length-len(prefix))
+	for i := range result {
+		result[i] = charset[rand.Intn(len(charset))]
+	}
+	return strings.ToLower(prefix) + string(result)
 }

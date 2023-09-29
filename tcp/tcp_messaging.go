@@ -3,9 +3,13 @@ package tcp
 import (
 	"github.com/iggy-rs/iggy-go-client/binary_serialization"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
+	ierror "github.com/iggy-rs/iggy-go-client/errors"
 )
 
 func (tms *IggyTcpClient) SendMessages(request SendMessagesRequest) error {
+	if len(request.Messages) == 0 {
+		return ierror.CustomError("messages_count_should_be_greater_than_zero")
+	}
 	serializedRequest := binaryserialization.TcpSendMessagesRequest{SendMessagesRequest: request}
 	_, err := tms.sendAndFetchResponse(serializedRequest.Serialize(), SendMessagesCode)
 	return err

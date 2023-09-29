@@ -15,6 +15,7 @@ type IggyTcpClient struct {
 const (
 	InitialBytesLength   = 4
 	ExpectedResponseSize = 8
+	MaxStringLength      = 255
 )
 
 func NewTcpMessageStream(url string) (*IggyTcpClient, error) {
@@ -24,6 +25,11 @@ func NewTcpMessageStream(url string) (*IggyTcpClient, error) {
 	}
 
 	conn, err := net.DialTCP("tcp", nil, addr)
+	if err != nil {
+		return nil, err
+	}
+
+	err = conn.SetKeepAlive(true)
 	if err != nil {
 		return nil, err
 	}
