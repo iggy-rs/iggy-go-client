@@ -16,6 +16,12 @@ type PartitionContract struct {
 	SizeBytes     uint64 `json:"sizeBytes"`
 }
 
+type CreatePartitionRequest struct {
+}
+
+type DeletePartitionRequest struct {
+}
+
 type PartitioningKind int
 
 const (

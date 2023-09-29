@@ -8,3 +8,6 @@ type ClientResponse struct {
 	ConsumerGroupsCount int                 `json:"consumerGroupsCount"`
 	ConsumerGroups      []ConsumerGroupInfo `json:"consumerGroups"`
 }
+
+type MeResponse struct {
+}
