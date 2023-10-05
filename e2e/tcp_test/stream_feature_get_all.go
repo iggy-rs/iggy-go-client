@@ -8,7 +8,7 @@ var _ = Describe("GET ALL STREAMS:", func() {
 	prefix := "GetAllStreams"
 	When("User is logged in", func() {
 		Context("and tries to get all streams", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, name := successfullyCreateStream(prefix, client)
 			defer deleteStreamAfterTests(streamId, client)
 			streams, err := client.GetStreams()
@@ -20,7 +20,7 @@ var _ = Describe("GET ALL STREAMS:", func() {
 
 	When("User is not logged in", func() {
 		Context("and tries to get all streams", func() {
-			client := createMessageStream()
+			client := createConnection()
 			_, err := client.GetStreams()
 
 			itShouldReturnUnauthenticatedError(err)

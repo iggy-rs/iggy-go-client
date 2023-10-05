@@ -9,7 +9,7 @@ var _ = Describe("SEND MESSAGES:", func() {
 	prefix := "SendMessages"
 	When("User is logged in", func() {
 		Context("and tries to send messages to the topic with balanced partitioning", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream("1"+prefix, client)
 			defer deleteStreamAfterTests(streamId, client)
 			topicId, _ := successfullyCreateTopic(streamId, client)
@@ -26,7 +26,7 @@ var _ = Describe("SEND MESSAGES:", func() {
 		})
 
 		Context("and tries to send messages to the non existing topic", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream("2"+prefix, client)
 			defer deleteStreamAfterTests(streamId, client)
 			messages := createDefaultMessages()
@@ -41,7 +41,7 @@ var _ = Describe("SEND MESSAGES:", func() {
 		})
 
 		Context("and tries to send messages to the non existing stream", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			messages := createDefaultMessages()
 			request := iggcon.SendMessagesRequest{
 				StreamId:     iggcon.NewIdentifier(int(createRandomUInt32())),
@@ -54,7 +54,7 @@ var _ = Describe("SEND MESSAGES:", func() {
 		})
 
 		Context("and tries to send messages to non existing partition", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream("3"+prefix, client)
 			defer deleteStreamAfterTests(streamId, client)
 			topicId, _ := successfullyCreateTopic(streamId, client)
@@ -70,9 +70,9 @@ var _ = Describe("SEND MESSAGES:", func() {
 		})
 
 		Context("and tries to send messages to valid topic but with 0 messages in payload", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream(prefix, client)
-			defer deleteStreamAfterTests(streamId, createAuthorizedStream())
+			defer deleteStreamAfterTests(streamId, createAuthorizedConnection())
 			topicId, _ := successfullyCreateTopic(streamId, client)
 			request := iggcon.SendMessagesRequest{
 				StreamId:     iggcon.NewIdentifier(streamId),
@@ -87,7 +87,7 @@ var _ = Describe("SEND MESSAGES:", func() {
 
 	When("User is not logged in", func() {
 		Context("and tries to update stream", func() {
-			client := createMessageStream()
+			client := createConnection()
 			messages := createDefaultMessages()
 			request := iggcon.SendMessagesRequest{
 				StreamId:     iggcon.NewIdentifier(int(createRandomUInt32())),

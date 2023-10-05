@@ -9,7 +9,7 @@ var _ = Describe("GET STREAM BY ID:", func() {
 	prefix := "GetStreamById"
 	When("User is logged in", func() {
 		Context("and tries to get existing stream", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, name := successfullyCreateStream(prefix, client)
 			defer deleteStreamAfterTests(streamId, client)
 			stream, err := client.GetStreamById(iggcon.GetStreamRequest{StreamID: iggcon.NewIdentifier(streamId)})
@@ -19,7 +19,7 @@ var _ = Describe("GET STREAM BY ID:", func() {
 		})
 
 		Context("and tries to get non-existing stream", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId := int(createRandomUInt32())
 
 			_, err := client.GetStreamById(iggcon.GetStreamRequest{StreamID: iggcon.NewIdentifier(streamId)})
@@ -30,7 +30,7 @@ var _ = Describe("GET STREAM BY ID:", func() {
 
 	When("User is not logged in", func() {
 		Context("and tries to get stream by id", func() {
-			client := createMessageStream()
+			client := createConnection()
 			_, err := client.GetStreamById(iggcon.GetStreamRequest{StreamID: iggcon.NewIdentifier(int(createRandomUInt32()))})
 
 			itShouldReturnUnauthenticatedError(err)

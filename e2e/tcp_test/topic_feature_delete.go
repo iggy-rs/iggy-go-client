@@ -9,18 +9,18 @@ var _ = Describe("DELETE TOPIC:", func() {
 	prefix := "DeleteTopic"
 	When("User is logged in", func() {
 		Context("and tries to delete existing topic", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream(prefix, client)
 			defer deleteStreamAfterTests(streamId, client)
 			topicId, _ := successfullyCreateTopic(streamId, client)
 			err := client.DeleteTopic(iggcon.NewIdentifier(streamId), iggcon.NewIdentifier(topicId))
 
 			itShouldNotReturnError(err)
-			itShouldSuccessfullyDeletedTopic(streamId, topicId, client)
+			itShouldSuccessfullyDeleteTopic(streamId, topicId, client)
 		})
 
 		Context("and tries to delete non-existing topic", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream(prefix, client)
 			defer deleteStreamAfterTests(streamId, client)
 			topicId := int(createRandomUInt32())
@@ -31,7 +31,7 @@ var _ = Describe("DELETE TOPIC:", func() {
 		})
 
 		Context("and tries to delete non-existing topic and stream", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId := int(createRandomUInt32())
 			topicId := int(createRandomUInt32())
 
@@ -43,7 +43,7 @@ var _ = Describe("DELETE TOPIC:", func() {
 
 	When("User is not logged in", func() {
 		Context("and tries to delete topic", func() {
-			client := createMessageStream()
+			client := createConnection()
 			err := client.DeleteTopic(iggcon.NewIdentifier(int(createRandomUInt32())), iggcon.NewIdentifier(int(createRandomUInt32())))
 
 			itShouldReturnUnauthenticatedError(err)

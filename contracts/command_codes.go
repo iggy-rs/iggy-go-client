@@ -3,7 +3,6 @@ package iggcon
 type CommandCode int
 
 const (
-	KillCode              CommandCode = 0
 	PingCode              CommandCode = 1
 	GetStatsCode          CommandCode = 10
 	GetMeCode             CommandCode = 20

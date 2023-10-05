@@ -22,7 +22,7 @@ type MessageStream interface {
 	GetOffset(request GetOffsetRequest) (*OffsetResponse, error)
 
 	GetConsumerGroups(streamId Identifier, topicId Identifier) ([]ConsumerGroupResponse, error)
-	GetConsumerGroupById(streamId Identifier, topicId Identifier, groupId int) (*ConsumerGroupResponse, error)
+	GetConsumerGroupById(streamId, topicId, groupId Identifier) (*ConsumerGroupResponse, error)
 	CreateConsumerGroup(request CreateConsumerGroupRequest) error
 	DeleteConsumerGroup(request DeleteConsumerGroupRequest) error
 	JoinConsumerGroup(request JoinConsumerGroupRequest) error
@@ -43,7 +43,6 @@ type MessageStream interface {
 	LogOut() error
 
 	GetStats() (*Stats, error)
-	Kill() error
 	Ping() error
 
 	GetMe() (*MeResponse, error)

@@ -9,7 +9,7 @@ var _ = Describe("UPDATE STREAM:", func() {
 	prefix := "UpdateStream"
 	When("User is logged in", func() {
 		Context("and tries to update existing stream with a valid name", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream(prefix, client)
 			defer deleteStreamAfterTests(streamId, client)
 			newName := createRandomString(128)
@@ -23,7 +23,7 @@ var _ = Describe("UPDATE STREAM:", func() {
 		})
 
 		Context("and tries to update stream with duplicate stream name", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			stream1Id, stream1Name := successfullyCreateStream(prefix, client)
 			stream2Id, _ := successfullyCreateStream(prefix, client)
 			defer deleteStreamAfterTests(stream1Id, client)
@@ -38,7 +38,7 @@ var _ = Describe("UPDATE STREAM:", func() {
 		})
 
 		Context("and tries to update non-existing stream", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			err := client.UpdateStream(iggcon.UpdateStreamRequest{
 				StreamId: iggcon.NewIdentifier(int(createRandomUInt32())),
 				Name:     createRandomString(128),
@@ -48,9 +48,9 @@ var _ = Describe("UPDATE STREAM:", func() {
 		})
 
 		Context("and tries to update existing stream with a name that's over 255 characters", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream(prefix, client)
-			defer deleteStreamAfterTests(streamId, createAuthorizedStream())
+			defer deleteStreamAfterTests(streamId, createAuthorizedConnection())
 
 			err := client.UpdateStream(iggcon.UpdateStreamRequest{
 				StreamId: iggcon.NewIdentifier(streamId),
@@ -63,7 +63,7 @@ var _ = Describe("UPDATE STREAM:", func() {
 
 	When("User is not logged in", func() {
 		Context("and tries to update stream", func() {
-			client := createMessageStream()
+			client := createConnection()
 			err := client.UpdateStream(iggcon.UpdateStreamRequest{
 				StreamId: iggcon.NewIdentifier(int(createRandomUInt32())),
 				Name:     createRandomString(128),
