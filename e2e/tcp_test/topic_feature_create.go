@@ -9,7 +9,7 @@ var _ = Describe("CREATE TOPIC:", func() {
 	prefix := "CreateTopic"
 	When("User is logged in", func() {
 		Context("and tries to create topic unique name and id", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream(prefix, client)
 			defer deleteStreamAfterTests(streamId, client)
 
@@ -27,7 +27,7 @@ var _ = Describe("CREATE TOPIC:", func() {
 		})
 
 		Context("and tries to create topic for a non existing stream", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId := int(createRandomUInt32())
 
 			request := iggcon.CreateTopicRequest{
@@ -43,7 +43,7 @@ var _ = Describe("CREATE TOPIC:", func() {
 		})
 
 		Context("and tries to create topic with duplicate topic name", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream(prefix, client)
 			defer deleteStreamAfterTests(streamId, client)
 			_, name := successfullyCreateTopic(streamId, client)
@@ -60,7 +60,7 @@ var _ = Describe("CREATE TOPIC:", func() {
 		})
 
 		Context("and tries to create topic with duplicate topic id", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream(prefix, client)
 			defer deleteStreamAfterTests(streamId, client)
 			topicId, _ := successfullyCreateTopic(streamId, client)
@@ -77,9 +77,9 @@ var _ = Describe("CREATE TOPIC:", func() {
 		})
 
 		Context("and tries to create topic with name that's over 255 characters", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream(prefix, client)
-			defer deleteStreamAfterTests(streamId, createAuthorizedStream())
+			defer deleteStreamAfterTests(streamId, createAuthorizedConnection())
 
 			request := iggcon.CreateTopicRequest{
 				TopicId:         int(createRandomUInt32()),
@@ -96,7 +96,7 @@ var _ = Describe("CREATE TOPIC:", func() {
 
 	When("User is not logged in", func() {
 		Context("and tries to create topic", func() {
-			client := createMessageStream()
+			client := createConnection()
 			err := client.CreateTopic(iggcon.CreateTopicRequest{
 				TopicId:         1,
 				StreamId:        iggcon.NewIdentifier(10),

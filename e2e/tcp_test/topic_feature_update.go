@@ -9,7 +9,7 @@ var _ = Describe("UPDATE TOPIC:", func() {
 	prefix := "UpdateTopic"
 	When("User is logged in", func() {
 		Context("and tries to update existing topic with a valid data", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream(prefix, client)
 			defer deleteStreamAfterTests(streamId, client)
 			topicId, _ := successfullyCreateTopic(streamId, client)
@@ -26,7 +26,7 @@ var _ = Describe("UPDATE TOPIC:", func() {
 		})
 
 		Context("and tries to create topic with duplicate topic name", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream(prefix, client)
 			defer deleteStreamAfterTests(streamId, client)
 			_, topic1Name := successfullyCreateTopic(streamId, client)
@@ -44,7 +44,7 @@ var _ = Describe("UPDATE TOPIC:", func() {
 		})
 
 		Context("and tries to update non-existing topic", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId := int(createRandomUInt32())
 			topicId := int(createRandomUInt32())
 			request := iggcon.UpdateTopicRequest{
@@ -59,9 +59,9 @@ var _ = Describe("UPDATE TOPIC:", func() {
 		})
 
 		Context("and tries to update non-existing stream", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream(prefix, client)
-			defer deleteStreamAfterTests(streamId, createAuthorizedStream())
+			defer deleteStreamAfterTests(streamId, createAuthorizedConnection())
 			topicId := int(createRandomUInt32())
 			request := iggcon.UpdateTopicRequest{
 				TopicId:       iggcon.NewIdentifier(topicId),
@@ -75,9 +75,9 @@ var _ = Describe("UPDATE TOPIC:", func() {
 		})
 
 		Context("and tries to update existing topic with a name that's over 255 characters", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream(prefix, client)
-			defer deleteStreamAfterTests(streamId, createAuthorizedStream())
+			defer deleteStreamAfterTests(streamId, createAuthorizedConnection())
 			topicId, _ := successfullyCreateTopic(streamId, client)
 			request := iggcon.UpdateTopicRequest{
 				TopicId:       iggcon.NewIdentifier(topicId),
@@ -94,7 +94,7 @@ var _ = Describe("UPDATE TOPIC:", func() {
 
 	When("User is not logged in", func() {
 		Context("and tries to update stream", func() {
-			client := createMessageStream()
+			client := createConnection()
 			err := client.UpdateStream(iggcon.UpdateStreamRequest{
 				StreamId: iggcon.NewIdentifier(int(createRandomUInt32())),
 				Name:     createRandomString(128),

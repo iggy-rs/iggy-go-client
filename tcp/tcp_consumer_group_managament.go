@@ -25,8 +25,8 @@ func (tms *IggyTcpClient) GetConsumerGroups(streamId Identifier, topicId Identif
 	return binaryserialization.DeserializeConsumerGroups(responseBuffer), err
 }
 
-func (tms *IggyTcpClient) GetConsumerGroupById(streamId Identifier, topicId Identifier, groupId int) (*ConsumerGroupResponse, error) {
-	message := binaryserialization.GetGroup(streamId, topicId, groupId)
+func (tms *IggyTcpClient) GetConsumerGroupById(streamId Identifier, topicId Identifier, groupId Identifier) (*ConsumerGroupResponse, error) {
+	message := binaryserialization.SerializeIdentifiers(streamId, topicId, groupId)
 	buffer, err := tms.sendAndFetchResponse(message, GetGroupCode)
 	if err != nil {
 		return nil, err
@@ -52,19 +52,19 @@ func (tms *IggyTcpClient) CreateConsumerGroup(request CreateConsumerGroupRequest
 }
 
 func (tms *IggyTcpClient) DeleteConsumerGroup(request DeleteConsumerGroupRequest) error {
-	message := binaryserialization.DeleteGroup(request)
+	message := binaryserialization.SerializeIdentifiers(request.StreamId, request.TopicId, request.ConsumerGroupId)
 	_, err := tms.sendAndFetchResponse(message, DeleteGroupCode)
 	return err
 }
 
 func (tms *IggyTcpClient) JoinConsumerGroup(request JoinConsumerGroupRequest) error {
-	message := binaryserialization.JoinGroup(request)
+	message := binaryserialization.SerializeIdentifiers(request.StreamId, request.TopicId, request.ConsumerGroupId)
 	_, err := tms.sendAndFetchResponse(message, JoinGroupCode)
 	return err
 }
 
 func (tms *IggyTcpClient) LeaveConsumerGroup(request LeaveConsumerGroupRequest) error {
-	message := binaryserialization.LeaveGroup(request)
+	message := binaryserialization.SerializeIdentifiers(request.StreamId, request.TopicId, request.ConsumerGroupId)
 	_, err := tms.sendAndFetchResponse(message, LeaveGroupCode)
 	return err
 }

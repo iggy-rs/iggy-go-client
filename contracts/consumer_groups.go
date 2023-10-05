@@ -1,33 +1,35 @@
 package iggcon
 
 type ConsumerGroupResponse struct {
-	Id              int `json:"id"`
-	MembersCount    int `json:"membersCount"`
-	PartitionsCount int `json:"partitionsCount"`
+	Id              int    `json:"id"`
+	Name            string `json:"name"`
+	PartitionsCount int    `json:"partitionsCount"`
+	MembersCount    int    `json:"membersCount"`
 }
 
 type CreateConsumerGroupRequest struct {
 	StreamId        Identifier `json:"streamId"`
 	TopicId         Identifier `json:"topicId"`
 	ConsumerGroupId int        `json:"consumerGroupId"`
+	Name            string     `json:"name"`
 }
 
 type DeleteConsumerGroupRequest struct {
 	StreamId        Identifier `json:"streamId"`
 	TopicId         Identifier `json:"topicId"`
-	ConsumerGroupId int        `json:"consumerGroupId"`
+	ConsumerGroupId Identifier `json:"consumerGroupId"`
 }
 
 type JoinConsumerGroupRequest struct {
 	StreamId        Identifier `json:"streamId"`
 	TopicId         Identifier `json:"topicId"`
-	ConsumerGroupId int        `json:"consumerGroupId"`
+	ConsumerGroupId Identifier `json:"consumerGroupId"`
 }
 
 type LeaveConsumerGroupRequest struct {
 	StreamId        Identifier `json:"streamId"`
 	TopicId         Identifier `json:"topicId"`
-	ConsumerGroupId int        `json:"consumerGroupId"`
+	ConsumerGroupId Identifier `json:"consumerGroupId"`
 }
 
 type ConsumerGroupInfo struct {

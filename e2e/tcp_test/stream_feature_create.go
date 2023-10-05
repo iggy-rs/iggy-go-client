@@ -8,7 +8,7 @@ import (
 var _ = Describe("CREATE STREAM:", func() {
 	When("User is logged in", func() {
 		Context("and tries to create stream with unique name and id", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId := int(createRandomUInt32())
 			name := createRandomString(32)
 
@@ -23,7 +23,7 @@ var _ = Describe("CREATE STREAM:", func() {
 		})
 
 		Context("and tries to create stream with duplicate stream name", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId := int(createRandomUInt32())
 			name := createRandomString(32)
 
@@ -45,7 +45,7 @@ var _ = Describe("CREATE STREAM:", func() {
 		})
 
 		Context("and tries to create stream with duplicate stream id", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId := int(createRandomUInt32())
 			name := createRandomString(32)
 
@@ -67,7 +67,7 @@ var _ = Describe("CREATE STREAM:", func() {
 		})
 
 		Context("and tries to create stream name that's over 255 characters", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId := int(createRandomUInt32())
 			name := createRandomString(256)
 
@@ -82,7 +82,7 @@ var _ = Describe("CREATE STREAM:", func() {
 
 	When("User is not logged in", func() {
 		Context("and tries to create stream", func() {
-			client := createMessageStream()
+			client := createConnection()
 			err := client.CreateStream(iggcon.CreateStreamRequest{
 				StreamId: int(createRandomUInt32()),
 				Name:     createRandomString(32),

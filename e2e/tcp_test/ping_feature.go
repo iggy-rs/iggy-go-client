@@ -4,22 +4,22 @@ import (
 	. "github.com/onsi/ginkgo"
 )
 
-var _ = Describe("LOGOUT FEATURE:", func() {
+var _ = Describe("PING FEATURE:", func() {
 	When("User is logged in", func() {
-		Context("and tries to log out", func() {
+		Context("and tries to ping server", func() {
 			client := createAuthorizedConnection()
-			err := client.LogOut()
+			err := client.Ping()
 
 			itShouldNotReturnError(err)
 		})
 	})
 
 	When("User is not logged in", func() {
-		Context("and tries to log out", func() {
+		Context("and tries to ping server", func() {
 			client := createConnection()
-			err := client.LogOut()
+			err := client.Ping()
 
-			itShouldReturnUnauthenticatedError(err)
+			itShouldNotReturnError(err)
 		})
 	})
 })

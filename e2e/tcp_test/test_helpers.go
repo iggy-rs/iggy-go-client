@@ -8,8 +8,8 @@ import (
 	"time"
 )
 
-func createAuthorizedStream() MessageStream {
-	ms := createMessageStream()
+func createAuthorizedConnection() MessageStream {
+	ms := createConnection()
 	_, err := ms.LogIn(LogInRequest{
 		Username: "iggy",
 		Password: "iggy",
@@ -20,7 +20,7 @@ func createAuthorizedStream() MessageStream {
 	return ms
 }
 
-func createMessageStream() MessageStream {
+func createConnection() MessageStream {
 	factory := &IggyClientFactory{}
 	config := IggyConfiguration{
 		BaseAddress: "127.0.0.1:8090",

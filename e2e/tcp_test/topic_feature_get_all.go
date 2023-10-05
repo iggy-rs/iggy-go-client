@@ -9,7 +9,7 @@ var _ = Describe("GET ALL TOPICS:", func() {
 	prefix := "GetAllTopics"
 	When("User is logged in", func() {
 		Context("and tries to get all topics", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream(prefix, client)
 			defer deleteStreamAfterTests(streamId, client)
 			topicId, name := successfullyCreateTopic(streamId, client)
@@ -22,7 +22,7 @@ var _ = Describe("GET ALL TOPICS:", func() {
 
 	When("User is not logged in", func() {
 		Context("and tries to get all topics", func() {
-			client := createMessageStream()
+			client := createConnection()
 			_, err := client.GetTopics(iggcon.NewIdentifier(int(createRandomUInt32())))
 
 			itShouldReturnUnauthenticatedError(err)

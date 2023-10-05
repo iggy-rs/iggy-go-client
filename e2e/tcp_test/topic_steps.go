@@ -94,7 +94,7 @@ func itShouldSuccessfullyUpdateTopic(streamId int, topicId int, expectedName str
 	itShouldNotReturnError(err)
 }
 
-func itShouldSuccessfullyDeletedTopic(streamId int, topicId int, client iggy.MessageStream) {
+func itShouldSuccessfullyDeleteTopic(streamId int, topicId int, client iggy.MessageStream) {
 	topic, err := client.GetTopicById(iggcon.NewIdentifier(streamId), iggcon.NewIdentifier(topicId))
 
 	itShouldReturnSpecificError(err, "topic_id_not_found")

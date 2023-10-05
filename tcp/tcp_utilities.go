@@ -28,12 +28,7 @@ func (tms *IggyTcpClient) GetStats() (*Stats, error) {
 	return &stats.Stats, err
 }
 
-func (tms *IggyTcpClient) Kill() error {
-	//TODO implement me
-	panic(KillCode)
-}
-
 func (tms *IggyTcpClient) Ping() error {
-	//TODO implement me
-	panic(PingCode)
+	_, err := tms.sendAndFetchResponse([]byte{}, PingCode)
+	return err
 }

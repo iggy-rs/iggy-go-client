@@ -8,7 +8,7 @@ import (
 var _ = Describe("STATE FEATURE:", func() {
 	When("user is logged in", func() {
 		Context("and tries to log with correct data", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			stats, err := client.GetStats()
 
 			itShouldNotReturnError(err)
@@ -20,7 +20,7 @@ var _ = Describe("STATE FEATURE:", func() {
 
 	When("user is not logged in", func() {
 		Context("and tries get iggy statistics", func() {
-			client := createMessageStream()
+			client := createConnection()
 			stats, err := client.GetStats()
 
 			itShouldReturnUnauthenticatedError(err)

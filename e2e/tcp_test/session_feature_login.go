@@ -9,7 +9,7 @@ import (
 var _ = Describe("LOGIN FEATURE:", func() {
 	When("user is already logged in", func() {
 		Context("and tries to log with correct data", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			user, err := client.LogIn(LogInRequest{
 				Username: "iggy",
 				Password: "iggy",
@@ -20,7 +20,7 @@ var _ = Describe("LOGIN FEATURE:", func() {
 		})
 
 		Context("and tries to log with invalid credentials", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			user, err := client.LogIn(LogInRequest{
 				Username: "incorrect",
 				Password: "random",
@@ -33,7 +33,7 @@ var _ = Describe("LOGIN FEATURE:", func() {
 
 	When("user is not logged in", func() {
 		Context("and tries to log with correct data", func() {
-			client := createMessageStream()
+			client := createConnection()
 			user, err := client.LogIn(LogInRequest{
 				Username: "iggy",
 				Password: "iggy",
@@ -44,7 +44,7 @@ var _ = Describe("LOGIN FEATURE:", func() {
 		})
 
 		Context("and tries to log with invalid credentials", func() {
-			client := createMessageStream()
+			client := createConnection()
 			user, err := client.LogIn(LogInRequest{
 				Username: "incorrect",
 				Password: "random",

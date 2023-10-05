@@ -9,7 +9,7 @@ var _ = Describe("DELETE STREAM:", func() {
 	prefix := "DeleteStream"
 	When("User is logged in", func() {
 		Context("and tries to delete existing stream", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId, _ := successfullyCreateStream(prefix, client)
 			err := client.DeleteStream(iggcon.NewIdentifier(streamId))
 
@@ -18,7 +18,7 @@ var _ = Describe("DELETE STREAM:", func() {
 		})
 
 		Context("and tries to delete non-existing stream", func() {
-			client := createAuthorizedStream()
+			client := createAuthorizedConnection()
 			streamId := int(createRandomUInt32())
 
 			err := client.DeleteStream(iggcon.NewIdentifier(streamId))
@@ -29,7 +29,7 @@ var _ = Describe("DELETE STREAM:", func() {
 
 	When("User is not logged in", func() {
 		Context("and tries to delete stream", func() {
-			client := createMessageStream()
+			client := createConnection()
 			err := client.DeleteStream(iggcon.NewIdentifier(int(createRandomUInt32())))
 
 			itShouldReturnUnauthenticatedError(err)
