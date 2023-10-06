@@ -37,12 +37,14 @@ func successfullyJoinConsumer(streamId int, topicId int, groupId int, client igg
 
 //assertions
 
-func itShouldReturnSpecificConsumer(id int, name string, consumer iggcon.ConsumerGroupResponse) {
+func itShouldReturnSpecificConsumer(id int, name string, consumer *iggcon.ConsumerGroupResponse) {
 	It("should fetch consumer with id "+string(rune(id)), func() {
+		Expect(consumer).NotTo(BeNil())
 		Expect(consumer.Id).To(Equal(id))
 	})
 
 	It("should fetch consumer with name "+name, func() {
+		Expect(consumer).NotTo(BeNil())
 		Expect(consumer.Name).To(Equal(name))
 	})
 }

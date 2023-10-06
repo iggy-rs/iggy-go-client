@@ -17,7 +17,7 @@ var _ = Describe("GET CONSUMER GROUP BY ID:", func() {
 			group, err := client.GetConsumerGroupById(iggcon.NewIdentifier(streamId), iggcon.NewIdentifier(topicId), iggcon.NewIdentifier(groupId))
 
 			itShouldNotReturnError(err)
-			itShouldReturnSpecificConsumer(groupId, name, *group)
+			itShouldReturnSpecificConsumer(groupId, name, group)
 		})
 
 		Context("and tries to get consumer from non-existing stream", func() {
@@ -53,7 +53,7 @@ var _ = Describe("GET CONSUMER GROUP BY ID:", func() {
 				iggcon.NewIdentifier(topicId),
 				iggcon.NewIdentifier(int(createRandomUInt32())))
 
-			itShouldReturnSpecificError(err, "group_id_not_found")
+			itShouldReturnSpecificError(err, "consumer_group_not_found")
 		})
 	})
 
