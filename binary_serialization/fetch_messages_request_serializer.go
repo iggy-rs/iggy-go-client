@@ -6,8 +6,6 @@ import (
 )
 
 const (
-	headerSize            = 5
-	streamTopicIdHeader   = 2
 	partitionStrategySize = 5
 	offsetSize            = 12
 	commitFlagSize        = 1
@@ -18,16 +16,16 @@ type TcpFetchMessagesRequest struct {
 }
 
 func (request *TcpFetchMessagesRequest) Serialize() []byte {
-	streamTopicIdLength := streamTopicIdHeader + request.StreamId.Length + streamTopicIdHeader + request.TopicId.Length
-	messageSize := headerSize + streamTopicIdLength + partitionStrategySize + offsetSize + commitFlagSize
+	streamTopicIdLength := 2 + request.StreamId.Length + 2 + request.TopicId.Length
+	messageSize := 2 + request.Consumer.Id.Length + streamTopicIdLength + partitionStrategySize + offsetSize + commitFlagSize + 1
 	bytes := make([]byte, messageSize)
 
 	bytes[0] = byte(request.Consumer.Kind)
-	binary.LittleEndian.PutUint32(bytes[1:5], uint32(request.Consumer.Id))
+	copy(bytes[1:3+request.Consumer.Id.Length], SerializeIdentifier(request.Consumer.Id))
 
-	position := headerSize
+	position := 3 + request.Consumer.Id.Length
 
-	copy(bytes[position:position+streamTopicIdLength], append(append([]byte{}, SerializeIdentifier(request.StreamId)...), SerializeIdentifier(request.TopicId)...))
+	copy(bytes[position:position+streamTopicIdLength], SerializeIdentifiers(request.StreamId, request.TopicId))
 
 	position += streamTopicIdLength
 	binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(request.PartitionId))
