@@ -3,6 +3,7 @@ package tcp
 import (
 	"github.com/iggy-rs/iggy-go-client/binary_serialization"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
+	ierror "github.com/iggy-rs/iggy-go-client/errors"
 )
 
 func (tms *IggyTcpClient) GetConsumerGroups(streamId Identifier, topicId Identifier) ([]ConsumerGroupResponse, error) {
@@ -46,6 +47,9 @@ func (tms *IggyTcpClient) GetConsumerGroupById(streamId Identifier, topicId Iden
 }
 
 func (tms *IggyTcpClient) CreateConsumerGroup(request CreateConsumerGroupRequest) error {
+	if MaxStringLength < len(request.Name) {
+		return ierror.TextTooLong("consumer_group_name")
+	}
 	message := binaryserialization.CreateGroup(request)
 	_, err := tms.sendAndFetchResponse(message, CreateGroupCode)
 	return err

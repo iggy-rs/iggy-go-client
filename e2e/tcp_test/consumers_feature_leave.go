@@ -38,7 +38,7 @@ var _ = Describe("LEAVE CONSUMER GROUP:", func() {
 				ConsumerGroupId: iggcon.NewIdentifier(groupId),
 			})
 
-			itShouldReturnSpecificError(err, "group_id_not_found")
+			itShouldReturnSpecificError(err, "consumer_group_not_found")
 		})
 
 		Context("and tries to leave consumer non-existing topic", func() {

@@ -8,7 +8,7 @@ import (
 
 func CreateGroup(request CreateConsumerGroupRequest) []byte {
 	customIdOffset := 4 + request.StreamId.Length + request.TopicId.Length
-	bytes := make([]byte, 4+request.StreamId.Length+request.TopicId.Length+1+len(request.Name))
+	bytes := make([]byte, 4+request.StreamId.Length+request.TopicId.Length+1+4+len(request.Name))
 	copy(bytes[0:customIdOffset], SerializeIdentifiers(request.StreamId, request.TopicId))
 	binary.LittleEndian.PutUint32(bytes[customIdOffset:customIdOffset+4], uint32(request.ConsumerGroupId))
 	bytes[customIdOffset+4] = byte(len(request.Name))

@@ -338,12 +338,16 @@ func DeserializeToConsumerGroup(payload []byte, position int) (*ConsumerGroupRes
 	id := int(binary.LittleEndian.Uint32(payload[position : position+4]))
 	membersCount := int(binary.LittleEndian.Uint32(payload[position+4 : position+8]))
 	partitionsCount := int(binary.LittleEndian.Uint32(payload[position+8 : position+12]))
-	readBytes := 12
+	nameLength := int(payload[position+12])
+	name := string(payload[position+13 : position+13+nameLength])
+
+	readBytes := 12 + 1 + nameLength
 
 	consumerGroup := ConsumerGroupResponse{
 		Id:              id,
 		MembersCount:    membersCount,
 		PartitionsCount: partitionsCount,
+		Name:            name,
 	}
 
 	return &consumerGroup, readBytes

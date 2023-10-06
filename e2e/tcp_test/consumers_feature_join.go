@@ -36,7 +36,7 @@ var _ = Describe("JOIN CONSUMER GROUP:", func() {
 				ConsumerGroupId: iggcon.NewIdentifier(groupId),
 			})
 
-			itShouldReturnSpecificError(err, "group_id_not_found")
+			itShouldReturnSpecificError(err, "consumer_group_not_found")
 		})
 
 		Context("and tries to join consumer non-existing topic", func() {

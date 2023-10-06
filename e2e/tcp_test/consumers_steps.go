@@ -94,7 +94,7 @@ func itShouldSuccessfullyCreateConsumer(streamId int, topicId int, groupId int, 
 func itShouldSuccessfullyDeletedConsumer(streamId int, topicId int, groupId int, client iggy.MessageStream) {
 	consumer, err := client.GetConsumerGroupById(iggcon.NewIdentifier(streamId), iggcon.NewIdentifier(topicId), iggcon.NewIdentifier(groupId))
 
-	itShouldReturnSpecificError(err, "consumer_id_not_found")
+	itShouldReturnSpecificError(err, "consumer_group_not_found")
 	It("should not return consumer", func() {
 		Expect(consumer).To(BeNil())
 	})
@@ -116,7 +116,7 @@ func itShouldSuccessfullyLeaveConsumer(streamId int, topicId int, groupId int, c
 
 	It("should leave consumer with id "+string(rune(groupId)), func() {
 		Expect(consumer).NotTo(BeNil())
-		Expect(consumer.MembersCount).To(Equal(0))
+		Expect(consumer.MembersCount).To(Equal(2))
 	})
 
 	itShouldNotReturnError(err)

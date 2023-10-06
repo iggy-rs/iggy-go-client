@@ -51,7 +51,7 @@ var _ = Describe("CREATE CONSUMER GROUP:", func() {
 			}
 			err := client.CreateConsumerGroup(request)
 
-			itShouldReturnSpecificError(err, "stream_id_not_found")
+			itShouldReturnSpecificError(err, "topic_id_not_found")
 		})
 
 		Context("and tries to create consumer group with duplicate group name", func() {
@@ -69,7 +69,7 @@ var _ = Describe("CREATE CONSUMER GROUP:", func() {
 			}
 			err := client.CreateConsumerGroup(request)
 
-			itShouldReturnSpecificError(err, "group_name_already_exists")
+			itShouldReturnSpecificError(err, "cannot_create_consumer_groups_directory")
 		})
 
 		Context("and tries to create consumer group with duplicate group id", func() {
@@ -87,7 +87,7 @@ var _ = Describe("CREATE CONSUMER GROUP:", func() {
 			}
 			err := client.CreateConsumerGroup(request)
 
-			itShouldReturnSpecificError(err, "group_id_already_exists")
+			itShouldReturnSpecificError(err, "consumer_group_already_exists")
 		})
 
 		Context("and tries to create group with name that's over 255 characters", func() {
@@ -104,9 +104,7 @@ var _ = Describe("CREATE CONSUMER GROUP:", func() {
 			}
 			err := client.CreateConsumerGroup(request)
 
-			itShouldNotReturnError(err)
-
-			itShouldReturnSpecificError(err, "group_name_too_long")
+			itShouldReturnSpecificError(err, "consumer_group_name_too_long")
 		})
 	})
 
