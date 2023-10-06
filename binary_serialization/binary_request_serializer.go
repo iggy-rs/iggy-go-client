@@ -38,3 +38,21 @@ func GetOffset(request GetOffsetRequest) []byte {
 	binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(request.PartitionId))
 	return bytes
 }
+
+func CreatePartitions(request CreatePartitionsRequest) []byte {
+	bytes := make([]byte, 8+request.StreamId.Length+request.TopicId.Length)
+	position := 4 + request.StreamId.Length + request.TopicId.Length
+	copy(bytes[0:position], SerializeIdentifiers(request.StreamId, request.TopicId))
+	binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(request.PartitionsCount))
+
+	return bytes
+}
+
+func DeletePartitions(request DeletePartitionRequest) []byte {
+	bytes := make([]byte, 8+request.StreamId.Length+request.TopicId.Length)
+	position := 4 + request.StreamId.Length + request.TopicId.Length
+	copy(bytes[0:position], SerializeIdentifiers(request.StreamId, request.TopicId))
+	binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(request.PartitionsCount))
+
+	return bytes
+}

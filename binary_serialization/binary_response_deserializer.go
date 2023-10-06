@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
 )
@@ -346,4 +347,166 @@ func DeserializeToConsumerGroup(payload []byte, position int) (*ConsumerGroupRes
 	}
 
 	return &consumerGroup, readBytes
+}
+
+func DeserializeUsers(payload []byte) ([]*UserResponse, error) {
+	if len(payload) == 0 {
+		return nil, errors.New("Empty payload")
+	}
+
+	var result []*UserResponse
+	length := len(payload)
+	position := 0
+
+	for position < length {
+		response, readBytes, err := deserializeUserResponse(payload, position)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, response)
+		position += readBytes
+	}
+
+	return result, nil
+}
+
+func DeserializeUser(payload []byte) (*UserResponse, error) {
+	response, position, err := deserializeUserResponse(payload, 0)
+	hasPermissions := payload[position]
+	if hasPermissions == 1 {
+		permissionLength := binary.LittleEndian.Uint32(payload[position+1 : position+5])
+		permissionsPayload := payload[position+5 : position+5+int(permissionLength)]
+		permissions := deserializePermissions(permissionsPayload)
+		return &UserResponse{
+			Permissions: permissions,
+			Id:          response.Id,
+			CreatedAt:   response.CreatedAt,
+			Username:    response.Username,
+			Status:      response.Status,
+		}, err
+	}
+	return &UserResponse{
+		Id:          response.Id,
+		CreatedAt:   response.CreatedAt,
+		Username:    response.Username,
+		Status:      response.Status,
+		Permissions: nil,
+	}, err
+}
+
+func deserializePermissions(bytes []byte) *Permissions {
+	streamMap := make(map[int]*StreamPermissions)
+	index := 0
+
+	globalPermissions := GlobalPermissions{
+		ManageServers: bytes[index] == 1,
+		ReadServers:   bytes[index+1] == 1,
+		ManageUsers:   bytes[index+2] == 1,
+		ReadUsers:     bytes[index+3] == 1,
+		ManageStreams: bytes[index+4] == 1,
+		ReadStreams:   bytes[index+5] == 1,
+		ManageTopics:  bytes[index+6] == 1,
+		ReadTopics:    bytes[index+7] == 1,
+		PollMessages:  bytes[index+8] == 1,
+		SendMessages:  bytes[index+9] == 1,
+	}
+
+	index += 10
+
+	if bytes[index] == 1 {
+		for {
+			streamId := int(binary.LittleEndian.Uint32(bytes[index : index+4]))
+			index += 4
+
+			manageStream := bytes[index] == 1
+			readStream := bytes[index+1] == 1
+			manageTopics := bytes[index+2] == 1
+			readTopics := bytes[index+3] == 1
+			pollMessagesStream := bytes[index+4] == 1
+			sendMessagesStream := bytes[index+5] == 1
+			topicsMap := make(map[int]*TopicPermissions)
+
+			index += 6
+
+			if bytes[index] == 1 {
+				for {
+					topicId := int(binary.LittleEndian.Uint32(bytes[index : index+4]))
+					index += 4
+
+					manageTopic := bytes[index] == 1
+					readTopic := bytes[index+1] == 1
+					pollMessagesTopic := bytes[index+2] == 1
+					sendMessagesTopic := bytes[index+3] == 1
+
+					topicsMap[topicId] = &TopicPermissions{
+						ManageTopic:  manageTopic,
+						ReadTopic:    readTopic,
+						PollMessages: pollMessagesTopic,
+						SendMessages: sendMessagesTopic,
+					}
+
+					index += 4
+
+					if bytes[index] == 0 {
+						break
+					}
+				}
+			}
+
+			streamMap[streamId] = &StreamPermissions{
+				ManageStream: manageStream,
+				ReadStream:   readStream,
+				ManageTopics: manageTopics,
+				ReadTopics:   readTopics,
+				PollMessages: pollMessagesStream,
+				SendMessages: sendMessagesStream,
+				Topics:       topicsMap,
+			}
+
+			index += 1
+
+			if bytes[index] == 0 {
+				break
+			}
+		}
+	}
+
+	return &Permissions{
+		Global:  globalPermissions,
+		Streams: streamMap,
+	}
+}
+
+func deserializeUserResponse(payload []byte, position int) (*UserResponse, int, error) {
+	if len(payload) < position+14 {
+		return nil, 0, errors.New("not enough data to map UserResponse")
+	}
+
+	id := binary.LittleEndian.Uint32(payload[position : position+4])
+	createdAt := binary.LittleEndian.Uint64(payload[position+4 : position+12])
+	status := payload[position+12]
+	var userStatus UserStatus
+	switch status {
+	case 1:
+		userStatus = Active
+	case 2:
+		userStatus = Inactive
+	default:
+		return nil, 0, fmt.Errorf("invalid user status: %d", status)
+	}
+
+	usernameLength := payload[position+13]
+	if len(payload) < position+14+int(usernameLength) {
+		return nil, 0, errors.New("not enough data to map username")
+	}
+	username := string(payload[position+14 : position+14+int(usernameLength)])
+
+	readBytes := 4 + 8 + 1 + 1 + int(usernameLength)
+
+	return &UserResponse{
+		Id:        id,
+		CreatedAt: createdAt,
+		Status:    userStatus,
+		Username:  username,
+	}, readBytes, nil
 }
