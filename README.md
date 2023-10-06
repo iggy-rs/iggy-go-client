@@ -3,10 +3,7 @@
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-<!-- [![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url] -->
-
-
+[![Go][Golang]][Golang-url]
 
 <!-- PROJECT LOGO -->
 <br />
@@ -33,49 +30,10 @@
   </p>
 </div>
 
-
-
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
-  </ol>
-</details>
-
-
-
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-<!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
-
-<!-- Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `eldpcn`, `iggy-go`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description` -->
-
 `iggy-go` is a golang SDK for <a href="https://github.com/iggy-rs/iggy">iggy</a> - persistent message streaming platform written in Rust.
-
-
-### Built With
- [![Go][Golang]][Golang-url]
-
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -85,7 +43,7 @@ To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
 
-In order to use this SDK you need to install golang on your enviroment. Here's a <a hfref="https://go.dev/doc/install">link to official go documentation</a> explaining how you can do that!
+In order to use this SDK you need to install golang on your environment. Here's a <a hfref="https://go.dev/doc/install">link to official go documentation</a> explaining how you can do that!
 
 ### Installation
 
@@ -99,7 +57,7 @@ In order to use this SDK you need to install golang on your enviroment. Here's a
     go build
     ``` 
 <!-- USAGE EXAMPLES -->
-## Usage
+## Usage (OBSOLETE; will be updated soon)
 
 If you want to use this sdk as a CLI tool, you can do that by following these steps:
 1. Clone iggy repo and run it in background
@@ -117,7 +75,7 @@ If you want to use this sdk as a CLI tool, you can do that by following these st
     go run ./cli <commandname>
     ```
 
-    You can run `help` command if would like to see avaiable commands:
+    You can run `help` command if you would like to see available commands:
 
     ```sh
       $ go run ./cli help
@@ -162,15 +120,23 @@ If you want to use this sdk as a CLI tool, you can do that by following these st
 <!-- ROADMAP -->
 ## Roadmap
 
-- [x] Basic CLI tool
+- [x] Basic CLI tool (already obsolete)
 - [x] Samples
 - [ ] Rewrite the CLI tool using CLI frameworks (like Cobra/Viper)
-- [ ] Full SDK implementation
-    - [x] TCP
-    - [ ] HTTP
-    - [ ] QUIC
-- [X] Human friendly error handling
+- [ ] Implementing all iggy features in the SDK
+    - [ ] TCP (in progress)
+    - [ ] HTTP (can be picked up at any moment)
+    - [ ] QUIC (blocked by TCP, can be completed after full implementation of binary serialization)
 - [ ] Implementing benchmarks
+- [ ] Implementing optional logging
+- [ ] Implementing tests
+  - [ ] Unit tests for binary serialization
+  - [ ] BDD integration tests
+    - [ ] Improve BDD tests assertions, so they can detect breaking changes in iggy-server
+- [X] Human friendly error handling
+- [ ] Documentation
+- [ ] GitHub actions CI/CD
+- [ ] Publishing to official golang packages repository
 
 See the [open issues](https://github.com/iggy-rs/iggy-go-client/issues) for a full list of proposed features (and known issues).
 
@@ -185,28 +151,11 @@ If you believe that you can improve this SDK feel free to contribute. Here's how
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-
-<!-- LICENSE -->
-<!-- ## License
-
-Distributed under the MIT License. See `LICENSE.txt` for more information.
- -->
-
-<!-- CONTACT -->
-<!-- ## Contact -->
-
-<!-- Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com -->
-<!-- 
-Project Link: [https://github.com/iggy-rs/iggy-go-client](https://github.com/iggy-rs/iggy-go-client)
-
- -->
-
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
 * [iggy-rs repository](https://github.com/iggy-rs/iggy)
 * [iggy-rs documentation](https://docs.iggy.rs/)
-* [iggy-dotnet-client](https://github.com/iggy-rs/iggy-dotnet-client)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [contributors-shield]: https://img.shields.io/github/contributors/iggy-rs/iggy-go-client.svg?style=for-the-badge
