@@ -6,23 +6,56 @@ import (
 )
 
 func (tms *IggyTcpClient) GetUser(identifier Identifier) (*UserResponse, error) {
-	//TODO implement me
-	panic(GetUserCode)
+	message := binaryserialization.SerializeIdentifier(identifier)
+	buffer, err := tms.sendAndFetchResponse(message, GetUserCode)
+	if err != nil {
+		return nil, err
+	}
+
+	responseLength, err := getResponseLength(buffer)
+	if err != nil {
+		return nil, err
+	}
+
+	responseBuffer := make([]byte, responseLength)
+	_, err = tms.client.Read(responseBuffer)
+	if err != nil {
+		return nil, err
+	}
+
+	return binaryserialization.DeserializeUser(responseBuffer)
 }
 
-func (tms *IggyTcpClient) GetUsers() ([]UserResponse, error) {
-	//TODO implement me
-	panic(GetUsersCode)
+func (tms *IggyTcpClient) GetUsers() ([]*UserResponse, error) {
+	buffer, err := tms.sendAndFetchResponse([]byte{}, GetUsersCode)
+	if err != nil {
+		return nil, err
+	}
+
+	responseLength, err := getResponseLength(buffer)
+	if err != nil {
+		return nil, err
+	}
+
+	responseBuffer := make([]byte, responseLength)
+	_, err = tms.client.Read(responseBuffer)
+	if err != nil {
+		return nil, err
+	}
+
+	return binaryserialization.DeserializeUsers(responseBuffer)
 }
 
 func (tms *IggyTcpClient) CreateUser(request CreateUserRequest) error {
-	//TODO implement me
-	panic(CreateUserCode)
+	var message []byte //TODO ADD SERIALIZATION
+	_, err := tms.sendAndFetchResponse(message, CreateUserCode)
+	return err
 }
 
 func (tms *IggyTcpClient) UpdateUser(request UpdateUserRequest) error {
-	//TODO implement me
-	panic(UpdateUserCode)
+	var message []byte //TODO ADD SERIALIZATION
+	_, err := tms.sendAndFetchResponse(message, UpdateUserCode)
+	return err
 }
 
 func (tms *IggyTcpClient) DeleteUser(identifier Identifier) error {
@@ -31,12 +64,14 @@ func (tms *IggyTcpClient) DeleteUser(identifier Identifier) error {
 	return err
 }
 
-func (tms *IggyTcpClient) UpdateUserPermissions(request UpdateUserPermissions) error {
-	//TODO implement me
-	panic(UpdatePermissionsCode)
+func (tms *IggyTcpClient) UpdateUserPermissions(request UpdateUserPermissionsRequest) error {
+	var message []byte //TODO ADD SERIALIZATION
+	_, err := tms.sendAndFetchResponse(message, UpdatePermissionsCode)
+	return err
 }
 
 func (tms *IggyTcpClient) ChangePassword(request ChangePasswordRequest) error {
-	//TODO implement me
-	panic(ChangePasswordCode)
+	var message []byte //TODO ADD SERIALIZATION
+	_, err := tms.sendAndFetchResponse(message, ChangePasswordCode)
+	return err
 }

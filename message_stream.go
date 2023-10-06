@@ -28,14 +28,14 @@ type MessageStream interface {
 	JoinConsumerGroup(request JoinConsumerGroupRequest) error
 	LeaveConsumerGroup(request LeaveConsumerGroupRequest) error
 
-	CreatePartition(request CreatePartitionRequest) error
+	CreatePartition(request CreatePartitionsRequest) error
 	DeletePartition(request DeletePartitionRequest) error
 
 	GetUser(identifier Identifier) (*UserResponse, error)
-	GetUsers() ([]UserResponse, error)
+	GetUsers() ([]*UserResponse, error)
 	CreateUser(request CreateUserRequest) error
 	UpdateUser(request UpdateUserRequest) error
-	UpdateUserPermissions(request UpdateUserPermissions) error
+	UpdateUserPermissions(request UpdateUserPermissionsRequest) error
 	ChangePassword(request ChangePasswordRequest) error
 	DeleteUser(identifier Identifier) error
 

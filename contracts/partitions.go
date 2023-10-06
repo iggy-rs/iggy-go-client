@@ -16,14 +16,16 @@ type PartitionContract struct {
 	SizeBytes     uint64 `json:"sizeBytes"`
 }
 
-type CreatePartitionRequest struct {
-	StreamId Identifier `json:"streamId"`
-	TopicId  Identifier `json:"topicId"`
+type CreatePartitionsRequest struct {
+	StreamId        Identifier `json:"streamId"`
+	TopicId         Identifier `json:"topicId"`
+	PartitionsCount int        `json:"partitionsCount"`
 }
 
 type DeletePartitionRequest struct {
-	StreamId Identifier `json:"streamId"`
-	TopicId  Identifier `json:"topicId"`
+	StreamId        Identifier `json:"streamId"`
+	TopicId         Identifier `json:"topicId"`
+	PartitionsCount int        `json:"partitionsCount"`
 }
 
 type PartitioningKind int
