@@ -32,7 +32,7 @@ func itShouldSuccessfullyPublishMessages(streamId int, topicId int, messages []i
 		TopicId:  iggcon.NewIdentifier(topicId),
 		Consumer: iggcon.Consumer{
 			Kind: iggcon.ConsumerSingle,
-			Id:   createRandomUInt32(),
+			Id:   iggcon.NewIdentifier(int(createRandomUInt32())),
 		},
 		PartitionId:     1,
 		PollingStrategy: iggcon.FirstPollingStrategy(),
