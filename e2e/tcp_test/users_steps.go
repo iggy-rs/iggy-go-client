@@ -94,7 +94,6 @@ func itShouldSuccessfullyUpdateUserPermissions(userId uint32, client iggy.Messag
 
 func itShouldBePossibleToLogInWithCredentials(username string, password string) {
 	ms := createConnection()
-
 	userId, err := ms.LogIn(iggcon.LogInRequest{
 		Username: username,
 		Password: password,
@@ -103,6 +102,34 @@ func itShouldBePossibleToLogInWithCredentials(username string, password string) 
 	itShouldNotReturnError(err)
 	It("should return userId", func() {
 		Expect(userId).NotTo(BeNil())
+	})
+}
+
+func itShouldReturnSpecificUser(name string, user iggcon.UserResponse) {
+	It("should fetch user with name "+name, func() {
+		Expect(user.Username).To(Equal(name))
+	})
+}
+
+func itShouldContainSpecificUser(name string, users []*iggcon.UserResponse) {
+	It("should fetch at least one user", func() {
+		Expect(len(users)).NotTo(Equal(0))
+	})
+
+	var user iggcon.UserResponse
+	found := false
+
+	for _, s := range users {
+		if s.Username == name {
+			user = *s
+			found = true
+			break
+		}
+	}
+
+	It("should fetch user with name "+name, func() {
+		Expect(found).To(BeTrue(), "User with name %s not found", name)
+		Expect(user.Username).To(Equal(name))
 	})
 }
 
