@@ -12,9 +12,9 @@ type UpdateUserPermissionsRequest struct {
 }
 
 type UpdateUserRequest struct {
-	UserID     Identifier `json:"-"`
-	Username   string     `json:"username"`
-	UserStatus UserStatus `json:"userStatus"`
+	UserID   Identifier  `json:"-"`
+	Username string      `json:"username"`
+	Status   *UserStatus `json:"userStatus"`
 }
 
 type CreateUserRequest struct {

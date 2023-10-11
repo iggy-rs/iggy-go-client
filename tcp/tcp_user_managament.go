@@ -47,13 +47,13 @@ func (tms *IggyTcpClient) GetUsers() ([]*UserResponse, error) {
 }
 
 func (tms *IggyTcpClient) CreateUser(request CreateUserRequest) error {
-	var message []byte //TODO ADD SERIALIZATION
+	message := binaryserialization.SerializeCreateUserRequest(request)
 	_, err := tms.sendAndFetchResponse(message, CreateUserCode)
 	return err
 }
 
 func (tms *IggyTcpClient) UpdateUser(request UpdateUserRequest) error {
-	var message []byte //TODO ADD SERIALIZATION
+	message := binaryserialization.SerializeUpdateUser(request)
 	_, err := tms.sendAndFetchResponse(message, UpdateUserCode)
 	return err
 }
@@ -65,13 +65,13 @@ func (tms *IggyTcpClient) DeleteUser(identifier Identifier) error {
 }
 
 func (tms *IggyTcpClient) UpdateUserPermissions(request UpdateUserPermissionsRequest) error {
-	var message []byte //TODO ADD SERIALIZATION
+	message := binaryserialization.SerializeUpdateUserPermissionsRequest(request)
 	_, err := tms.sendAndFetchResponse(message, UpdatePermissionsCode)
 	return err
 }
 
 func (tms *IggyTcpClient) ChangePassword(request ChangePasswordRequest) error {
-	var message []byte //TODO ADD SERIALIZATION
+	message := binaryserialization.SerializeChangePasswordRequest(request)
 	_, err := tms.sendAndFetchResponse(message, ChangePasswordCode)
 	return err
 }
