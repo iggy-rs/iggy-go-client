@@ -10,7 +10,6 @@ var _ = Describe("DELETE USER:", func() {
 		Context("tries to delete user with correct data", func() {
 			client := createAuthorizedConnection()
 			userId := successfullyCreateUser(createRandomString(16), client)
-			defer deleteUserAfterTests(int(userId), client)
 
 			err := client.DeleteUser(iggcon.NewIdentifier(int(userId)))
 
