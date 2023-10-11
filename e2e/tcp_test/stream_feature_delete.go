@@ -14,7 +14,7 @@ var _ = Describe("DELETE STREAM:", func() {
 			err := client.DeleteStream(iggcon.NewIdentifier(streamId))
 
 			itShouldNotReturnError(err)
-			itShouldSuccessfullyDeletedStream(streamId, client)
+			itShouldSuccessfullyDeleteStream(streamId, client)
 		})
 
 		Context("and tries to delete non-existing stream", func() {

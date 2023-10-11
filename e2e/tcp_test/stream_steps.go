@@ -89,7 +89,7 @@ func itShouldSuccessfullyUpdateStream(id int, expectedName string, client iggy.M
 	})
 }
 
-func itShouldSuccessfullyDeletedStream(id int, client iggy.MessageStream) {
+func itShouldSuccessfullyDeleteStream(id int, client iggy.MessageStream) {
 	stream, err := client.GetStreamById(iggcon.GetStreamRequest{StreamID: iggcon.NewIdentifier(id)})
 
 	itShouldReturnSpecificError(err, "stream_id_not_found")
