@@ -514,3 +514,74 @@ func deserializeUserResponse(payload []byte, position int) (*UserResponse, int, 
 		Username:  username,
 	}, readBytes, nil
 }
+
+func DeserializeClients(payload []byte) ([]ClientResponse, error) {
+	if len(payload) == 0 {
+		return []ClientResponse{}, nil
+	}
+
+	var response []ClientResponse
+	length := len(payload)
+	position := 0
+
+	for position < length {
+		client, readBytes := MapClientInfo(payload, position)
+		response = append(response, client)
+		position += readBytes
+	}
+
+	return response, nil
+}
+
+func MapClientInfo(payload []byte, position int) (ClientResponse, int) {
+	var readBytes int
+	id := binary.LittleEndian.Uint32(payload[position : position+4])
+	userId := binary.LittleEndian.Uint32(payload[position+4 : position+8])
+	transportByte := payload[position+8]
+	transport := "Unknown"
+
+	if transportByte == 1 {
+		transport = string(Tcp)
+	} else if transportByte == 2 {
+		transport = string(Quic)
+	}
+
+	addressLength := int(binary.LittleEndian.Uint32(payload[position+9 : position+13]))
+	address := string(payload[position+13 : position+13+addressLength])
+	readBytes = 4 + 1 + 4 + 4 + addressLength
+	position += readBytes
+	consumerGroupsCount := binary.LittleEndian.Uint32(payload[position : position+4])
+	readBytes += 4
+
+	return ClientResponse{
+		ID:                  id,
+		UserID:              userId,
+		Transport:           transport,
+		Address:             address,
+		ConsumerGroupsCount: consumerGroupsCount,
+	}, readBytes
+}
+
+func DeserializeClient(payload []byte) *ClientResponse {
+	response, position := MapClientInfo(payload, 0)
+	consumerGroups := make([]ConsumerGroupInfo, response.ConsumerGroupsCount)
+	length := len(payload)
+
+	for position < length {
+		for i := uint32(0); i < response.ConsumerGroupsCount; i++ {
+			streamId := int32(binary.LittleEndian.Uint32(payload[position : position+4]))
+			topicId := int32(binary.LittleEndian.Uint32(payload[position+4 : position+8]))
+			consumerGroupId := int32(binary.LittleEndian.Uint32(payload[position+8 : position+12]))
+
+			consumerGroup := ConsumerGroupInfo{
+				StreamId:        int(streamId),
+				TopicId:         int(topicId),
+				ConsumerGroupId: int(consumerGroupId),
+			}
+			consumerGroups = append(consumerGroups, consumerGroup)
+			position += 12
+		}
+	}
+	response.ConsumerGroups = consumerGroups
+	return &response
+}

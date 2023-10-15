@@ -45,7 +45,6 @@ type MessageStream interface {
 	GetStats() (*Stats, error)
 	Ping() error
 
-	GetMe() (*MeResponse, error)
 	GetClients() ([]ClientResponse, error)
 	GetClientById(clientId int) (*ClientResponse, error)
 }

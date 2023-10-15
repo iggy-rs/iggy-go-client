@@ -5,27 +5,31 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("STAT FEATURE:", func() {
+var _ = Describe("GET ALL CLIENT FEATURE:", func() {
 	When("user is logged in", func() {
 		Context("and tries to log with correct data", func() {
 			client := createAuthorizedConnection()
-			stats, err := client.GetStats()
+			clients, err := client.GetClients()
 
 			itShouldNotReturnError(err)
 			It("should return stats", func() {
-				Expect(stats).ToNot(BeNil())
+				Expect(clients).ToNot(BeNil())
+			})
+
+			It("should return at least one client", func() {
+				Expect(len(clients)).ToNot(BeZero())
 			})
 		})
 	})
 
 	When("user is not logged in", func() {
-		Context("and tries get iggy statistics", func() {
+		Context("and tries get all clients", func() {
 			client := createConnection()
-			stats, err := client.GetStats()
+			clients, err := client.GetClients()
 
 			itShouldReturnUnauthenticatedError(err)
-			It("should not return stats", func() {
-				Expect(stats).To(BeNil())
+			It("should not return clients", func() {
+				Expect(clients).To(BeNil())
 			})
 		})
 	})
