@@ -124,9 +124,9 @@ If you want to use this sdk as a CLI tool, you can do that by following these st
 - [x] Samples
 - [ ] Rewrite the CLI tool using CLI frameworks (like Cobra/Viper)
 - [ ] Implementing all iggy features in the SDK
-    - [ ] TCP (in progress)
+    - [x] TCP
     - [ ] HTTP (can be picked up at any moment)
-    - [ ] QUIC (blocked by TCP, can be completed after full implementation of binary serialization)
+    - [ ] QUIC
 - [ ] Implementing benchmarks
 - [ ] Implementing optional logging
 - [ ] Implementing tests
