@@ -39,7 +39,12 @@ type MessageStream interface {
 	ChangePassword(request ChangePasswordRequest) error
 	DeleteUser(identifier Identifier) error
 
+	CreateAccessToken(request CreateAccessTokenRequest) (*AccessToken, error)
+	DeleteAccessToken(request DeleteAccessTokenRequest) error
+	GetAccessTokens() ([]AccessTokenResponse, error)
+
 	LogIn(request LogInRequest) (*LogInResponse, error)
+	LogInWithAccessToken(request LogInAccessTokenRequest) (*LogInResponse, error)
 	LogOut() error
 
 	GetStats() (*Stats, error)

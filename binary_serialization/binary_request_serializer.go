@@ -295,3 +295,28 @@ func SerializeInt(value int) []byte {
 	binary.LittleEndian.PutUint32(bytes, uint32(value))
 	return bytes
 }
+
+func SerializeLoginWithPersonalAccessToken(request LogInAccessTokenRequest) []byte {
+	length := 1 + len(request.Token)
+	bytes := make([]byte, length)
+	bytes[0] = byte(len(request.Token))
+	copy(bytes[1:], []byte(request.Token))
+	return bytes
+}
+
+func SerializeDeletePersonalAccessToken(request DeleteAccessTokenRequest) []byte {
+	length := 1 + len(request.Name)
+	bytes := make([]byte, length)
+	bytes[0] = byte(len(request.Name))
+	copy(bytes[1:], []byte(request.Name))
+	return bytes
+}
+
+func SerializeCreatePersonalAccessToken(request CreateAccessTokenRequest) []byte {
+	length := 1 + len(request.Name) + 4
+	bytes := make([]byte, length)
+	bytes[0] = byte(len(request.Name))
+	copy(bytes[1:], []byte(request.Name))
+	binary.LittleEndian.PutUint32(bytes[len(bytes)-4:], request.Expiry)
+	return bytes
+}
