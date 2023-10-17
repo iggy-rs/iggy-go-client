@@ -26,6 +26,26 @@ func (tms *IggyTcpClient) LogIn(request LogInRequest) (*LogInResponse, error) {
 	return binaryserialization.DeserializeLogInResponse(responseBuffer), nil
 }
 
+func (tms *IggyTcpClient) LogInWithAccessToken(request LogInAccessTokenRequest) (*LogInResponse, error) {
+	message := binaryserialization.SerializeLoginWithPersonalAccessToken(request)
+	buffer, err := tms.sendAndFetchResponse(message, LoginWithAccessTokenCode)
+	if err != nil {
+		return nil, err
+	}
+
+	responseLength, err := getResponseLength(buffer)
+	if err != nil {
+		return nil, err
+	}
+
+	responseBuffer := make([]byte, responseLength)
+	if _, err := tms.client.Read(responseBuffer); err != nil {
+		return nil, err
+	}
+
+	return binaryserialization.DeserializeLogInResponse(responseBuffer), nil
+}
+
 func (tms *IggyTcpClient) LogOut() error {
 	_, err := tms.sendAndFetchResponse([]byte{}, LogoutUserCode)
 	return err

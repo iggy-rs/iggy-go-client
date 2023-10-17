@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
+	ierror "github.com/iggy-rs/iggy-go-client/errors"
+	"time"
 )
 
 func DeserializeLogInResponse(payload []byte) *LogInResponse {
@@ -584,4 +586,50 @@ func DeserializeClient(payload []byte) *ClientResponse {
 	}
 	response.ConsumerGroups = consumerGroups
 	return &response
+}
+
+func DeserializeAccessToken(payload []byte) (*AccessToken, error) {
+	tokenLength := int(payload[0])
+	token := string(payload[1 : 1+tokenLength])
+	return &AccessToken{
+		Token: token,
+	}, nil
+}
+
+func DeserializeAccessTokens(payload []byte) ([]AccessTokenResponse, error) {
+	if len(payload) == 0 {
+		return []AccessTokenResponse{}, ierror.CustomError("Empty payload")
+	}
+
+	var result []AccessTokenResponse
+	position := 0
+	length := len(payload)
+
+	for position < length {
+		response, readBytes := deserializeToPersonalAccessTokenResponse(payload, position)
+		result = append(result, response)
+		position += readBytes
+	}
+
+	return result, nil
+}
+
+func deserializeToPersonalAccessTokenResponse(payload []byte, position int) (AccessTokenResponse, int) {
+	nameLength := int(payload[position])
+	name := string(payload[position+1 : position+1+nameLength])
+	expiryBytes := payload[position+1+nameLength:]
+	var expiry *time.Time
+
+	if len(expiryBytes) >= 8 {
+		unixMicroSeconds := binary.LittleEndian.Uint64(expiryBytes)
+		expiryTime := time.Unix(0, int64(unixMicroSeconds))
+		expiry = &expiryTime
+	}
+
+	readBytes := 1 + nameLength + 8
+
+	return AccessTokenResponse{
+		Name:   name,
+		Expiry: expiry,
+	}, readBytes
 }
