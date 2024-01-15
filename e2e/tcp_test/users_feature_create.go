@@ -37,6 +37,63 @@ var _ = Describe("CREATE USER:", func() {
 			itShouldSuccessfullyCreateUser(request.Username, client)
 			//itShouldBePossibleToLogInWithCredentials(request.Username, request.Password)
 		})
+
+		Context("tries to create user with correct data and custom permissions", func() {
+			client := createAuthorizedConnection()
+			streamId, _ := successfullyCreateStream("ss", client)
+			topicId, _ := successfullyCreateTopic(streamId, client)
+
+			topicPermissionRequest := iggcon.TopicPermissions{
+				ManageTopic:  false,
+				ReadTopic:    true,
+				PollMessages: true,
+				SendMessages: true,
+			}
+			streamPermissionRequest := iggcon.StreamPermissions{
+				ManageStream: false,
+				ReadStream:   true,
+				ManageTopics: true,
+				ReadTopics:   true,
+				PollMessages: false,
+				SendMessages: true,
+				Topics: map[int]*iggcon.TopicPermissions{
+					int(topicId): &topicPermissionRequest,
+				},
+			}
+
+			userStreamPermissions := map[int]*iggcon.StreamPermissions{
+				int(streamId): &streamPermissionRequest,
+			}
+
+			request := iggcon.CreateUserRequest{
+				Username: createRandomString(16),
+				Password: createRandomString(16),
+				Status:   iggcon.Active,
+				Permissions: &iggcon.Permissions{
+					Global: iggcon.GlobalPermissions{
+						ManageServers: true,
+						ReadServers:   true,
+						ManageUsers:   true,
+						ReadUsers:     true,
+						ManageStreams: true,
+						ReadStreams:   true,
+						ManageTopics:  true,
+						ReadTopics:    true,
+						PollMessages:  true,
+						SendMessages:  true,
+					},
+					Streams: userStreamPermissions,
+				},
+			}
+
+			err := client.CreateUser(request)
+			defer deleteUserAfterTests(request.Username, client)
+			defer deleteStreamAfterTests(streamId, client)
+
+			itShouldNotReturnError(err)
+			itShouldSuccessfullyCreateUserWithPermissions(request.Username, client, userStreamPermissions)
+			//itShouldBePossibleToLogInWithCredentials(request.Username, request.Password)
+		})
 	})
 
 	When("User is not logged in", func() {

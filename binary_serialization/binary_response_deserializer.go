@@ -421,6 +421,7 @@ func deserializePermissions(bytes []byte) *Permissions {
 
 	if bytes[index] == 1 {
 		for {
+			index += 1
 			streamId := int(binary.LittleEndian.Uint32(bytes[index : index+4]))
 			index += 4
 
@@ -436,6 +437,7 @@ func deserializePermissions(bytes []byte) *Permissions {
 
 			if bytes[index] == 1 {
 				for {
+					index += 1
 					topicId := int(binary.LittleEndian.Uint32(bytes[index : index+4]))
 					index += 4
 
