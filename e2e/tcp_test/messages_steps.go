@@ -2,17 +2,18 @@ package tcp_test
 
 import (
 	"bytes"
+	"reflect"
+
 	"github.com/iggy-rs/iggy-go-client"
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"reflect"
 )
 
 func createDefaultMessageHeaders() map[iggcon.HeaderKey]iggcon.HeaderValue {
 	return map[iggcon.HeaderKey]iggcon.HeaderValue{
-		iggcon.HeaderKey{Value: createRandomString(4)}: {Kind: iggcon.String, Value: []byte(createRandomString(8))},
-		iggcon.HeaderKey{Value: createRandomString(8)}: {Kind: iggcon.Uint32, Value: []byte{0x01, 0x02, 0x03, 0x04}},
+		{Value: createRandomString(4)}: {Kind: iggcon.String, Value: []byte(createRandomString(8))},
+		{Value: createRandomString(8)}: {Kind: iggcon.Uint32, Value: []byte{0x01, 0x02, 0x03, 0x04}},
 	}
 }
 

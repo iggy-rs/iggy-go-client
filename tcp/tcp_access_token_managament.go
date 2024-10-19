@@ -17,8 +17,7 @@ func (tms *IggyTcpClient) CreateAccessToken(request CreateAccessTokenRequest) (*
 		return nil, err
 	}
 
-	responseBuffer := make([]byte, responseLength)
-	_, err = tms.client.Read(responseBuffer)
+	_, responseBuffer, err := tms.read(responseLength)
 	if err != nil {
 		return nil, err
 	}
@@ -43,8 +42,7 @@ func (tms *IggyTcpClient) GetAccessTokens() ([]AccessTokenResponse, error) {
 		return nil, err
 	}
 
-	responseBuffer := make([]byte, responseLength)
-	_, err = tms.client.Read(responseBuffer)
+	_, responseBuffer, err := tms.read(responseLength)
 	if err != nil {
 		return nil, err
 	}

@@ -1,11 +1,14 @@
 package iggcon
 
 type CreateTopicRequest struct {
-	TopicId         int        `json:"topicId"`
-	StreamId        Identifier `json:"streamId"`
-	Name            string     `json:"name"`
-	MessageExpiry   int        `json:"messageExpiry"`
-	PartitionsCount int        `json:"partitionsCount"`
+	StreamId             Identifier `json:"streamId"`
+	TopicId              int        `json:"topicId"`
+	PartitionsCount      int        `json:"partitionsCount"`
+	CompressionAlgorithm uint8      `json:"compressionAlgorithm"`
+	Name                 string     `json:"name"`
+	MessageExpiry        int        `json:"messageExpiry"`
+	MaxTopicSize         uint64     `json:"maxTopicSize"`
+	ReplicationFactor    uint8      `json:"replicationFactor"`
 }
 
 type UpdateTopicRequest struct {

@@ -1,15 +1,18 @@
 package tcp
 
 import (
+	"context"
 	"encoding/binary"
 	"net"
+	"sync"
 
 	. "github.com/iggy-rs/iggy-go-client/contracts"
 	ierror "github.com/iggy-rs/iggy-go-client/errors"
 )
 
 type IggyTcpClient struct {
-	client *net.TCPConn
+	client   *net.TCPConn
+	readLock sync.Mutex
 }
 
 const (
@@ -18,39 +21,107 @@ const (
 	MaxStringLength      = 255
 )
 
-func NewTcpMessageStream(url string) (*IggyTcpClient, error) {
+func NewTcpMessageStream(ctx context.Context, url string) (*IggyTcpClient, error) {
 	addr, err := net.ResolveTCPAddr("tcp", url)
 	if err != nil {
 		return nil, err
 	}
 
-	conn, err := net.DialTCP("tcp", nil, addr)
+	var d = net.Dialer{
+		KeepAlive: -1,
+	}
+	conn, err := d.DialContext(ctx, "tcp", addr.String())
 	if err != nil {
 		return nil, err
 	}
 
-	err = conn.SetKeepAlive(true)
-	if err != nil {
-		return nil, err
+	return &IggyTcpClient{client: conn.(*net.TCPConn)}, nil
+}
+
+const MAX_CHUNK_SIZE = 8192
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func (tms *IggyTcpClient) read(expectedSize int) (int, []byte, error) {
+	// ! TODO: aditional locks may be required for multiple tcp conns
+	// tms.readLock.Lock()
+	// defer tms.readLock.Unlock()
+
+	var totalRead int
+	buffer := make([]byte, expectedSize)
+
+	for totalRead < expectedSize {
+		readSize := expectedSize - totalRead
+		n, err := tms.client.Read(buffer[totalRead : totalRead+readSize])
+		if err != nil {
+			return totalRead, buffer[:totalRead], err
+		}
+		totalRead += n
 	}
 
-	return &IggyTcpClient{client: conn}, nil
+	return totalRead, buffer, nil
+}
+
+func (tms *IggyTcpClient) write(payload []byte) (int, error) {
+	// ! TODO: aditional locks may be required for multiple tcp conns
+	// tms.readLock.Lock()
+	// defer tms.readLock.Unlock()
+
+	n, err := tms.client.Write(payload)
+	if err != nil {
+		return n, err
+	}
+
+	return n, nil
 }
 
 func (tms *IggyTcpClient) sendAndFetchResponse(message []byte, command CommandCode) ([]byte, error) {
 	payload := createPayload(message, command)
-
-	if _, err := tms.client.Write(payload); err != nil {
+	if _, err := tms.write(payload); err != nil {
 		return nil, err
 	}
 
-	buffer := make([]byte, ExpectedResponseSize)
-	if _, err := tms.client.Read(buffer); err != nil {
+	_, buffer, err := tms.read(ExpectedResponseSize)
+	if err != nil {
 		return nil, err
 	}
+
+	length := int(binary.LittleEndian.Uint32(buffer[4:]))
 
 	if responseCode := getResponseCode(buffer); responseCode != 0 {
-		return nil, ierror.MapFromCode(responseCode)
+		// TEMP: See https://github.com/iggy-rs/iggy/pull/604 for context.
+		// based on https://github.com/iggy-rs/iggy/blob/master/sdk/src/tcp/client.rs#L217
+		if responseCode == 2012 ||
+			responseCode == 2013 ||
+			responseCode == 1011 ||
+			responseCode == 1012 ||
+			responseCode == 46 ||
+			responseCode == 51 ||
+			responseCode == 5001 ||
+			responseCode == 5004 {
+		} else {
+			return nil, ierror.MapFromCode(responseCode)
+		}
+
+		// ! TODO: Should handle full support for decoding these messages
+		// for now still need to read bytes to stop compy with spec
+		_, _, err := tms.read(length)
+		if err != nil {
+			return nil, err
+		}
+
+		return buffer, ierror.MapFromCode(responseCode)
+	}
+
+	// Added to support messages that do not send back bytes
+	// from: https://github.com/iggy-rs/iggy/blob/214f0ca9368a74164caa4aa5cc55320dfa49ee6a/sdk/src/tcp/client.rs#L363
+	if length <= 1 {
+		return []byte{}, nil
 	}
 
 	return buffer, nil

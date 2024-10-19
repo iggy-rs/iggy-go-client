@@ -1,7 +1,7 @@
 package tcp
 
 import (
-	"github.com/iggy-rs/iggy-go-client/binary_serialization"
+	binaryserialization "github.com/iggy-rs/iggy-go-client/binary_serialization"
 
 	. "github.com/iggy-rs/iggy-go-client/contracts"
 )
@@ -38,8 +38,8 @@ func (tms *IggyTcpClient) LogInWithAccessToken(request LogInAccessTokenRequest) 
 		return nil, err
 	}
 
-	responseBuffer := make([]byte, responseLength)
-	if _, err := tms.client.Read(responseBuffer); err != nil {
+	_, responseBuffer, err := tms.read(responseLength)
+	if err != nil {
 		return nil, err
 	}
 

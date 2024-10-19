@@ -17,8 +17,7 @@ func (tms *IggyTcpClient) GetUser(identifier Identifier) (*UserResponse, error) 
 		return nil, err
 	}
 
-	responseBuffer := make([]byte, responseLength)
-	_, err = tms.client.Read(responseBuffer)
+	_, responseBuffer, err := tms.read(responseLength)
 	if err != nil {
 		return nil, err
 	}
@@ -37,8 +36,7 @@ func (tms *IggyTcpClient) GetUsers() ([]*UserResponse, error) {
 		return nil, err
 	}
 
-	responseBuffer := make([]byte, responseLength)
-	_, err = tms.client.Read(responseBuffer)
+	_, responseBuffer, err := tms.read(responseLength)
 	if err != nil {
 		return nil, err
 	}

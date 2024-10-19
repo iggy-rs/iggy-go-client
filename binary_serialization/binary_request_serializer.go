@@ -313,7 +313,7 @@ func SerializeDeletePersonalAccessToken(request DeleteAccessTokenRequest) []byte
 }
 
 func SerializeCreatePersonalAccessToken(request CreateAccessTokenRequest) []byte {
-	length := 1 + len(request.Name) + 4
+	length := 1 + len(request.Name) + 8
 	bytes := make([]byte, length)
 	bytes[0] = byte(len(request.Name))
 	copy(bytes[1:], []byte(request.Name))

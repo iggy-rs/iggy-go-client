@@ -1,7 +1,7 @@
 package tcp
 
 import (
-	"github.com/iggy-rs/iggy-go-client/binary_serialization"
+	binaryserialization "github.com/iggy-rs/iggy-go-client/binary_serialization"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
 )
 
@@ -16,8 +16,7 @@ func (tms *IggyTcpClient) GetStats() (*Stats, error) {
 		return nil, err
 	}
 
-	responseBuffer := make([]byte, responseLength)
-	_, err = tms.client.Read(responseBuffer)
+	_, responseBuffer, err := tms.read(responseLength)
 	if err != nil {
 		return nil, err
 	}

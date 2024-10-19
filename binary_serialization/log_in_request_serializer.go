@@ -1,6 +1,8 @@
 package binaryserialization
 
 import (
+	"encoding/binary"
+
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
 )
 
@@ -9,12 +11,40 @@ type TcpLogInRequest struct {
 }
 
 func (request *TcpLogInRequest) Serialize() []byte {
-	serialized := make([]byte, 2+len(request.Password)+len(request.Username))
+	usernameBytes := []byte(request.Username)
+	passwordBytes := []byte(request.Password)
+	versionBytes := []byte(request.Version)
+	contextBytes := []byte(request.Context)
 
-	serialized[0] = byte(len(request.Username))
-	copy(serialized[1:1+len(request.Username)], []byte(request.Username))
-	serialized[1+len(request.Username)] = byte(len(request.Password))
-	copy(serialized[2+len(request.Username):], []byte(request.Username))
+	// Calculate total length
+	totalLength := 2 + len(usernameBytes) + len(passwordBytes) +
+		8 + len(versionBytes) + len(contextBytes)
 
-	return serialized
+	result := make([]byte, totalLength)
+	position := 0
+
+	// Username
+	result[position] = byte(len(usernameBytes))
+	position++
+	copy(result[position:], usernameBytes)
+	position += len(usernameBytes)
+
+	// Password
+	result[position] = byte(len(passwordBytes))
+	position++
+	copy(result[position:], passwordBytes)
+	position += len(passwordBytes)
+
+	// Version
+	binary.LittleEndian.PutUint32(result[position:], uint32(len(versionBytes)))
+	position += 4
+	copy(result[position:], versionBytes)
+	position += len(versionBytes)
+
+	// Context
+	binary.LittleEndian.PutUint32(result[position:], uint32(len(contextBytes)))
+	position += 4
+	copy(result[position:], contextBytes)
+
+	return result
 }

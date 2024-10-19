@@ -1,7 +1,7 @@
 package tcp
 
 import (
-	"github.com/iggy-rs/iggy-go-client/binary_serialization"
+	binaryserialization "github.com/iggy-rs/iggy-go-client/binary_serialization"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
 	ierror "github.com/iggy-rs/iggy-go-client/errors"
 )
@@ -18,8 +18,8 @@ func (tms *IggyTcpClient) GetConsumerGroups(streamId Identifier, topicId Identif
 		return nil, err
 	}
 
-	responseBuffer := make([]byte, responseLength)
-	if _, err := tms.client.Read(responseBuffer); err != nil {
+	_, responseBuffer, err := tms.read(responseLength)
+	if err != nil {
 		return nil, err
 	}
 
@@ -38,8 +38,8 @@ func (tms *IggyTcpClient) GetConsumerGroupById(streamId Identifier, topicId Iden
 		return nil, err
 	}
 
-	responseBuffer := make([]byte, responseLength)
-	if _, err := tms.client.Read(responseBuffer); err != nil {
+	_, responseBuffer, err := tms.read(responseLength)
+	if err != nil {
 		return nil, err
 	}
 

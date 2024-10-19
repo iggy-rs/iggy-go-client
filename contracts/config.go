@@ -1,6 +1,9 @@
 package iggcon
 
+import "context"
+
 type IggyConfiguration struct {
+	context.Context
 	BaseAddress string   `json:"baseAddress"`
 	Protocol    Protocol `json:"protocol"`
 }
