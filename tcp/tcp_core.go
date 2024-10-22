@@ -48,10 +48,6 @@ func min(a, b int) int {
 }
 
 func (tms *IggyTcpClient) read(expectedSize int) (int, []byte, error) {
-	// ! TODO: aditional locks may be required for multiple tcp conns
-	// tms.readLock.Lock()
-	// defer tms.readLock.Unlock()
-
 	var totalRead int
 	buffer := make([]byte, expectedSize)
 
@@ -68,10 +64,6 @@ func (tms *IggyTcpClient) read(expectedSize int) (int, []byte, error) {
 }
 
 func (tms *IggyTcpClient) write(payload []byte) (int, error) {
-	// ! TODO: aditional locks may be required for multiple tcp conns
-	// tms.readLock.Lock()
-	// defer tms.readLock.Unlock()
-
 	n, err := tms.client.Write(payload)
 	if err != nil {
 		return n, err
@@ -81,6 +73,10 @@ func (tms *IggyTcpClient) write(payload []byte) (int, error) {
 }
 
 func (tms *IggyTcpClient) sendAndFetchResponse(message []byte, command CommandCode) ([]byte, error) {
+	// ! TODO: aditional locks may be required for multiple tcp conns
+	// tms.readLock.Lock()
+	// defer tms.readLock.Unlock()
+
 	payload := createPayload(message, command)
 	if _, err := tms.write(payload); err != nil {
 		return nil, err
