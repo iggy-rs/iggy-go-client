@@ -124,6 +124,11 @@ func (tms *IggyTcpClient) sendAndFetchResponse(message []byte, command CommandCo
 		return []byte{}, nil
 	}
 
+	_, buffer, err = tms.read(length)
+	if err != nil {
+		return nil, err
+	}
+
 	return buffer, nil
 }
 

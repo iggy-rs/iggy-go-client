@@ -6,10 +6,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/google/uuid"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
 	ierror "github.com/iggy-rs/iggy-go-client/errors"
-	"time"
 )
 
 func DeserializeLogInResponse(payload []byte) *LogInResponse {
@@ -92,6 +93,14 @@ func DeserializeToStream(payload []byte, position int) (StreamResponse, int) {
 }
 
 func DeserializeFetchMessagesResponse(payload []byte) (*FetchMessagesResponse, error) {
+	if len(payload) == 0 {
+		return &FetchMessagesResponse{
+			PartitionId:   0,
+			CurrentOffset: 0,
+			Messages:      make([]MessageResponse, 0),
+		}, nil
+	}
+
 	const propertiesSize = 45
 	length := len(payload)
 	partitionId := int(binary.LittleEndian.Uint32(payload[0:4]))

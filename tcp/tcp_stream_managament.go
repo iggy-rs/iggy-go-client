@@ -12,17 +12,7 @@ func (tms *IggyTcpClient) GetStreams() ([]StreamResponse, error) {
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	_, responseBuffer, err := tms.read(responseLength)
-	if err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeStreams(responseBuffer), nil
+	return binaryserialization.DeserializeStreams(buffer), nil
 }
 
 func (tms *IggyTcpClient) GetStreamById(request GetStreamRequest) (*StreamResponse, error) {
@@ -32,17 +22,7 @@ func (tms *IggyTcpClient) GetStreamById(request GetStreamRequest) (*StreamRespon
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	_, responseBuffer, err := tms.read(responseLength)
-	if err != nil {
-		return nil, err
-	}
-
-	stream, _ := binaryserialization.DeserializeToStream(responseBuffer, 0)
+	stream, _ := binaryserialization.DeserializeToStream(buffer, 0)
 	return &stream, nil
 }
 

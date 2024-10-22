@@ -12,17 +12,7 @@ func (tms *IggyTcpClient) GetUser(identifier Identifier) (*UserResponse, error) 
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	_, responseBuffer, err := tms.read(responseLength)
-	if err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeUser(responseBuffer)
+	return binaryserialization.DeserializeUser(buffer)
 }
 
 func (tms *IggyTcpClient) GetUsers() ([]*UserResponse, error) {
@@ -31,17 +21,7 @@ func (tms *IggyTcpClient) GetUsers() ([]*UserResponse, error) {
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	_, responseBuffer, err := tms.read(responseLength)
-	if err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeUsers(responseBuffer)
+	return binaryserialization.DeserializeUsers(buffer)
 }
 
 func (tms *IggyTcpClient) CreateUser(request CreateUserRequest) error {

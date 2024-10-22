@@ -13,17 +13,7 @@ func (tms *IggyTcpClient) GetConsumerGroups(streamId Identifier, topicId Identif
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	_, responseBuffer, err := tms.read(responseLength)
-	if err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeConsumerGroups(responseBuffer), err
+	return binaryserialization.DeserializeConsumerGroups(buffer), err
 }
 
 func (tms *IggyTcpClient) GetConsumerGroupById(streamId Identifier, topicId Identifier, groupId Identifier) (*ConsumerGroupResponse, error) {
@@ -33,17 +23,7 @@ func (tms *IggyTcpClient) GetConsumerGroupById(streamId Identifier, topicId Iden
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	_, responseBuffer, err := tms.read(responseLength)
-	if err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeConsumerGroup(responseBuffer)
+	return binaryserialization.DeserializeConsumerGroup(buffer)
 }
 
 func (tms *IggyTcpClient) CreateConsumerGroup(request CreateConsumerGroupRequest) error {

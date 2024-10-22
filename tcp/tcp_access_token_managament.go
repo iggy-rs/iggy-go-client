@@ -12,17 +12,7 @@ func (tms *IggyTcpClient) CreateAccessToken(request CreateAccessTokenRequest) (*
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	_, responseBuffer, err := tms.read(responseLength)
-	if err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeAccessToken(responseBuffer)
+	return binaryserialization.DeserializeAccessToken(buffer)
 }
 
 func (tms *IggyTcpClient) DeleteAccessToken(request DeleteAccessTokenRequest) error {
@@ -37,15 +27,5 @@ func (tms *IggyTcpClient) GetAccessTokens() ([]AccessTokenResponse, error) {
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	_, responseBuffer, err := tms.read(responseLength)
-	if err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeAccessTokens(responseBuffer)
+	return binaryserialization.DeserializeAccessTokens(buffer)
 }

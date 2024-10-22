@@ -13,17 +13,7 @@ func (tms *IggyTcpClient) GetTopics(streamId Identifier) ([]TopicResponse, error
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	_, responseBuffer, err := tms.read(responseLength)
-	if err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeTopics(responseBuffer)
+	return binaryserialization.DeserializeTopics(buffer)
 }
 
 func (tms *IggyTcpClient) GetTopicById(streamId Identifier, topicId Identifier) (*TopicResponse, error) {
@@ -33,17 +23,7 @@ func (tms *IggyTcpClient) GetTopicById(streamId Identifier, topicId Identifier) 
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	_, responseBuffer, err := tms.read(responseLength)
-	if err != nil {
-		return nil, err
-	}
-
-	topic, _, err := binaryserialization.DeserializeToTopic(responseBuffer, 0)
+	topic, _, err := binaryserialization.DeserializeToTopic(buffer, 0)
 	if err != nil {
 		return nil, err
 	}

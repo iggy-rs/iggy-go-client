@@ -11,18 +11,8 @@ func (tms *IggyTcpClient) GetStats() (*Stats, error) {
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	_, responseBuffer, err := tms.read(responseLength)
-	if err != nil {
-		return nil, err
-	}
-
 	stats := &binaryserialization.TcpStats{}
-	err = stats.Deserialize(responseBuffer)
+	err = stats.Deserialize(buffer)
 
 	return &stats.Stats, err
 }
