@@ -11,8 +11,8 @@ import (
 )
 
 type IggyTcpClient struct {
-	client   *net.TCPConn
-	readLock sync.Mutex
+	client *net.TCPConn
+	mtx    sync.Mutex
 }
 
 const (
@@ -37,8 +37,6 @@ func NewTcpMessageStream(ctx context.Context, url string) (*IggyTcpClient, error
 
 	return &IggyTcpClient{client: conn.(*net.TCPConn)}, nil
 }
-
-const MAX_CHUNK_SIZE = 8192
 
 func min(a, b int) int {
 	if a < b {
@@ -74,8 +72,8 @@ func (tms *IggyTcpClient) write(payload []byte) (int, error) {
 
 func (tms *IggyTcpClient) sendAndFetchResponse(message []byte, command CommandCode) ([]byte, error) {
 	// ! TODO: aditional locks may be required for multiple tcp conns
-	// tms.readLock.Lock()
-	// defer tms.readLock.Unlock()
+	// tms.mtx.Lock()
+	// defer tms.mtx.Unlock()
 
 	payload := createPayload(message, command)
 	if _, err := tms.write(payload); err != nil {
@@ -91,7 +89,7 @@ func (tms *IggyTcpClient) sendAndFetchResponse(message []byte, command CommandCo
 
 	if responseCode := getResponseCode(buffer); responseCode != 0 {
 		// TEMP: See https://github.com/iggy-rs/iggy/pull/604 for context.
-		// based on https://github.com/iggy-rs/iggy/blob/master/sdk/src/tcp/client.rs#L217
+		// from: https://github.com/iggy-rs/iggy/blob/master/sdk/src/tcp/client.rs#L217
 		if responseCode == 2012 ||
 			responseCode == 2013 ||
 			responseCode == 1011 ||
@@ -105,7 +103,7 @@ func (tms *IggyTcpClient) sendAndFetchResponse(message []byte, command CommandCo
 		}
 
 		// ! TODO: Should handle full support for decoding these messages
-		// for now still need to read bytes to stop compy with spec
+		// for now still need to read bytes to stop comply with spec
 		_, _, err := tms.read(length)
 		if err != nil {
 			return nil, err
