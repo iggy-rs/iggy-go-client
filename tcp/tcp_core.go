@@ -62,12 +62,16 @@ func (tms *IggyTcpClient) read(expectedSize int) (int, []byte, error) {
 }
 
 func (tms *IggyTcpClient) write(payload []byte) (int, error) {
-	n, err := tms.client.Write(payload)
-	if err != nil {
-		return n, err
+	var totalWritten int
+	for totalWritten < len(payload) {
+		n, err := tms.client.Write(payload)
+		if err != nil {
+			return totalWritten, err
+		}
+		totalWritten += n
 	}
 
-	return n, nil
+	return totalWritten, nil
 }
 
 func (tms *IggyTcpClient) sendAndFetchResponse(message []byte, command CommandCode) ([]byte, error) {
