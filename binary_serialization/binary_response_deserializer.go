@@ -10,6 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
+	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
 	ierror "github.com/iggy-rs/iggy-go-client/errors"
 	"github.com/klauspost/compress/s2"
 )
@@ -102,24 +103,13 @@ func DeserializeFetchMessagesResponse(payload []byte, compression IggyMessageCom
 		}, nil
 	}
 
-	const propertiesSize = 45
+	propertiesSize := 45
 	length := len(payload)
 	partitionId := int(binary.LittleEndian.Uint32(payload[0:4]))
 	currentOffset := binary.LittleEndian.Uint64(payload[4:12])
-	//messagesCount := int(binary.LittleEndian.Uint32(payload[12:16]))
+	messagesCount := int(binary.LittleEndian.Uint32(payload[12:16]))
 	position := 16
-
-	response := FetchMessagesResponse{
-		PartitionId:   partitionId,
-		CurrentOffset: currentOffset,
-	}
-
-	if length <= position {
-		return &response, nil
-	}
-
 	var messages []MessageResponse
-
 	for position < length {
 		offset := binary.LittleEndian.Uint64(payload[position : position+8])
 		state, err := mapMessageState(payload[position+8])
@@ -127,25 +117,26 @@ func DeserializeFetchMessagesResponse(payload []byte, compression IggyMessageCom
 		id, err := uuid.FromBytes(payload[position+17 : position+33])
 		checksum := binary.LittleEndian.Uint32(payload[position+33 : position+37])
 		headersLength := int(binary.LittleEndian.Uint32(payload[position+37 : position+41]))
-		headers, err := deserializeHeaders(payload[(position + 41):(position + 41 + headersLength)])
+		headers, err := deserializeHeaders(payload[position+41 : position+41+headersLength])
 		if err != nil {
 			return nil, err
 		}
 		position += headersLength
-		messageLength := binary.LittleEndian.Uint32(payload[position+41 : position+45])
+		messageLength := binary.LittleEndian.Uint32(payload[position+41+headersLength : position+41+headersLength+4])
 
-		payloadRangeStart := position + propertiesSize
-		payloadRangeEnd := position + propertiesSize + int(messageLength)
-
+		payloadRangeStart := position + propertiesSize + headersLength
+		payloadRangeEnd := payloadRangeStart + int(messageLength)
 		if payloadRangeStart > length || payloadRangeEnd > length {
 			break
 		}
 
 		payloadSlice := payload[payloadRangeStart:payloadRangeEnd]
+		totalSize := propertiesSize + int(messageLength)
+		position += totalSize
 
 		switch compression {
-		case MESSAGE_COMPRESSION_S2:
-			if messageLength > 32 {
+		case iggcon.MESSAGE_COMPRESSION_S2, iggcon.MESSAGE_COMPRESSION_S2_BETTER, iggcon.MESSAGE_COMPRESSION_S2_BEST:
+			if messageLength < 32 {
 				break
 			}
 			payloadSlice, err = s2.Decode(nil, payloadSlice)
@@ -153,9 +144,6 @@ func DeserializeFetchMessagesResponse(payload []byte, compression IggyMessageCom
 				panic("iggy: failed to decode s2 payload: " + err.Error())
 			}
 		}
-
-		totalSize := propertiesSize + int(messageLength)
-		position += totalSize
 
 		messages = append(messages, MessageResponse{
 			Id:        id,
@@ -172,8 +160,13 @@ func DeserializeFetchMessagesResponse(payload []byte, compression IggyMessageCom
 		}
 	}
 
-	response.Messages = messages
-	return &response, nil
+	// !TODO: Add message offset ordering
+	return &FetchMessagesResponse{
+		PartitionId:   partitionId,
+		CurrentOffset: currentOffset,
+		Messages:      messages,
+		MessageCount:  messagesCount,
+	}, nil
 }
 
 func mapMessageState(state byte) (MessageState, error) {

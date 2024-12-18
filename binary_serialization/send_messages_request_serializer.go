@@ -15,10 +15,20 @@ func (request *TcpSendMessagesRequest) Serialize(compression iggcon.IggyMessageC
 	for i, message := range request.Messages {
 		switch compression {
 		case iggcon.MESSAGE_COMPRESSION_S2:
-			if len(message.Payload) > 32 {
+			if len(message.Payload) < 32 {
 				break
 			}
 			request.Messages[i].Payload = s2.Encode(nil, message.Payload)
+		case iggcon.MESSAGE_COMPRESSION_S2_BETTER:
+			if len(message.Payload) < 32 {
+				break
+			}
+			request.Messages[i].Payload = s2.EncodeBetter(nil, message.Payload)
+		case iggcon.MESSAGE_COMPRESSION_S2_BEST:
+			if len(message.Payload) < 32 {
+				break
+			}
+			request.Messages[i].Payload = s2.EncodeBest(nil, message.Payload)
 		}
 	}
 

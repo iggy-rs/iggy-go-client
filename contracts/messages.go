@@ -18,6 +18,7 @@ type FetchMessagesResponse struct {
 	PartitionId   int
 	CurrentOffset uint64
 	Messages      []MessageResponse
+	MessageCount  int
 }
 
 type MessageResponse struct {
