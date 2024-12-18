@@ -12,12 +12,13 @@ type TcpSendMessagesRequest struct {
 }
 
 func (request *TcpSendMessagesRequest) Serialize(compression iggcon.IggyMessageCompression) []byte {
-	for _, message := range request.Messages {
+	for i, message := range request.Messages {
 		switch compression {
 		case iggcon.MESSAGE_COMPRESSION_S2:
 			if len(message.Payload) > 32 {
-				message.Payload = s2.Encode(nil, message.Payload)
+				break
 			}
+			request.Messages[i].Payload = s2.Encode(nil, message.Payload)
 		}
 	}
 
@@ -59,7 +60,7 @@ func (request *TcpSendMessagesRequest) Serialize(compression iggcon.IggyMessageC
 	return bytes
 }
 
-func calculateMessageBytesCount(messages []*iggcon.Message) int {
+func calculateMessageBytesCount(messages []iggcon.Message) int {
 	count := 0
 	for _, msg := range messages {
 		count += 16 + 4 + len(msg.Payload) + 4

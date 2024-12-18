@@ -43,7 +43,7 @@ type SendMessagesRequest struct {
 	StreamId     Identifier   `json:"streamId"`
 	TopicId      Identifier   `json:"topicId"`
 	Partitioning Partitioning `json:"partitioning"`
-	Messages     []*Message   `json:"messages"`
+	Messages     []Message    `json:"messages"`
 }
 
 type Message struct {
@@ -52,8 +52,8 @@ type Message struct {
 	Headers map[HeaderKey]HeaderValue
 }
 
-func NewMessage(payload []byte, headers map[HeaderKey]HeaderValue) *Message {
-	return &Message{
+func NewMessage(payload []byte, headers map[HeaderKey]HeaderValue) Message {
+	return Message{
 		Id:      uuid.New(),
 		Payload: payload,
 		Headers: headers,
