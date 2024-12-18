@@ -7,12 +7,14 @@ import (
 	"sync"
 
 	. "github.com/iggy-rs/iggy-go-client/contracts"
+	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
 	ierror "github.com/iggy-rs/iggy-go-client/errors"
 )
 
 type IggyTcpClient struct {
-	client *net.TCPConn
-	mtx    sync.Mutex
+	client             *net.TCPConn
+	mtx                sync.Mutex
+	MessageCompression iggcon.IggyMessageCompression
 }
 
 const (
@@ -21,7 +23,7 @@ const (
 	MaxStringLength      = 255
 )
 
-func NewTcpMessageStream(ctx context.Context, url string) (*IggyTcpClient, error) {
+func NewTcpMessageStream(ctx context.Context, url string, compression iggcon.IggyMessageCompression) (*IggyTcpClient, error) {
 	addr, err := net.ResolveTCPAddr("tcp", url)
 	if err != nil {
 		return nil, err
@@ -35,7 +37,7 @@ func NewTcpMessageStream(ctx context.Context, url string) (*IggyTcpClient, error
 		return nil, err
 	}
 
-	return &IggyTcpClient{client: conn.(*net.TCPConn)}, nil
+	return &IggyTcpClient{client: conn.(*net.TCPConn), MessageCompression: compression}, nil
 }
 
 func min(a, b int) int {

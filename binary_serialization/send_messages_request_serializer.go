@@ -2,14 +2,16 @@ package binaryserialization
 
 import (
 	"encoding/binary"
+
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
+	"github.com/klauspost/compress/s2"
 )
 
 type TcpSendMessagesRequest struct {
 	iggcon.SendMessagesRequest
 }
 
-func (request *TcpSendMessagesRequest) Serialize() []byte {
+func (request *TcpSendMessagesRequest) Serialize(compression iggcon.IggyMessageCompression) []byte {
 	streamTopicIdLength := 2 + request.StreamId.Length + 2 + request.TopicId.Length
 	messageBytesCount := calculateMessageBytesCount(request.Messages)
 	totalSize := streamTopicIdLength + messageBytesCount + request.Partitioning.Length + 2
@@ -29,7 +31,6 @@ func (request *TcpSendMessagesRequest) Serialize() []byte {
 	emptyHeaders := make([]byte, 4)
 
 	for _, message := range request.Messages {
-
 		copy(bytes[position:position+16], message.Id[:])
 		if message.Headers != nil {
 			headersBytes := getHeadersBytes(message.Headers)
@@ -41,9 +42,15 @@ func (request *TcpSendMessagesRequest) Serialize() []byte {
 			position += 20
 		}
 
-		binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(len(message.Payload)))
-		copy(bytes[position+4:position+4+len(message.Payload)], message.Payload)
-		position += len(message.Payload) + 4
+		switch compression {
+		case iggcon.MESSAGE_COMPRESSION_S2:
+			message.Payload = s2.Encode(nil, message.Payload)
+		}
+		payloadLength := len(message.Payload)
+
+		binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(payloadLength))
+		copy(bytes[position+4:position+4+payloadLength], message.Payload)
+		position += payloadLength + 4
 	}
 
 	return bytes

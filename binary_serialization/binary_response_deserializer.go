@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
 	ierror "github.com/iggy-rs/iggy-go-client/errors"
+	"github.com/klauspost/compress/s2"
 )
 
 func DeserializeLogInResponse(payload []byte) *LogInResponse {
@@ -92,7 +93,7 @@ func DeserializeToStream(payload []byte, position int) (StreamResponse, int) {
 	}, readBytes
 }
 
-func DeserializeFetchMessagesResponse(payload []byte) (*FetchMessagesResponse, error) {
+func DeserializeFetchMessagesResponse(payload []byte, compression IggyMessageCompression) (*FetchMessagesResponse, error) {
 	if len(payload) == 0 {
 		return &FetchMessagesResponse{
 			PartitionId:   0,
@@ -141,6 +142,15 @@ func DeserializeFetchMessagesResponse(payload []byte) (*FetchMessagesResponse, e
 		}
 
 		payloadSlice := payload[payloadRangeStart:payloadRangeEnd]
+
+		switch compression {
+		case MESSAGE_COMPRESSION_S2:
+			payloadSlice, err = s2.Decode(nil, payloadSlice)
+			if err != nil {
+				panic("iggy: failed to decode s2 payload")
+			}
+		}
+
 		totalSize := propertiesSize + int(messageLength)
 		position += totalSize
 

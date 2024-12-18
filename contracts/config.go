@@ -1,11 +1,22 @@
 package iggcon
 
-import "context"
+import (
+	"context"
+)
+
+type IggyMessageCompression string
+
+const (
+	MESSAGE_COMPRESSION_NONE IggyMessageCompression = "none"
+	MESSAGE_COMPRESSION_S2   IggyMessageCompression = "s2"
+	// MESSAGE_COMPRESSION_ZSTD IggyMessageCompression = "zstd"
+)
 
 type IggyConfiguration struct {
 	context.Context
-	BaseAddress string   `json:"baseAddress"`
-	Protocol    Protocol `json:"protocol"`
+	BaseAddress        string                 `json:"baseAddress"`
+	Protocol           Protocol               `json:"protocol"`
+	MessageCompression IggyMessageCompression `json:"compression"`
 }
 
 type Protocol string

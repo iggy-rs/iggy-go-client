@@ -11,7 +11,7 @@ func (tms *IggyTcpClient) SendMessages(request SendMessagesRequest) error {
 		return ierror.CustomError("messages_count_should_be_greater_than_zero")
 	}
 	serializedRequest := binaryserialization.TcpSendMessagesRequest{SendMessagesRequest: request}
-	_, err := tms.sendAndFetchResponse(serializedRequest.Serialize(), SendMessagesCode)
+	_, err := tms.sendAndFetchResponse(serializedRequest.Serialize(tms.MessageCompression), SendMessagesCode)
 	return err
 }
 
@@ -22,5 +22,5 @@ func (tms *IggyTcpClient) PollMessages(request FetchMessagesRequest) (*FetchMess
 		return nil, err
 	}
 
-	return binaryserialization.DeserializeFetchMessagesResponse(buffer)
+	return binaryserialization.DeserializeFetchMessagesResponse(buffer, tms.MessageCompression)
 }
