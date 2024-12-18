@@ -92,14 +92,14 @@ func PublishMessages(messageStream MessageStream) error {
 
 	for {
 		var debugMessages []sharedDemoContracts.ISerializableMessage
-		var messages []Message
+		var messages []*Message
 
 		for i := 0; i < MessageBatchCount; i++ {
 			message := messageGenerator.GenerateMessage()
 			json := message.ToBytes()
 
 			debugMessages = append(debugMessages, message)
-			messages = append(messages, Message{
+			messages = append(messages, &Message{
 				Id:      uuid.New(),
 				Payload: json,
 			})

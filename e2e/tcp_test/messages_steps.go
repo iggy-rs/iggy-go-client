@@ -17,9 +17,9 @@ func createDefaultMessageHeaders() map[iggcon.HeaderKey]iggcon.HeaderValue {
 	}
 }
 
-func createDefaultMessages() []iggcon.Message {
+func createDefaultMessages() []*iggcon.Message {
 	headers := createDefaultMessageHeaders()
-	messages := []iggcon.Message{
+	messages := []*iggcon.Message{
 		iggcon.NewMessage([]byte(createRandomString(256)), headers),
 		iggcon.NewMessage([]byte(createRandomString(256)), headers),
 	}
@@ -27,7 +27,7 @@ func createDefaultMessages() []iggcon.Message {
 	return messages
 }
 
-func itShouldSuccessfullyPublishMessages(streamId int, topicId int, messages []iggcon.Message, client iggy.MessageStream) {
+func itShouldSuccessfullyPublishMessages(streamId int, topicId int, messages []*iggcon.Message, client iggy.MessageStream) {
 	result, err := client.PollMessages(iggcon.FetchMessagesRequest{
 		StreamId: iggcon.NewIdentifier(streamId),
 		TopicId:  iggcon.NewIdentifier(topicId),
@@ -61,7 +61,7 @@ func itShouldSuccessfullyPublishMessages(streamId int, topicId int, messages []i
 	})
 }
 
-func compareMessage(resultMessages []iggcon.MessageResponse, expectedMessage iggcon.Message) bool {
+func compareMessage(resultMessages []iggcon.MessageResponse, expectedMessage *iggcon.Message) bool {
 	for _, msg := range resultMessages {
 		if msg.Id == expectedMessage.Id && bytes.Equal(msg.Payload, expectedMessage.Payload) {
 			if reflect.DeepEqual(msg.Headers, expectedMessage.Headers) {

@@ -145,9 +145,11 @@ func DeserializeFetchMessagesResponse(payload []byte, compression IggyMessageCom
 
 		switch compression {
 		case MESSAGE_COMPRESSION_S2:
-			payloadSlice, err = s2.Decode(nil, payloadSlice)
-			if err != nil {
-				panic("iggy: failed to decode s2 payload")
+			if messageLength > 32 {
+				payloadSlice, err = s2.Decode(nil, payloadSlice)
+				if err != nil {
+					panic("iggy: failed to decode s2 payload")
+				}
 			}
 		}
 

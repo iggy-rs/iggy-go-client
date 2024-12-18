@@ -12,6 +12,15 @@ type TcpSendMessagesRequest struct {
 }
 
 func (request *TcpSendMessagesRequest) Serialize(compression iggcon.IggyMessageCompression) []byte {
+	for _, message := range request.Messages {
+		switch compression {
+		case iggcon.MESSAGE_COMPRESSION_S2:
+			if len(message.Payload) > 32 {
+				message.Payload = s2.Encode(nil, message.Payload)
+			}
+		}
+	}
+
 	streamTopicIdLength := 2 + request.StreamId.Length + 2 + request.TopicId.Length
 	messageBytesCount := calculateMessageBytesCount(request.Messages)
 	totalSize := streamTopicIdLength + messageBytesCount + request.Partitioning.Length + 2
@@ -42,21 +51,15 @@ func (request *TcpSendMessagesRequest) Serialize(compression iggcon.IggyMessageC
 			position += 20
 		}
 
-		switch compression {
-		case iggcon.MESSAGE_COMPRESSION_S2:
-			message.Payload = s2.Encode(nil, message.Payload)
-		}
-		payloadLength := len(message.Payload)
-
-		binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(payloadLength))
-		copy(bytes[position+4:position+4+payloadLength], message.Payload)
-		position += payloadLength + 4
+		binary.LittleEndian.PutUint32(bytes[position:position+4], uint32(len(message.Payload)))
+		copy(bytes[position+4:position+4+len(message.Payload)], message.Payload)
+		position += len(message.Payload) + 4
 	}
 
 	return bytes
 }
 
-func calculateMessageBytesCount(messages []iggcon.Message) int {
+func calculateMessageBytesCount(messages []*iggcon.Message) int {
 	count := 0
 	for _, msg := range messages {
 		count += 16 + 4 + len(msg.Payload) + 4

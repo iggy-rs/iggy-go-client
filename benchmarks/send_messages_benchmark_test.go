@@ -2,13 +2,14 @@ package benchmarks
 
 import (
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/iggy-rs/iggy-go-client"
-	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
 	"math/rand"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/iggy-rs/iggy-go-client"
+	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
 )
 
 const (
@@ -120,8 +121,8 @@ func cleanupInfrastructure(messageStream iggy.MessageStream, streamId int) error
 }
 
 // CreateMessages creates messages with random payloads.
-func CreateMessages(messagesCount, messageSize int) []iggcon.Message {
-	messages := make([]iggcon.Message, messagesCount)
+func CreateMessages(messagesCount, messageSize int) []*iggcon.Message {
+	messages := make([]*iggcon.Message, messagesCount)
 	for i := 0; i < messagesCount; i++ {
 		payload := make([]byte, messageSize)
 		for j := 0; j < messageSize; j++ {
@@ -129,7 +130,7 @@ func CreateMessages(messagesCount, messageSize int) []iggcon.Message {
 		}
 		id, _ := uuid.NewUUID()
 
-		messages[i] = iggcon.Message{Id: id, Payload: payload}
+		messages[i] = &iggcon.Message{Id: id, Payload: payload}
 	}
 	return messages
 }
