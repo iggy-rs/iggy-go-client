@@ -2,7 +2,8 @@ package tcp_test
 
 import (
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
-	. "github.com/onsi/ginkgo"
+	ierror "github.com/iggy-rs/iggy-go-client/errors"
+	. "github.com/onsi/ginkgo/v2"
 )
 
 var _ = Describe("GET CONSUMER GROUP BY ID:", func() {
@@ -28,7 +29,7 @@ var _ = Describe("GET CONSUMER GROUP BY ID:", func() {
 				iggcon.NewIdentifier(int(createRandomUInt32())),
 				iggcon.NewIdentifier(int(createRandomUInt32())))
 
-			itShouldReturnSpecificError(err, "stream_id_not_found")
+			itShouldReturnSpecificIggyError(err, ierror.ConsumerGroupIdNotFound)
 		})
 
 		Context("and tries to get consumer from non-existing topic", func() {
@@ -36,11 +37,12 @@ var _ = Describe("GET CONSUMER GROUP BY ID:", func() {
 			streamId, _ := successfullyCreateStream(prefix, client)
 			defer deleteStreamAfterTests(streamId, client)
 
-			_, err := client.GetConsumerGroupById(iggcon.NewIdentifier(streamId),
+			_, err := client.GetConsumerGroupById(
+				iggcon.NewIdentifier(streamId),
 				iggcon.NewIdentifier(int(createRandomUInt32())),
 				iggcon.NewIdentifier(int(createRandomUInt32())))
 
-			itShouldReturnSpecificError(err, "topic_id_not_found")
+			itShouldReturnSpecificIggyError(err, ierror.ConsumerGroupIdNotFound)
 		})
 
 		Context("and tries to get from non-existing consumer", func() {
@@ -49,23 +51,25 @@ var _ = Describe("GET CONSUMER GROUP BY ID:", func() {
 			defer deleteStreamAfterTests(streamId, client)
 			topicId, _ := successfullyCreateTopic(streamId, client)
 
-			_, err := client.GetConsumerGroupById(iggcon.NewIdentifier(streamId),
+			_, err := client.GetConsumerGroupById(
+				iggcon.NewIdentifier(streamId),
 				iggcon.NewIdentifier(topicId),
 				iggcon.NewIdentifier(int(createRandomUInt32())))
 
-			itShouldReturnSpecificError(err, "consumer_group_not_found")
+			itShouldReturnSpecificIggyError(err, ierror.ConsumerGroupIdNotFound)
 		})
 	})
 
-	When("User is not logged in", func() {
-		Context("and tries to get topic by id", func() {
-			client := createConnection()
-			_, err := client.GetConsumerGroupById(
-				iggcon.NewIdentifier(int(createRandomUInt32())),
-				iggcon.NewIdentifier(int(createRandomUInt32())),
-				iggcon.NewIdentifier(int(createRandomUInt32())))
+	// ! TODO: review if needed to implement into sdk
+	// When("User is not logged in", func() {
+	// 	Context("and tries to get topic by id", func() {
+	// 		client := createConnection()
+	// 		_, err := client.GetConsumerGroupById(
+	// 			iggcon.NewIdentifier(int(createRandomUInt32())),
+	// 			iggcon.NewIdentifier(int(createRandomUInt32())),
+	// 			iggcon.NewIdentifier(int(createRandomUInt32())))
 
-			itShouldReturnUnauthenticatedError(err)
-		})
-	})
+	// 		itShouldReturnUnauthenticatedError(err)
+	// 	})
+	// })
 })

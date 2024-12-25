@@ -6,7 +6,7 @@ import (
 
 	"github.com/iggy-rs/iggy-go-client"
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -35,7 +35,6 @@ func itShouldSuccessfullyPublishMessages(streamId int, topicId int, messages []i
 			Kind: iggcon.ConsumerSingle,
 			Id:   iggcon.NewIdentifier(int(createRandomUInt32())),
 		},
-		PartitionId:     1,
 		PollingStrategy: iggcon.FirstPollingStrategy(),
 		Count:           len(messages),
 		AutoCommit:      true,

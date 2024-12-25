@@ -1,13 +1,20 @@
 package tcp_test
 
 import (
-	. "github.com/onsi/ginkgo"
+	ierror "github.com/iggy-rs/iggy-go-client/errors"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 func itShouldReturnSpecificError(err error, errorMessage string) {
-	It("Should return error:"+errorMessage, func() {
+	It("Should return error: "+errorMessage, func() {
 		Expect(err.Error()).To(ContainSubstring(errorMessage))
+	})
+}
+
+func itShouldReturnSpecificIggyError(err error, iggyError *ierror.IggyError) {
+	It("Should return error: "+iggyError.Error(), func() {
+		Expect(err).To(MatchError(iggyError))
 	})
 }
 

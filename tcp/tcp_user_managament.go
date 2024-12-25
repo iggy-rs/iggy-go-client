@@ -3,6 +3,7 @@ package tcp
 import (
 	binaryserialization "github.com/iggy-rs/iggy-go-client/binary_serialization"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
+	ierror "github.com/iggy-rs/iggy-go-client/errors"
 )
 
 func (tms *IggyTcpClient) GetUser(identifier Identifier) (*UserResponse, error) {
@@ -10,6 +11,9 @@ func (tms *IggyTcpClient) GetUser(identifier Identifier) (*UserResponse, error) 
 	buffer, err := tms.sendAndFetchResponse(message, GetUserCode)
 	if err != nil {
 		return nil, err
+	}
+	if len(buffer) == 0 {
+		return nil, ierror.ResourceNotFound
 	}
 
 	return binaryserialization.DeserializeUser(buffer)

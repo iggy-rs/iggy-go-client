@@ -1,11 +1,13 @@
 package tcp_test
 
 import (
+	"strconv"
+
 	"github.com/iggy-rs/iggy-go-client"
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
-	. "github.com/onsi/ginkgo"
+	ierror "github.com/iggy-rs/iggy-go-client/errors"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"strconv"
 )
 
 //operations
@@ -92,7 +94,7 @@ func itShouldSuccessfullyUpdateStream(id int, expectedName string, client iggy.M
 func itShouldSuccessfullyDeleteStream(id int, client iggy.MessageStream) {
 	stream, err := client.GetStreamById(iggcon.GetStreamRequest{StreamID: iggcon.NewIdentifier(id)})
 
-	itShouldReturnSpecificError(err, "stream_id_not_found")
+	itShouldReturnSpecificIggyError(err, ierror.StreamIdNotFound)
 	It("should not return stream", func() {
 		Expect(stream).To(BeNil())
 	})

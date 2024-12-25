@@ -3,7 +3,7 @@ package tcp_test
 import (
 	"github.com/iggy-rs/iggy-go-client"
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

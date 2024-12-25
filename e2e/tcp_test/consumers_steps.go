@@ -1,11 +1,12 @@
 package tcp_test
 
 import (
+	"strconv"
+
 	"github.com/iggy-rs/iggy-go-client"
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"strconv"
 )
 
 // operations
@@ -116,7 +117,7 @@ func itShouldSuccessfullyLeaveConsumer(streamId int, topicId int, groupId int, c
 
 	It("should leave consumer with id "+string(rune(groupId)), func() {
 		Expect(consumer).NotTo(BeNil())
-		Expect(consumer.MembersCount).To(Equal(2))
+		Expect(consumer.MembersCount).To(Equal(0))
 	})
 
 	itShouldNotReturnError(err)

@@ -21,6 +21,9 @@ func (tms *IggyTcpClient) GetStreamById(request GetStreamRequest) (*StreamRespon
 	if err != nil {
 		return nil, err
 	}
+	if len(buffer) == 0 {
+		return nil, ierror.StreamIdNotFound
+	}
 
 	stream, _ := binaryserialization.DeserializeToStream(buffer, 0)
 	return &stream, nil

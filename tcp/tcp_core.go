@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"net"
 	"sync"
+	"time"
 
 	. "github.com/iggy-rs/iggy-go-client/contracts"
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
@@ -23,7 +24,12 @@ const (
 	MaxStringLength      = 255
 )
 
-func NewTcpMessageStream(ctx context.Context, url string, compression iggcon.IggyMessageCompression) (*IggyTcpClient, error) {
+func NewTcpMessageStream(
+	ctx context.Context,
+	url string,
+	compression iggcon.IggyMessageCompression,
+	heartbeatInterval time.Duration,
+) (*IggyTcpClient, error) {
 	addr, err := net.ResolveTCPAddr("tcp", url)
 	if err != nil {
 		return nil, err
@@ -37,14 +43,24 @@ func NewTcpMessageStream(ctx context.Context, url string, compression iggcon.Igg
 		return nil, err
 	}
 
-	return &IggyTcpClient{client: conn.(*net.TCPConn), MessageCompression: compression}, nil
-}
+	client := &IggyTcpClient{client: conn.(*net.TCPConn), MessageCompression: compression}
 
-func min(a, b int) int {
-	if a < b {
-		return a
+	if heartbeatInterval > 0 {
+		go func() {
+			ticker := time.NewTicker(heartbeatInterval)
+			defer ticker.Stop()
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case <-ticker.C:
+					client.Ping()
+				}
+			}
+		}()
 	}
-	return b
+
+	return client, nil
 }
 
 func (tms *IggyTcpClient) read(expectedSize int) (int, []byte, error) {
@@ -77,9 +93,8 @@ func (tms *IggyTcpClient) write(payload []byte) (int, error) {
 }
 
 func (tms *IggyTcpClient) sendAndFetchResponse(message []byte, command CommandCode) ([]byte, error) {
-	// ! TODO: aditional locks may be required for multiple tcp conns
-	// tms.mtx.Lock()
-	// defer tms.mtx.Unlock()
+	tms.mtx.Lock()
+	defer tms.mtx.Unlock()
 
 	payload := createPayload(message, command)
 	if _, err := tms.write(payload); err != nil {
@@ -92,10 +107,9 @@ func (tms *IggyTcpClient) sendAndFetchResponse(message []byte, command CommandCo
 	}
 
 	length := int(binary.LittleEndian.Uint32(buffer[4:]))
-
 	if responseCode := getResponseCode(buffer); responseCode != 0 {
 		// TEMP: See https://github.com/iggy-rs/iggy/pull/604 for context.
-		// from: https://github.com/iggy-rs/iggy/blob/master/sdk/src/tcp/client.rs#L217
+		// from: https://github.com/iggy-rs/iggy/blob/master/sdk/src/tcp/client.rs#L326
 		if responseCode == 2012 ||
 			responseCode == 2013 ||
 			responseCode == 1011 ||
@@ -108,18 +122,17 @@ func (tms *IggyTcpClient) sendAndFetchResponse(message []byte, command CommandCo
 			return nil, ierror.MapFromCode(responseCode)
 		}
 
-		// ! TODO: Should handle full support for decoding these messages
-		// for now still need to read bytes to stop comply with spec
-		_, _, err := tms.read(length)
-		if err != nil {
-			return nil, err
-		}
+		// ! TODO: MAY NOT BE NEEDED ANYMORE
+		// // ! TODO: Should handle full support for decoding these messages
+		// // for now still need to read bytes to stop comply with spec
+		// _, _, err := tms.read(length)
+		// if err != nil {
+		// 	return nil, err
+		// }
 
 		return buffer, ierror.MapFromCode(responseCode)
 	}
 
-	// Added to support messages that do not send back bytes
-	// from: https://github.com/iggy-rs/iggy/blob/214f0ca9368a74164caa4aa5cc55320dfa49ee6a/sdk/src/tcp/client.rs#L363
 	if length <= 1 {
 		return []byte{}, nil
 	}

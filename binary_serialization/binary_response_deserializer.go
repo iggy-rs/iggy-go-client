@@ -1,9 +1,7 @@
 package binaryserialization
 
 import (
-	"bytes"
 	"encoding/binary"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -109,7 +107,7 @@ func DeserializeFetchMessagesResponse(payload []byte, compression IggyMessageCom
 	currentOffset := binary.LittleEndian.Uint64(payload[4:12])
 	messagesCount := int(binary.LittleEndian.Uint32(payload[12:16]))
 	position := 16
-	var messages []MessageResponse
+	var messages = make([]MessageResponse, 0)
 	for position < length {
 		offset := binary.LittleEndian.Uint64(payload[position : position+8])
 		state, err := mapMessageState(payload[position+8])
@@ -122,9 +120,9 @@ func DeserializeFetchMessagesResponse(payload []byte, compression IggyMessageCom
 			return nil, err
 		}
 		position += headersLength
-		messageLength := binary.LittleEndian.Uint32(payload[position+41+headersLength : position+41+headersLength+4])
+		messageLength := binary.LittleEndian.Uint32(payload[position+41 : position+45])
 
-		payloadRangeStart := position + propertiesSize + headersLength
+		payloadRangeStart := position + propertiesSize
 		payloadRangeEnd := payloadRangeStart + int(messageLength)
 		if payloadRangeStart > length || payloadRangeEnd > length {
 			break
@@ -194,11 +192,10 @@ func deserializeHeaders(payload []byte) (map[HeaderKey]HeaderValue, error) {
 		}
 
 		keyLength := binary.LittleEndian.Uint32(payload[position : position+4])
-		position += 4
-
 		if keyLength == 0 || 255 < keyLength {
 			return nil, errors.New("Key has incorrect size, must be between 1 and 255")
 		}
+		position += 4
 
 		if len(payload) < position+int(keyLength) {
 			return nil, errors.New("Invalid header key")
@@ -293,20 +290,17 @@ func DeserializeToTopic(payload []byte, position int) (TopicResponse, int, error
 	topic.Id = int(binary.LittleEndian.Uint32(payload[position : position+4]))
 	topic.CreatedAt = int(binary.LittleEndian.Uint64(payload[position+4 : position+12]))
 	topic.PartitionsCount = int(binary.LittleEndian.Uint32(payload[position+12 : position+16]))
-	topic.MessageExpiry = int(binary.LittleEndian.Uint32(payload[position+16 : position+20]))
-	topic.SizeBytes = binary.LittleEndian.Uint64(payload[position+20 : position+28])
-	topic.MessagesCount = binary.LittleEndian.Uint64(payload[position+28 : position+36])
+	topic.MessageExpiry = time.Microsecond * time.Duration(int(binary.LittleEndian.Uint64(payload[position+16:position+24])))
+	topic.CompressionAlgorithm = payload[position+24]
+	topic.MaxTopicSize = binary.LittleEndian.Uint64(payload[position+25 : position+33])
+	topic.ReplicationFactor = payload[position+33]
+	topic.SizeBytes = binary.LittleEndian.Uint64(payload[position+34 : position+42])
+	topic.MessagesCount = binary.LittleEndian.Uint64(payload[position+42 : position+50])
 
-	nameLength := int(payload[position+36])
-	nameEnd := position + 37 + nameLength
+	nameLength := int(payload[position+50])
+	topic.Name = string(payload[position+51 : position+51+nameLength])
 
-	if nameEnd > len(payload) {
-		return TopicResponse{}, 0, json.Unmarshal([]byte(`{}`), &topic)
-	}
-
-	topic.Name = string(bytes.Trim(payload[position+37:nameEnd], "\x00"))
-
-	readBytes := 4 + 4 + 4 + 8 + 8 + 1 + 8 + nameLength
+	readBytes := 4 + 8 + 4 + 8 + 8 + 8 + 8 + 1 + 1 + 1 + nameLength
 	return topic, readBytes, nil
 }
 
@@ -353,8 +347,8 @@ func DeserializeConsumerGroup(payload []byte) (*ConsumerGroupResponse, error) {
 
 func DeserializeToConsumerGroup(payload []byte, position int) (*ConsumerGroupResponse, int) {
 	id := int(binary.LittleEndian.Uint32(payload[position : position+4]))
-	membersCount := int(binary.LittleEndian.Uint32(payload[position+4 : position+8]))
-	partitionsCount := int(binary.LittleEndian.Uint32(payload[position+8 : position+12]))
+	partitionsCount := int(binary.LittleEndian.Uint32(payload[position+4 : position+8]))
+	membersCount := int(binary.LittleEndian.Uint32(payload[position+8 : position+12]))
 	nameLength := int(payload[position+12])
 	name := string(payload[position+13 : position+13+nameLength])
 

@@ -1,8 +1,10 @@
 package tcp_test
 
 import (
+	"math"
+
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 )
 
 var _ = Describe("CREATE TOPIC:", func() {
@@ -14,11 +16,14 @@ var _ = Describe("CREATE TOPIC:", func() {
 			defer deleteStreamAfterTests(streamId, client)
 
 			request := iggcon.CreateTopicRequest{
-				TopicId:         1,
-				StreamId:        iggcon.NewIdentifier(streamId),
-				Name:            createRandomString(32),
-				MessageExpiry:   1000,
-				PartitionsCount: 2,
+				TopicId:              1,
+				StreamId:             iggcon.NewIdentifier(streamId),
+				Name:                 createRandomString(32),
+				MessageExpiry:        1000,
+				PartitionsCount:      2,
+				CompressionAlgorithm: 1,
+				MaxTopicSize:         math.MaxUint64,
+				ReplicationFactor:    1,
 			}
 			err := client.CreateTopic(request)
 
@@ -31,11 +36,14 @@ var _ = Describe("CREATE TOPIC:", func() {
 			streamId := int(createRandomUInt32())
 
 			request := iggcon.CreateTopicRequest{
-				TopicId:         1,
-				StreamId:        iggcon.NewIdentifier(streamId),
-				Name:            createRandomString(32),
-				MessageExpiry:   1000,
-				PartitionsCount: 2,
+				TopicId:              1,
+				StreamId:             iggcon.NewIdentifier(streamId),
+				Name:                 createRandomString(32),
+				MessageExpiry:        1000,
+				PartitionsCount:      2,
+				CompressionAlgorithm: 1,
+				MaxTopicSize:         math.MaxUint64,
+				ReplicationFactor:    1,
 			}
 			err := client.CreateTopic(request)
 
@@ -49,11 +57,14 @@ var _ = Describe("CREATE TOPIC:", func() {
 			_, name := successfullyCreateTopic(streamId, client)
 
 			request := iggcon.CreateTopicRequest{
-				TopicId:         int(createRandomUInt32()),
-				StreamId:        iggcon.NewIdentifier(streamId),
-				Name:            name,
-				MessageExpiry:   0,
-				PartitionsCount: 2,
+				TopicId:              int(createRandomUInt32()),
+				StreamId:             iggcon.NewIdentifier(streamId),
+				Name:                 name,
+				MessageExpiry:        0,
+				PartitionsCount:      2,
+				CompressionAlgorithm: 1,
+				MaxTopicSize:         math.MaxUint64,
+				ReplicationFactor:    1,
 			}
 			err := client.CreateTopic(request)
 			itShouldReturnSpecificError(err, "topic_name_already_exists")
@@ -66,11 +77,14 @@ var _ = Describe("CREATE TOPIC:", func() {
 			topicId, _ := successfullyCreateTopic(streamId, client)
 
 			request := iggcon.CreateTopicRequest{
-				TopicId:         topicId,
-				StreamId:        iggcon.NewIdentifier(streamId),
-				Name:            createRandomString(32),
-				MessageExpiry:   0,
-				PartitionsCount: 2,
+				TopicId:              topicId,
+				StreamId:             iggcon.NewIdentifier(streamId),
+				Name:                 createRandomString(32),
+				MessageExpiry:        0,
+				PartitionsCount:      2,
+				CompressionAlgorithm: 1,
+				MaxTopicSize:         math.MaxUint64,
+				ReplicationFactor:    1,
 			}
 			err := client.CreateTopic(request)
 			itShouldReturnSpecificError(err, "topic_id_already_exists")
@@ -82,11 +96,14 @@ var _ = Describe("CREATE TOPIC:", func() {
 			defer deleteStreamAfterTests(streamId, createAuthorizedConnection())
 
 			request := iggcon.CreateTopicRequest{
-				TopicId:         int(createRandomUInt32()),
-				StreamId:        iggcon.NewIdentifier(streamId),
-				Name:            createRandomString(256),
-				MessageExpiry:   0,
-				PartitionsCount: 2,
+				TopicId:              int(createRandomUInt32()),
+				StreamId:             iggcon.NewIdentifier(streamId),
+				Name:                 createRandomString(256),
+				MessageExpiry:        0,
+				PartitionsCount:      2,
+				CompressionAlgorithm: 1,
+				MaxTopicSize:         math.MaxUint64,
+				ReplicationFactor:    1,
 			}
 			err := client.CreateTopic(request)
 
@@ -98,11 +115,14 @@ var _ = Describe("CREATE TOPIC:", func() {
 		Context("and tries to create topic", func() {
 			client := createConnection()
 			err := client.CreateTopic(iggcon.CreateTopicRequest{
-				TopicId:         1,
-				StreamId:        iggcon.NewIdentifier(10),
-				Name:            "name",
-				MessageExpiry:   0,
-				PartitionsCount: 2,
+				TopicId:              1,
+				StreamId:             iggcon.NewIdentifier(10),
+				Name:                 "name",
+				MessageExpiry:        0,
+				PartitionsCount:      2,
+				CompressionAlgorithm: 1,
+				MaxTopicSize:         math.MaxUint64,
+				ReplicationFactor:    1,
 			})
 
 			itShouldReturnUnauthenticatedError(err)

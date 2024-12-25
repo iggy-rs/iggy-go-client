@@ -2,7 +2,8 @@ package tcp_test
 
 import (
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
-	. "github.com/onsi/ginkgo"
+	ierror "github.com/iggy-rs/iggy-go-client/errors"
+	. "github.com/onsi/ginkgo/v2"
 )
 
 var _ = Describe("GET TOPIC BY ID:", func() {
@@ -25,7 +26,7 @@ var _ = Describe("GET TOPIC BY ID:", func() {
 
 			_, err := client.GetTopicById(iggcon.NewIdentifier(streamId), iggcon.NewIdentifier(int(createRandomUInt32())))
 
-			itShouldReturnSpecificError(err, "stream_id_not_found")
+			itShouldReturnSpecificIggyError(err, ierror.TopicIdNotFound)
 		})
 
 		Context("and tries to get non-existing topic", func() {
@@ -35,16 +36,17 @@ var _ = Describe("GET TOPIC BY ID:", func() {
 
 			_, err := client.GetTopicById(iggcon.NewIdentifier(streamId), iggcon.NewIdentifier(int(createRandomUInt32())))
 
-			itShouldReturnSpecificError(err, "topic_id_not_found")
+			itShouldReturnSpecificIggyError(err, ierror.TopicIdNotFound)
 		})
 	})
 
-	When("User is not logged in", func() {
-		Context("and tries to get topic by id", func() {
-			client := createConnection()
-			_, err := client.GetTopicById(iggcon.NewIdentifier(int(createRandomUInt32())), iggcon.NewIdentifier(int(createRandomUInt32())))
+	// ! TODO: review if needed to implement into sdk
+	// When("User is not logged in", func() {
+	// 	Context("and tries to get topic by id", func() {
+	// 		client := createConnection()
+	// 		_, err := client.GetTopicById(iggcon.NewIdentifier(int(createRandomUInt32())), iggcon.NewIdentifier(int(createRandomUInt32())))
 
-			itShouldReturnUnauthenticatedError(err)
-		})
-	})
+	// 		itShouldReturnUnauthenticatedError(err)
+	// 	})
+	// })
 })

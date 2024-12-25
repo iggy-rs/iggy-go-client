@@ -2,6 +2,7 @@ package iggcon
 
 import (
 	"context"
+	"time"
 )
 
 type IggyMessageCompression string
@@ -19,6 +20,7 @@ type IggyConfiguration struct {
 	BaseAddress        string                 `json:"baseAddress"`
 	Protocol           Protocol               `json:"protocol"`
 	MessageCompression IggyMessageCompression `json:"compression"`
+	HeartbeatInterval  time.Duration          `json:"heartbeatInterval"`
 }
 
 type Protocol string

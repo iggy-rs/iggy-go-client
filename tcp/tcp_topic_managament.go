@@ -22,13 +22,16 @@ func (tms *IggyTcpClient) GetTopicById(streamId Identifier, topicId Identifier) 
 	if err != nil {
 		return nil, err
 	}
+	if len(buffer) == 0 {
+		return nil, ierror.TopicIdNotFound
+	}
 
-	topic, _, err := binaryserialization.DeserializeToTopic(buffer, 0)
+	topic, err := binaryserialization.DeserializeTopic(buffer)
 	if err != nil {
 		return nil, err
 	}
 
-	return &topic, nil
+	return topic, nil
 }
 
 func (tms *IggyTcpClient) CreateTopic(request CreateTopicRequest) error {

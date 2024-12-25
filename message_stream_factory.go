@@ -22,7 +22,12 @@ func (msf *IggyClientFactory) CreateMessageStream(config iggcon.IggyConfiguratio
 	}
 
 	if config.Protocol == iggcon.Tcp {
-		tcpMessageStream, err := tcp.NewTcpMessageStream(config.Context, config.BaseAddress, config.MessageCompression)
+		tcpMessageStream, err := tcp.NewTcpMessageStream(
+			config.Context,
+			config.BaseAddress,
+			config.MessageCompression,
+			config.HeartbeatInterval,
+		)
 		if err != nil {
 			return nil, err
 		}

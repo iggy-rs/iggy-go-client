@@ -44,7 +44,7 @@ func (request *TcpCreateTopicRequest) Serialize() []byte {
 	position++
 
 	// MessageExpiry
-	binary.LittleEndian.PutUint64(bytes[position:], uint64(request.MessageExpiry))
+	binary.LittleEndian.PutUint64(bytes[position:], uint64(request.MessageExpiry.Microseconds()))
 	position += 8
 
 	// MaxTopicSize

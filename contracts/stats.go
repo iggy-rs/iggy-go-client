@@ -3,6 +3,7 @@ package iggcon
 type Stats struct {
 	ProcessId           int     `json:"process_id"`
 	CpuUsage            float32 `json:"cpu_usage"`
+	TotalCpuUsage       float32 `json:"total_cpu_usage"`
 	MemoryUsage         uint64  `json:"memory_usage"`
 	TotalMemory         uint64  `json:"total_memory"`
 	AvailableMemory     uint64  `json:"available_memory"`

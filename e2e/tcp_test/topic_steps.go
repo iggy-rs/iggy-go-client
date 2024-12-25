@@ -1,22 +1,28 @@
 package tcp_test
 
 import (
+	"math"
+	"strconv"
+
 	"github.com/iggy-rs/iggy-go-client"
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
-	. "github.com/onsi/ginkgo"
+	ierror "github.com/iggy-rs/iggy-go-client/errors"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"strconv"
 )
 
 //operations
 
 func successfullyCreateTopic(streamId int, client iggy.MessageStream) (int, string) {
 	request := iggcon.CreateTopicRequest{
-		TopicId:         int(createRandomUInt32()),
-		StreamId:        iggcon.NewIdentifier(streamId),
-		Name:            createRandomString(128),
-		MessageExpiry:   0,
-		PartitionsCount: 2,
+		TopicId:              int(createRandomUInt32()),
+		StreamId:             iggcon.NewIdentifier(streamId),
+		Name:                 createRandomString(128),
+		MessageExpiry:        0,
+		PartitionsCount:      2,
+		CompressionAlgorithm: 1,
+		MaxTopicSize:         math.MaxUint64,
+		ReplicationFactor:    1,
 	}
 	err := client.CreateTopic(request)
 
@@ -66,7 +72,6 @@ func itShouldContainSpecificTopic(id int, name string, topics []iggcon.TopicResp
 
 func itShouldSuccessfullyCreateTopic(streamId int, topicId int, expectedName string, client iggy.MessageStream) {
 	topic, err := client.GetTopicById(iggcon.NewIdentifier(streamId), iggcon.NewIdentifier(topicId))
-
 	It("should create topic with id "+string(rune(topicId)), func() {
 		Expect(topic).NotTo(BeNil())
 		Expect(topic.Id).To(Equal(topicId))
@@ -97,7 +102,7 @@ func itShouldSuccessfullyUpdateTopic(streamId int, topicId int, expectedName str
 func itShouldSuccessfullyDeleteTopic(streamId int, topicId int, client iggy.MessageStream) {
 	topic, err := client.GetTopicById(iggcon.NewIdentifier(streamId), iggcon.NewIdentifier(topicId))
 
-	itShouldReturnSpecificError(err, "topic_id_not_found")
+	itShouldReturnSpecificIggyError(err, ierror.TopicIdNotFound)
 	It("should not return topic", func() {
 		Expect(topic).To(BeNil())
 	})
