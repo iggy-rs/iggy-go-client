@@ -122,14 +122,6 @@ func (tms *IggyTcpClient) sendAndFetchResponse(message []byte, command CommandCo
 			return nil, ierror.MapFromCode(responseCode)
 		}
 
-		// ! TODO: MAY NOT BE NEEDED ANYMORE
-		// // ! TODO: Should handle full support for decoding these messages
-		// // for now still need to read bytes to stop comply with spec
-		// _, _, err := tms.read(length)
-		// if err != nil {
-		// 	return nil, err
-		// }
-
 		return buffer, ierror.MapFromCode(responseCode)
 	}
 

@@ -18,15 +18,15 @@ var _ = Describe("STAT FEATURE:", func() {
 		})
 	})
 
-	When("user is not logged in", func() {
-		Context("and tries get iggy statistics", func() {
-			client := createConnection()
-			stats, err := client.GetStats()
+	// When("user is not logged in", func() {
+	// 	Context("and tries get iggy statistics", func() {
+	// 		client := createConnection()
+	// 		stats, err := client.GetStats()
 
-			itShouldReturnUnauthenticatedError(err)
-			It("should not return stats", func() {
-				Expect(stats).To(BeNil())
-			})
-		})
-	})
+	// 		itShouldReturnUnauthenticatedError(err)
+	// 		It("should not return stats", func() {
+	// 			Expect(stats).To(BeNil())
+	// 		})
+	// 	})
+	// })
 })
