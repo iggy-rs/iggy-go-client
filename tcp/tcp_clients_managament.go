@@ -11,18 +11,7 @@ func (tms *IggyTcpClient) GetClients() ([]ClientResponse, error) {
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	responseBuffer := make([]byte, responseLength)
-	_, err = tms.client.Read(responseBuffer)
-	if err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeClients(responseBuffer)
+	return binaryserialization.DeserializeClients(buffer)
 }
 
 func (tms *IggyTcpClient) GetClientById(clientId int) (*ClientResponse, error) {
@@ -32,16 +21,5 @@ func (tms *IggyTcpClient) GetClientById(clientId int) (*ClientResponse, error) {
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	responseBuffer := make([]byte, responseLength)
-	_, err = tms.client.Read(responseBuffer)
-	if err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeClient(responseBuffer), nil
+	return binaryserialization.DeserializeClient(buffer), nil
 }

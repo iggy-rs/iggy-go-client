@@ -2,7 +2,8 @@ package tcp_test
 
 import (
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
-	. "github.com/onsi/ginkgo"
+	ierror "github.com/iggy-rs/iggy-go-client/errors"
+	. "github.com/onsi/ginkgo/v2"
 )
 
 var _ = Describe("DELETE CONSUMER GROUP:", func() {
@@ -36,7 +37,7 @@ var _ = Describe("DELETE CONSUMER GROUP:", func() {
 				ConsumerGroupId: iggcon.NewIdentifier(groupId),
 			})
 
-			itShouldReturnSpecificError(err, "consumer_group_not_found")
+			itShouldReturnSpecificIggyError(err, ierror.ConsumerGroupIdNotFound)
 		})
 
 		Context("and tries to delete consumer non-existing topic", func() {

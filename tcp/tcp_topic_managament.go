@@ -1,7 +1,7 @@
 package tcp
 
 import (
-	"github.com/iggy-rs/iggy-go-client/binary_serialization"
+	binaryserialization "github.com/iggy-rs/iggy-go-client/binary_serialization"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
 	ierror "github.com/iggy-rs/iggy-go-client/errors"
 )
@@ -13,18 +13,7 @@ func (tms *IggyTcpClient) GetTopics(streamId Identifier) ([]TopicResponse, error
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	responseBuffer := make([]byte, responseLength)
-	_, err = tms.client.Read(responseBuffer)
-	if err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeTopics(responseBuffer)
+	return binaryserialization.DeserializeTopics(buffer)
 }
 
 func (tms *IggyTcpClient) GetTopicById(streamId Identifier, topicId Identifier) (*TopicResponse, error) {
@@ -33,18 +22,16 @@ func (tms *IggyTcpClient) GetTopicById(streamId Identifier, topicId Identifier) 
 	if err != nil {
 		return nil, err
 	}
+	if len(buffer) == 0 {
+		return nil, ierror.TopicIdNotFound
+	}
 
-	responseLength, err := getResponseLength(buffer)
+	topic, err := binaryserialization.DeserializeTopic(buffer)
 	if err != nil {
 		return nil, err
 	}
 
-	responseBuffer := make([]byte, responseLength)
-	if _, err := tms.client.Read(responseBuffer); err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeTopic(responseBuffer)
+	return topic, nil
 }
 
 func (tms *IggyTcpClient) CreateTopic(request CreateTopicRequest) error {

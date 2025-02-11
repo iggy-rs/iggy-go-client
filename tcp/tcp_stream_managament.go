@@ -1,7 +1,7 @@
 package tcp
 
 import (
-	"github.com/iggy-rs/iggy-go-client/binary_serialization"
+	binaryserialization "github.com/iggy-rs/iggy-go-client/binary_serialization"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
 	ierror "github.com/iggy-rs/iggy-go-client/errors"
 )
@@ -12,18 +12,7 @@ func (tms *IggyTcpClient) GetStreams() ([]StreamResponse, error) {
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	responseBuffer := make([]byte, responseLength)
-	_, err = tms.client.Read(responseBuffer)
-	if err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeStreams(responseBuffer), nil
+	return binaryserialization.DeserializeStreams(buffer), nil
 }
 
 func (tms *IggyTcpClient) GetStreamById(request GetStreamRequest) (*StreamResponse, error) {
@@ -32,19 +21,12 @@ func (tms *IggyTcpClient) GetStreamById(request GetStreamRequest) (*StreamRespon
 	if err != nil {
 		return nil, err
 	}
-
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
+	if len(buffer) == 0 {
+		return nil, ierror.StreamIdNotFound
 	}
 
-	responseBuffer := make([]byte, responseLength)
-	_, err = tms.client.Read(responseBuffer)
-	if err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializerStream(responseBuffer), nil
+	stream, _ := binaryserialization.DeserializeToStream(buffer, 0)
+	return &stream, nil
 }
 
 func (tms *IggyTcpClient) CreateStream(request CreateStreamRequest) error {

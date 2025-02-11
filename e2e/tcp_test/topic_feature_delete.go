@@ -2,7 +2,8 @@ package tcp_test
 
 import (
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
-	. "github.com/onsi/ginkgo"
+	ierror "github.com/iggy-rs/iggy-go-client/errors"
+	. "github.com/onsi/ginkgo/v2"
 )
 
 var _ = Describe("DELETE TOPIC:", func() {
@@ -27,7 +28,7 @@ var _ = Describe("DELETE TOPIC:", func() {
 
 			err := client.DeleteTopic(iggcon.NewIdentifier(streamId), iggcon.NewIdentifier(topicId))
 
-			itShouldReturnSpecificError(err, "topic_id_not_found")
+			itShouldReturnSpecificIggyError(err, ierror.TopicIdNotFound)
 		})
 
 		Context("and tries to delete non-existing topic and stream", func() {
@@ -37,7 +38,7 @@ var _ = Describe("DELETE TOPIC:", func() {
 
 			err := client.DeleteTopic(iggcon.NewIdentifier(streamId), iggcon.NewIdentifier(topicId))
 
-			itShouldReturnSpecificError(err, "stream_id_not_found")
+			itShouldReturnSpecificIggyError(err, ierror.StreamIdNotFound)
 		})
 	})
 

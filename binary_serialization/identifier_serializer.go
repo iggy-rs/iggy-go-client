@@ -1,7 +1,10 @@
 package binaryserialization
 
-import "encoding/binary"
-import iggcon "github.com/iggy-rs/iggy-go-client/contracts"
+import (
+	"encoding/binary"
+
+	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
+)
 
 const (
 	idKindOffset    = 0

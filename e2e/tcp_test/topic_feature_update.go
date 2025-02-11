@@ -1,8 +1,10 @@
 package tcp_test
 
 import (
+	"math"
+
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 )
 
 var _ = Describe("UPDATE TOPIC:", func() {
@@ -15,10 +17,13 @@ var _ = Describe("UPDATE TOPIC:", func() {
 			topicId, _ := successfullyCreateTopic(streamId, client)
 			newName := createRandomString(128)
 			request := iggcon.UpdateTopicRequest{
-				TopicId:       iggcon.NewIdentifier(topicId),
-				StreamId:      iggcon.NewIdentifier(streamId),
-				Name:          newName,
-				MessageExpiry: 0,
+				TopicId:              iggcon.NewIdentifier(topicId),
+				StreamId:             iggcon.NewIdentifier(streamId),
+				Name:                 newName,
+				MessageExpiry:        1,
+				CompressionAlgorithm: 1,
+				MaxTopicSize:         math.MaxUint64,
+				ReplicationFactor:    1,
 			}
 			err := client.UpdateTopic(request)
 			itShouldNotReturnError(err)
@@ -33,10 +38,13 @@ var _ = Describe("UPDATE TOPIC:", func() {
 			topic2Id, _ := successfullyCreateTopic(streamId, client)
 
 			request := iggcon.UpdateTopicRequest{
-				TopicId:       iggcon.NewIdentifier(topic2Id),
-				StreamId:      iggcon.NewIdentifier(streamId),
-				Name:          topic1Name,
-				MessageExpiry: 0,
+				TopicId:              iggcon.NewIdentifier(topic2Id),
+				StreamId:             iggcon.NewIdentifier(streamId),
+				Name:                 topic1Name,
+				MessageExpiry:        0,
+				CompressionAlgorithm: 1,
+				MaxTopicSize:         math.MaxUint64,
+				ReplicationFactor:    1,
 			}
 			err := client.UpdateTopic(request)
 
@@ -48,10 +56,13 @@ var _ = Describe("UPDATE TOPIC:", func() {
 			streamId := int(createRandomUInt32())
 			topicId := int(createRandomUInt32())
 			request := iggcon.UpdateTopicRequest{
-				TopicId:       iggcon.NewIdentifier(topicId),
-				StreamId:      iggcon.NewIdentifier(streamId),
-				Name:          createRandomString(128),
-				MessageExpiry: 0,
+				TopicId:              iggcon.NewIdentifier(topicId),
+				StreamId:             iggcon.NewIdentifier(streamId),
+				Name:                 createRandomString(128),
+				MessageExpiry:        0,
+				CompressionAlgorithm: 1,
+				MaxTopicSize:         math.MaxUint64,
+				ReplicationFactor:    1,
 			}
 			err := client.UpdateTopic(request)
 
@@ -64,10 +75,13 @@ var _ = Describe("UPDATE TOPIC:", func() {
 			defer deleteStreamAfterTests(streamId, createAuthorizedConnection())
 			topicId := int(createRandomUInt32())
 			request := iggcon.UpdateTopicRequest{
-				TopicId:       iggcon.NewIdentifier(topicId),
-				StreamId:      iggcon.NewIdentifier(streamId),
-				Name:          createRandomString(128),
-				MessageExpiry: 0,
+				TopicId:              iggcon.NewIdentifier(topicId),
+				StreamId:             iggcon.NewIdentifier(streamId),
+				Name:                 createRandomString(128),
+				MessageExpiry:        0,
+				CompressionAlgorithm: 1,
+				MaxTopicSize:         math.MaxUint64,
+				ReplicationFactor:    1,
 			}
 			err := client.UpdateTopic(request)
 
@@ -80,10 +94,13 @@ var _ = Describe("UPDATE TOPIC:", func() {
 			defer deleteStreamAfterTests(streamId, createAuthorizedConnection())
 			topicId, _ := successfullyCreateTopic(streamId, client)
 			request := iggcon.UpdateTopicRequest{
-				TopicId:       iggcon.NewIdentifier(topicId),
-				StreamId:      iggcon.NewIdentifier(streamId),
-				Name:          createRandomString(256),
-				MessageExpiry: 0,
+				TopicId:              iggcon.NewIdentifier(topicId),
+				StreamId:             iggcon.NewIdentifier(streamId),
+				Name:                 createRandomString(256),
+				MessageExpiry:        0,
+				CompressionAlgorithm: 1,
+				MaxTopicSize:         math.MaxUint64,
+				ReplicationFactor:    1,
 			}
 
 			err := client.UpdateTopic(request)

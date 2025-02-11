@@ -1,15 +1,21 @@
 package tcp
 
 import (
+	"context"
 	"encoding/binary"
 	"net"
+	"sync"
+	"time"
 
 	. "github.com/iggy-rs/iggy-go-client/contracts"
+	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
 	ierror "github.com/iggy-rs/iggy-go-client/errors"
 )
 
 type IggyTcpClient struct {
-	client *net.TCPConn
+	client             *net.TCPConn
+	mtx                sync.Mutex
+	MessageCompression iggcon.IggyMessageCompression
 }
 
 const (
@@ -18,39 +24,114 @@ const (
 	MaxStringLength      = 255
 )
 
-func NewTcpMessageStream(url string) (*IggyTcpClient, error) {
+func NewTcpMessageStream(
+	ctx context.Context,
+	url string,
+	compression iggcon.IggyMessageCompression,
+	heartbeatInterval time.Duration,
+) (*IggyTcpClient, error) {
 	addr, err := net.ResolveTCPAddr("tcp", url)
 	if err != nil {
 		return nil, err
 	}
 
-	conn, err := net.DialTCP("tcp", nil, addr)
+	var d = net.Dialer{
+		KeepAlive: -1,
+	}
+	conn, err := d.DialContext(ctx, "tcp", addr.String())
 	if err != nil {
 		return nil, err
 	}
 
-	err = conn.SetKeepAlive(true)
-	if err != nil {
-		return nil, err
+	client := &IggyTcpClient{client: conn.(*net.TCPConn), MessageCompression: compression}
+
+	if heartbeatInterval > 0 {
+		go func() {
+			ticker := time.NewTicker(heartbeatInterval)
+			defer ticker.Stop()
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case <-ticker.C:
+					client.Ping()
+				}
+			}
+		}()
 	}
 
-	return &IggyTcpClient{client: conn}, nil
+	return client, nil
+}
+
+func (tms *IggyTcpClient) read(expectedSize int) (int, []byte, error) {
+	var totalRead int
+	buffer := make([]byte, expectedSize)
+
+	for totalRead < expectedSize {
+		readSize := expectedSize - totalRead
+		n, err := tms.client.Read(buffer[totalRead : totalRead+readSize])
+		if err != nil {
+			return totalRead, buffer[:totalRead], err
+		}
+		totalRead += n
+	}
+
+	return totalRead, buffer, nil
+}
+
+func (tms *IggyTcpClient) write(payload []byte) (int, error) {
+	var totalWritten int
+	for totalWritten < len(payload) {
+		n, err := tms.client.Write(payload[totalWritten:])
+		if err != nil {
+			return totalWritten, err
+		}
+		totalWritten += n
+	}
+
+	return totalWritten, nil
 }
 
 func (tms *IggyTcpClient) sendAndFetchResponse(message []byte, command CommandCode) ([]byte, error) {
+	tms.mtx.Lock()
+	defer tms.mtx.Unlock()
+
 	payload := createPayload(message, command)
-
-	if _, err := tms.client.Write(payload); err != nil {
+	if _, err := tms.write(payload); err != nil {
 		return nil, err
 	}
 
-	buffer := make([]byte, ExpectedResponseSize)
-	if _, err := tms.client.Read(buffer); err != nil {
+	_, buffer, err := tms.read(ExpectedResponseSize)
+	if err != nil {
 		return nil, err
 	}
 
+	length := int(binary.LittleEndian.Uint32(buffer[4:]))
 	if responseCode := getResponseCode(buffer); responseCode != 0 {
-		return nil, ierror.MapFromCode(responseCode)
+		// TEMP: See https://github.com/iggy-rs/iggy/pull/604 for context.
+		// from: https://github.com/iggy-rs/iggy/blob/master/sdk/src/tcp/client.rs#L326
+		if responseCode == 2012 ||
+			responseCode == 2013 ||
+			responseCode == 1011 ||
+			responseCode == 1012 ||
+			responseCode == 46 ||
+			responseCode == 51 ||
+			responseCode == 5001 ||
+			responseCode == 5004 {
+		} else {
+			return nil, ierror.MapFromCode(responseCode)
+		}
+
+		return buffer, ierror.MapFromCode(responseCode)
+	}
+
+	if length <= 1 {
+		return []byte{}, nil
+	}
+
+	_, buffer, err = tms.read(length)
+	if err != nil {
+		return nil, err
 	}
 
 	return buffer, nil

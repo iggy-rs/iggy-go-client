@@ -1,49 +1,32 @@
 package tcp
 
 import (
-	"github.com/iggy-rs/iggy-go-client/binary_serialization"
+	binaryserialization "github.com/iggy-rs/iggy-go-client/binary_serialization"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
 	ierror "github.com/iggy-rs/iggy-go-client/errors"
 )
 
-func (tms *IggyTcpClient) GetConsumerGroups(streamId Identifier, topicId Identifier) ([]ConsumerGroupResponse, error) {
+func (tms *IggyTcpClient) GetConsumerGroups(streamId, topicId Identifier) ([]ConsumerGroupResponse, error) {
 	message := binaryserialization.SerializeIdentifiers(streamId, topicId)
 	buffer, err := tms.sendAndFetchResponse(message, GetGroupsCode)
 	if err != nil {
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	responseBuffer := make([]byte, responseLength)
-	if _, err := tms.client.Read(responseBuffer); err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeConsumerGroups(responseBuffer), err
+	return binaryserialization.DeserializeConsumerGroups(buffer), err
 }
 
-func (tms *IggyTcpClient) GetConsumerGroupById(streamId Identifier, topicId Identifier, groupId Identifier) (*ConsumerGroupResponse, error) {
+func (tms *IggyTcpClient) GetConsumerGroupById(streamId, topicId, groupId Identifier) (*ConsumerGroupResponse, error) {
 	message := binaryserialization.SerializeIdentifiers(streamId, topicId, groupId)
 	buffer, err := tms.sendAndFetchResponse(message, GetGroupCode)
 	if err != nil {
 		return nil, err
 	}
-
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
+	if len(buffer) == 0 {
+		return nil, ierror.ConsumerGroupIdNotFound
 	}
 
-	responseBuffer := make([]byte, responseLength)
-	if _, err := tms.client.Read(responseBuffer); err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeConsumerGroup(responseBuffer)
+	return binaryserialization.DeserializeConsumerGroup(buffer)
 }
 
 func (tms *IggyTcpClient) CreateConsumerGroup(request CreateConsumerGroupRequest) error {

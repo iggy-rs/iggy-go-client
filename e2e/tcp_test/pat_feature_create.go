@@ -2,7 +2,7 @@ package tcp_test
 
 import (
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 )
 
 var _ = Describe("CREATE PAT:", func() {
@@ -14,11 +14,11 @@ var _ = Describe("CREATE PAT:", func() {
 				Expiry: 0,
 			}
 
-			_, err := client.CreateAccessToken(request)
+			response, err := client.CreateAccessToken(request)
 
 			itShouldNotReturnError(err)
 			itShouldSuccessfullyCreateAccessToken(request.Name, client)
-			//itShouldBePossibleToLogInWithAccessToken(response.Token)
+			itShouldBePossibleToLogInWithAccessToken(response.Token)
 		})
 	})
 

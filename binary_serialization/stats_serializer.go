@@ -2,7 +2,7 @@ package binaryserialization
 
 import (
 	"encoding/binary"
-	"unsafe"
+	"math"
 
 	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
 )
@@ -15,28 +15,28 @@ type TcpStats struct {
 const (
 	processIDPos           = 0
 	cpuUsagePos            = 4
-	memoryUsagePos         = 8
-	totalMemoryPos         = 16
-	availableMemoryPos     = 24
-	runTimePos             = 32
-	startTimePos           = 40
-	readBytesPos           = 48
-	writtenBytesPos        = 56
-	messagesSizeBytesPos   = 64
-	streamsCountPos        = 72
-	topicsCountPos         = 76
-	partitionsCountPos     = 80
-	segmentsCountPos       = 84
-	messagesCountPos       = 88
-	clientsCountPos        = 96
-	consumerGroupsCountPos = 100
+	totalCpuUsagePos       = 8
+	memoryUsagePos         = 12
+	totalMemoryPos         = 20
+	availableMemoryPos     = 28
+	runTimePos             = 36
+	startTimePos           = 44
+	readBytesPos           = 52
+	writtenBytesPos        = 60
+	messagesSizeBytesPos   = 68
+	streamsCountPos        = 76
+	topicsCountPos         = 80
+	partitionsCountPos     = 84
+	segmentsCountPos       = 88
+	messagesCountPos       = 92
+	clientsCountPos        = 100
+	consumerGroupsCountPos = 104
 )
 
-// Deserialize deserializes a byte slice into a TcpStats structure.
-// It populates the TcpStats fields by interpreting data from the payload byte slice.
 func (stats *TcpStats) Deserialize(payload []byte) error {
 	stats.ProcessId = int(binary.LittleEndian.Uint32(payload[processIDPos : processIDPos+4]))
-	stats.CpuUsage = *(*float32)(unsafe.Pointer(&payload[cpuUsagePos]))
+	stats.CpuUsage = math.Float32frombits(binary.LittleEndian.Uint32(payload[cpuUsagePos : cpuUsagePos+4]))
+	stats.TotalCpuUsage = math.Float32frombits(binary.LittleEndian.Uint32(payload[totalCpuUsagePos : totalCpuUsagePos+4]))
 	stats.MemoryUsage = binary.LittleEndian.Uint64(payload[memoryUsagePos : memoryUsagePos+8])
 	stats.TotalMemory = binary.LittleEndian.Uint64(payload[totalMemoryPos : totalMemoryPos+8])
 	stats.AvailableMemory = binary.LittleEndian.Uint64(payload[availableMemoryPos : availableMemoryPos+8])

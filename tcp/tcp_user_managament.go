@@ -3,6 +3,7 @@ package tcp
 import (
 	binaryserialization "github.com/iggy-rs/iggy-go-client/binary_serialization"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
+	ierror "github.com/iggy-rs/iggy-go-client/errors"
 )
 
 func (tms *IggyTcpClient) GetUser(identifier Identifier) (*UserResponse, error) {
@@ -11,19 +12,11 @@ func (tms *IggyTcpClient) GetUser(identifier Identifier) (*UserResponse, error) 
 	if err != nil {
 		return nil, err
 	}
-
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
+	if len(buffer) == 0 {
+		return nil, ierror.ResourceNotFound
 	}
 
-	responseBuffer := make([]byte, responseLength)
-	_, err = tms.client.Read(responseBuffer)
-	if err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeUser(responseBuffer)
+	return binaryserialization.DeserializeUser(buffer)
 }
 
 func (tms *IggyTcpClient) GetUsers() ([]*UserResponse, error) {
@@ -32,18 +25,7 @@ func (tms *IggyTcpClient) GetUsers() ([]*UserResponse, error) {
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	responseBuffer := make([]byte, responseLength)
-	_, err = tms.client.Read(responseBuffer)
-	if err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeUsers(responseBuffer)
+	return binaryserialization.DeserializeUsers(buffer)
 }
 
 func (tms *IggyTcpClient) CreateUser(request CreateUserRequest) error {

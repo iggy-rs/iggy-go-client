@@ -1,8 +1,9 @@
 package binaryserialization
 
 import (
-	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
 	"testing"
+
+	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
 )
 
 func TestSerializeIdentifier_StringId(t *testing.T) {

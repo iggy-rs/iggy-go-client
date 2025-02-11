@@ -1,7 +1,7 @@
 package tcp
 
 import (
-	"github.com/iggy-rs/iggy-go-client/binary_serialization"
+	binaryserialization "github.com/iggy-rs/iggy-go-client/binary_serialization"
 	. "github.com/iggy-rs/iggy-go-client/contracts"
 )
 
@@ -12,17 +12,7 @@ func (tms *IggyTcpClient) GetOffset(request GetOffsetRequest) (*OffsetResponse, 
 		return nil, err
 	}
 
-	responseLength, err := getResponseLength(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	responseBuffer := make([]byte, responseLength)
-	if _, err := tms.client.Read(responseBuffer); err != nil {
-		return nil, err
-	}
-
-	return binaryserialization.DeserializeOffset(responseBuffer), nil
+	return binaryserialization.DeserializeOffset(buffer), nil
 }
 
 func (tms *IggyTcpClient) StoreOffset(request StoreOffsetRequest) error {

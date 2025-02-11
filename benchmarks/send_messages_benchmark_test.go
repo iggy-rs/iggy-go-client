@@ -2,13 +2,14 @@ package benchmarks
 
 import (
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/iggy-rs/iggy-go-client"
-	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
 	"math/rand"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/iggy-rs/iggy-go-client"
+	iggcon "github.com/iggy-rs/iggy-go-client/contracts"
 )
 
 const (

@@ -95,7 +95,7 @@ func ConsumeMessages(messageStream MessageStream) error {
 			Count:           1,
 			StreamId:        NewIdentifier(DefaultStreamId),
 			TopicId:         NewIdentifier(TopicId),
-			Consumer:        Consumer{Kind: ConsumerSingle, Id: ConsumerId},
+			Consumer:        Consumer{Kind: ConsumerSingle, Id: NewIdentifier(ConsumerId)},
 			PartitionId:     Partition,
 			PollingStrategy: NextPollingStrategy(),
 			AutoCommit:      true,
