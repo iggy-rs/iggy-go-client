@@ -103,10 +103,11 @@ func ensureInfrastructureIsInitialized(messageStream iggy.MessageStream, streamI
 	}
 	if _, topicErr := messageStream.GetTopicById(iggcon.NewIdentifier(streamId), iggcon.NewIdentifier(1)); topicErr != nil {
 		topicErr = messageStream.CreateTopic(iggcon.CreateTopicRequest{
-			TopicId:         1,
-			Name:            "benchmark",
-			PartitionsCount: 1,
-			StreamId:        iggcon.NewIdentifier(streamId),
+			TopicId:              1,
+			Name:                 "benchmark",
+			PartitionsCount:      1,
+			StreamId:             iggcon.NewIdentifier(streamId),
+			CompressionAlgorithm: 1,
 		})
 
 		if topicErr != nil {
