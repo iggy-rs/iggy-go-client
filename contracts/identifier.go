@@ -17,6 +17,10 @@ func NewIdentifier(id any) Identifier {
 	var kind IdKind
 	var length int
 
+	if id == "" {
+		panic("Id must be defined")
+	}
+
 	switch v := id.(type) {
 	case int:
 		kind = NumericId
